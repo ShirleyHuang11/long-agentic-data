@@ -204,14 +204,14 @@ class SparseHolographicTransformer(nn.Module):
 
 class GatedHolographicNetwork(nn.Module):
     """
-    基于动态门控机制（LSTM）的序列模型
-    用于解决 Transformer 在高深度全息数据上的“注意力饱和”问题
+    Sequence model based on dynamic gating mechanism (LSTM)
+    Used to solve the "attention saturation" problem of Transformers on high-depth holographic data
     """
     def __init__(
         self, 
         num_nodes: int = 16, 
         d_model: int = 128, 
-        num_layers: int = 4,   # 维持一定的物理深度以支持多跳逻辑
+        num_layers: int = 4,   # Maintain sufficient physical depth to support multi-hop reasoning
         pad_id: int = 0,
         dropout: float = 0.1
     ):
@@ -219,11 +219,11 @@ class GatedHolographicNetwork(nn.Module):
         self.num_nodes = num_nodes
         self.pad_id = pad_id
         
-        # 词嵌入层（循环神经网络天然具有顺序性，无需显式的位置编码）
+        # Token embedding layer (RNNs naturally have sequential order, no explicit positional encoding needed)
         self.embedding = nn.Embedding(num_nodes, d_model, padding_idx=pad_id)
         
-        # 核心：使用多层 LSTM 引入动态门控机制 (Dynamic Gating)
-        # 遗忘门 (Forget Gate) 会帮助截断无用信息，避免注意力饱和
+        # Core: use multi-layer LSTM to introduce dynamic gating mechanism (Dynamic Gating)
+        # Forget Gate helps truncate useless information and avoid attention saturation
         self.lstm = nn.LSTM(
             input_size=d_model,
             hidden_size=d_model,
@@ -243,14 +243,123 @@ class GatedHolographicNetwork(nn.Module):
         # [batch, seq_len, d_model]
         x_embed = self.embedding(x)
         
-        # LSTM 前向传播，自动处理时间序列的显式记忆与遗忘
-        # out 包含所有时间步的顶层隐藏状态，(h_n, c_n) 为最后一步的状态
+        # LSTM forward pass, automatically handles explicit memory and forgetting in time series
+        # out contains all timesteps' top-layer hidden states, (h_n, c_n) is the final timestep state
         out, (h_n, c_n) = self.lstm(x_embed)
         
-        # 取最后一个时间步的输出进行预测
+        # Take the last timestep output for prediction
         last_hidden_state = out[:, -1, :]
         last_hidden_state = self.final_norm(last_hidden_state)
         
         logits = self.fc_out(last_hidden_state)
         return logits
-    
+
+class SimplifiedSelectiveSSM(nn.Module):
+    """
+    Minimal PyTorch implementation of Mamba (Selective State Space Model) core layer.
+    Implements input-dependent sequence state tracking through dynamic gating (delta, B, C).
+    """
+    def __init__(self, d_model, d_state=16):
+        super().__init__()
+        self.d_model = d_model
+        self.d_state = d_state
+        
+        # State transition matrix A (in Mamba usually fixed or slowly varying)
+        # For simplicity, we make it learnable here
+        self.A = nn.Parameter(torch.randn(d_model, d_state) * 0.1)
+        
+        # Input-dependent projections (core of Selective Mechanism)
+        self.proj_B = nn.Linear(d_model, d_state)
+        self.proj_C = nn.Linear(d_model, d_state)
+        self.proj_delta = nn.Linear(d_model, d_model)
+        
+        # Output mixing projection
+        self.out_proj = nn.Linear(d_model, d_model)
+        
+    def forward(self, x):
+        B_batch, L, D = x.shape
+        
+        # 1. Compute input-dependent parameters (Selective Gating)
+        # Softplus ensures timestep delta is positive
+        delta = F.softplus(self.proj_delta(x)) # [Batch, L, d_model]
+        mat_B = self.proj_B(x)                 # [Batch, L, d_state]
+        mat_C = self.proj_C(x)                 # [Batch, L, d_state]
+        
+        # Initialize hidden state
+        h = torch.zeros(B_batch, D, self.d_state, device=x.device)
+        outputs = []
+        
+        # 2. Discretization of continuous state space and recurrence (RNN-like unfolding)
+        # Note: pure PyTorch loops are slower on long sequences, but sufficient for validating theoretical logic
+        for t in range(L):
+            dt = delta[:, t, :].unsqueeze(-1)          # [Batch, d_model, 1]
+            
+            # Discretize A and B (using simplified exponential approximation here)
+            A_bar = torch.exp(-dt * torch.exp(self.A.unsqueeze(0))) # [Batch, d_model, d_state]
+            B_bar = dt * mat_B[:, t, :].unsqueeze(1)                # [Batch, d_model, d_state]
+            
+            x_t = x[:, t, :].unsqueeze(-1)             # [Batch, d_model, 1]
+            
+            # State update equation: h_t = A_bar * h_{t-1} + B_bar * x_t
+            h = A_bar * h + B_bar * x_t                # [Batch, d_model, d_state]
+            
+            # Output equation: y_t = C_t * h_t
+            C_t = mat_C[:, t, :].unsqueeze(1)          # [Batch, 1, d_state]
+            y_t = torch.sum(h * C_t, dim=-1)           # [Batch, d_model]
+            
+            outputs.append(y_t)
+            
+        y = torch.stack(outputs, dim=1) # [Batch, L, d_model]
+        return self.out_proj(y)
+
+
+class SSMBlock(nn.Module):
+    """Standard SSM block with normalization and feedforward network"""
+    def __init__(self, d_model, d_state=16, dropout=0.1):
+        super().__init__()
+        self.norm1 = nn.LayerNorm(d_model)
+        self.ssm = SimplifiedSelectiveSSM(d_model, d_state)
+        self.norm2 = nn.LayerNorm(d_model)
+        self.ffn = nn.Sequential(
+            nn.Linear(d_model, d_model * 2),
+            nn.SiLU(), # Mamba prefers SiLU/Swish
+            nn.Linear(d_model * 2, d_model),
+            nn.Dropout(dropout)
+        )
+        
+    def forward(self, x):
+        # Similar to Transformer's Pre-LN structure
+        x = x + self.ssm(self.norm1(x))
+        x = x + self.ffn(self.norm2(x))
+        return x
+
+
+class HolographicMamba(nn.Module):
+    """
+    Holographic reasoning network based on Selective State Space Model (SSM)
+    Completely abandons the Attention mechanism
+    """
+    def __init__(self, num_nodes=16, d_model=64, d_state=16, num_layers=6):
+        super().__init__()
+        self.num_nodes = num_nodes
+        self.embedding = nn.Embedding(num_nodes, d_model)
+        
+        # Stack SSM blocks
+        self.layers = nn.ModuleList([
+            SSMBlock(d_model, d_state) for _ in range(num_layers)
+        ])
+        
+        self.final_norm = nn.LayerNorm(d_model)
+        self.fc_out = nn.Linear(d_model, num_nodes)
+
+    def forward(self, x):
+        # Note: SSM is inherently a directional sequence model, no Positional Embedding needed
+        out = self.embedding(x)
+        
+        for layer in self.layers:
+            out = layer(out)
+            
+        out = self.final_norm(out)
+        
+        # Use the last token's hidden state for prediction
+        return self.fc_out(out[:, -1, :])

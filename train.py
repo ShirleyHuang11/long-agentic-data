@@ -6,7 +6,13 @@ import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from data.pointer import HolographicPointerDataset
-from model import HolographicTransformer, SparseHolographicTransformer
+from model import (
+    HolographicTransformer, 
+    # SparseHolographicTransformer,  # Commented out for ablation study
+    GatedHolographicNetwork,
+    HolographicMamba
+)
+from utils import ocean_serenity, watermelon_sorbet
 
 def train_holographic_experiment_deep(num_nodes=16, path_depths=[8, 32, 128]):
     """
@@ -86,20 +92,8 @@ def train_holographic_experiment_deep(num_nodes=16, path_depths=[8, 32, 128]):
     # 4. Plot analysis chart
     plt.figure(figsize=(10, 6))
     
-    # Define the palette by hex codes
-    ocean_serenity = [
-        "#03045e",
-        "#023e8a",
-        "#0077b6",
-        "#0096c7",
-        "#00b4d8",
-        "#48cae4",
-        "#90e0ef",
-        "#ade8f4",
-        "#caf0f8"
-    ][::-2]
-
-    sns.set_palette(ocean_serenity)
+    # Use palette from utils (every other color for cleaner look)
+    sns.set_palette(ocean_serenity[::-2])
     
     for depth, loss_vals in results.items():
         plt.plot(loss_vals, label=f'Depth (k) = {depth}', linewidth=2)
@@ -154,8 +148,8 @@ def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=50):
     """
     Ablation study comparing multiple model variants:
     1. Standard Transformer (deep, narrow)
-    2. Sparse Transformer (Top-K attention)
-    3. Sparse Transformer (different top_k values)
+    2. LSTM-based Gated Network
+    3. Mamba (SSM-based)
     """
     # Automatically select device
     if torch.cuda.is_available():
@@ -180,41 +174,61 @@ def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=50):
             ).to(device)
         },
         {
-            "name": "Sparse Transformer (top_k=2)",
-            "model_fn": lambda: SparseHolographicTransformer(
+            "name": "LSTM Gated Network (4 layers)",
+            "model_fn": lambda: GatedHolographicNetwork(
                 num_nodes=num_nodes,
-                d_model=32,
-                nhead=4,
-                dim_feedforward=64,
-                num_layers=16,
-                max_seq_len=300,
-                top_k=2
+                d_model=128,
+                num_layers=4,
+                pad_id=0,
+                dropout=0.1
             ).to(device)
         },
         {
-            "name": "Sparse Transformer (top_k=4)",
-            "model_fn": lambda: SparseHolographicTransformer(
+            "name": "Mamba (SSM, 6 layers)",
+            "model_fn": lambda: HolographicMamba(
                 num_nodes=num_nodes,
-                d_model=32,
-                nhead=4,
-                dim_feedforward=64,
-                num_layers=16,
-                max_seq_len=300,
-                top_k=4
+                d_model=64,
+                d_state=16,
+                num_layers=6
             ).to(device)
         },
-        {
-            "name": "Sparse Transformer (top_k=8)",
-            "model_fn": lambda: SparseHolographicTransformer(
-                num_nodes=num_nodes,
-                d_model=32,
-                nhead=4,
-                dim_feedforward=64,
-                num_layers=16,
-                max_seq_len=300,
-                top_k=8
-            ).to(device)
-        },
+        # Sparse Transformer variants commented out for this ablation study
+        # {
+        #     "name": "Sparse Transformer (top_k=2)",
+        #     "model_fn": lambda: SparseHolographicTransformer(
+        #         num_nodes=num_nodes,
+        #         d_model=32,
+        #         nhead=4,
+        #         dim_feedforward=64,
+        #         num_layers=16,
+        #         max_seq_len=300,
+        #         top_k=2
+        #     ).to(device)
+        # },
+        # {
+        #     "name": "Sparse Transformer (top_k=4)",
+        #     "model_fn": lambda: SparseHolographicTransformer(
+        #         num_nodes=num_nodes,
+        #         d_model=32,
+        #         nhead=4,
+        #         dim_feedforward=64,
+        #         num_layers=16,
+        #         max_seq_len=300,
+        #         top_k=4
+        #     ).to(device)
+        # },
+        # {
+        #     "name": "Sparse Transformer (top_k=8)",
+        #     "model_fn": lambda: SparseHolographicTransformer(
+        #         num_nodes=num_nodes,
+        #         d_model=32,
+        #         nhead=4,
+        #         dim_feedforward=64,
+        #         num_layers=16,
+        #         max_seq_len=300,
+        #         top_k=8
+        #     ).to(device)
+        # },
     ]
     
     all_results = {}  # {depth: {model_name: [losses]}}
@@ -284,12 +298,6 @@ def print_summary_table(all_results, path_depths):
 
 def plot_ablation_results(all_results, path_depths):
     """Plot ablation study results comparing all model variants"""
-    # Define color palette
-    ocean_serenity = [
-        "#03045e", "#023e8a", "#0077b6", "#0096c7",
-        "#00b4d8", "#48cae4", "#90e0ef", "#ade8f4", "#caf0f8"
-    ]
-    
     # Create subplots for each depth
     fig, axes = plt.subplots(1, len(path_depths), figsize=(6*len(path_depths), 5))
     if len(path_depths) == 1:
@@ -300,7 +308,7 @@ def plot_ablation_results(all_results, path_depths):
         depth_results = all_results[depth]
         
         for i, (model_name, losses) in enumerate(depth_results.items()):
-            color = ocean_serenity[i % len(ocean_serenity)]
+            color = watermelon_sorbet[i % len(watermelon_sorbet)]
             ax.plot(losses, label=model_name, linewidth=2, color=color)
         
         ax.set_xlabel('Epochs', fontsize=12)
@@ -320,7 +328,7 @@ def plot_ablation_results(all_results, path_depths):
     
     model_names = list(all_results[path_depths[0]].keys())
     for i, model_name in enumerate(model_names):
-        color = ocean_serenity[i % len(ocean_serenity)]
+        color = watermelon_sorbet[i % len(watermelon_sorbet)]
         for depth in path_depths:
             losses = all_results[depth][model_name]
             ax.plot(
