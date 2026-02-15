@@ -108,11 +108,56 @@ def train_holographic_experiment_deep(num_nodes=16, path_depths=[8, 32, 128]):
     plt.show()
 
 
-def train_single_model(model, loader, device, epochs=50, lr=2e-3, model_name="Model", depth=None):
-    """Train a single model and return loss history"""
-    optimizer = optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5)
+def train_with_warmup(model, device, num_nodes=16, warmup_epochs=5, warmup_length=4):
+    """
+    Curriculum learning strategy:
+    Step 1: Warm-up on very short logical chains (k=4) to let the model learn how to 'gate' information
+    Step 2: Switch to holographic logical chains (k=32/128) for formal training
+    """
+    optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3, weight_decay=1e-4)
     criterion = nn.CrossEntropyLoss()
+    
+    # --- Step 1: Warm-up (simple logic alignment) ---
+    print("\n>>> Stage 1: Warm-up on simple logic (k={})".format(warmup_length))
+    warmup_dataset = HolographicPointerDataset(
+        num_samples=5000, 
+        num_nodes=num_nodes, 
+        path_length=warmup_length
+    )
+    loader = DataLoader(warmup_dataset, batch_size=64, shuffle=True)
+    
+    model.train()
+    for epoch in range(warmup_epochs):
+        epoch_loss = 0
+        for x, y in loader:
+            x, y = x.to(device), y.to(device)
+            loss = criterion(model(x), y)
+            optimizer.zero_grad()
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+            optimizer.step()
+            epoch_loss += loss.item()
+        avg_loss = epoch_loss / len(loader)
+        if (epoch + 1) % 2 == 0 or epoch == 0:
+            print(f"  Warm-up Epoch {epoch+1}/{warmup_epochs} | Loss: {avg_loss:.4f}")
+    
+    print(">>> Stage 2: Ready for formal training on holographic depth")
+    return optimizer, criterion
+
+
+def train_single_model(model, loader, device, epochs=50, lr=2e-3, model_name="Model", depth=None, use_warmup=False, num_nodes=16):
+    """Train a single model and return loss history"""
+    # Apply warmup if requested
+    if use_warmup:
+        optimizer, criterion = train_with_warmup(model, device, num_nodes=num_nodes)
+        # Continue with the warmup optimizer, but adjust learning rate for main training
+        for param_group in optimizer.param_groups:
+            param_group['lr'] = lr
+    else:
+        optimizer = optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
+        criterion = nn.CrossEntropyLoss()
+    
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5)
     
     losses = []
     model.train()
@@ -144,12 +189,19 @@ def train_single_model(model, loader, device, epochs=50, lr=2e-3, model_name="Mo
     return losses
 
 
-def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=50):
+def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=50, test_generalization=False, use_warmup=False):
     """
     Ablation study comparing multiple model variants:
     1. Standard Transformer (deep, narrow)
     2. LSTM-based Gated Network
     3. Mamba (SSM-based)
+    
+    Args:
+        num_nodes: Number of nodes in the graph
+        path_depths: List of logical depths to test
+        epochs: Number of training epochs
+        test_generalization: If True, test length generalization after training
+        use_warmup: If True, use curriculum learning with warmup on short sequences
     """
     # Automatically select device
     if torch.cuda.is_available():
@@ -174,24 +226,24 @@ def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=50):
             ).to(device)
         },
         {
-            "name": "LSTM Gated Network (4 layers)",
-            "model_fn": lambda: GatedHolographicNetwork(
-                num_nodes=num_nodes,
-                d_model=128,
-                num_layers=4,
-                pad_id=0,
-                dropout=0.1
-            ).to(device)
-        },
-        {
             "name": "Mamba (SSM, 6 layers)",
             "model_fn": lambda: HolographicMamba(
                 num_nodes=num_nodes,
                 d_model=64,
-                d_state=16,
+                d_state=128,
                 num_layers=6
             ).to(device)
         },
+        # {
+        #     "name": "LSTM Gated Network (4 layers)",
+        #     "model_fn": lambda: GatedHolographicNetwork(
+        #         num_nodes=num_nodes,
+        #         d_model=128,
+        #         num_layers=4,
+        #         pad_id=0,
+        #         dropout=0.1
+        #     ).to(device)
+        # },
         # Sparse Transformer variants commented out for this ablation study
         # {
         #     "name": "Sparse Transformer (top_k=2)",
@@ -254,11 +306,17 @@ def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=50):
             
             losses = train_single_model(
                 model, loader, device, epochs=epochs,
-                model_name=config["name"], depth=depth
+                model_name=config["name"], depth=depth,
+                use_warmup=use_warmup, num_nodes=num_nodes
             )
             
             depth_results[config["name"]] = losses
             print(f"  ✓ {config['name']}: Final loss = {losses[-1]:.4f}")
+            
+            # Test length generalization if requested
+            if test_generalization:
+                print(f"\n  Testing length generalization for {config['name']}...")
+                test_length_generalization(model, device, num_nodes=num_nodes)
         
         all_results[depth] = depth_results
     
@@ -353,11 +411,57 @@ def plot_ablation_results(all_results, path_depths):
     plt.show()
 
 
+def test_length_generalization(model, device, num_nodes=16, test_lengths=[32, 128, 512, 1024]):
+    """
+    Validate Section 2.2 of the paper: Operator Isomorphism
+    Test the model's logical preservation capability on unseen ultra-long sequences
+    """
+    model.eval()
+    print("\n" + "="*50)
+    print("LENGTH GENERALIZATION TEST (Zero-shot)")
+    print("="*50)
+    print(f"{'Test Length (L)':<20} | {'Accuracy':<10} | {'Status':<10}")
+    print("-" * 50)
+
+    with torch.no_grad():
+        for length in test_lengths:
+            try:
+                # Generate ultra-long test data
+                test_dataset = HolographicPointerDataset(
+                    num_samples=1000, 
+                    num_nodes=num_nodes, 
+                    path_length=length
+                )
+                test_loader = DataLoader(test_dataset, batch_size=32)
+                
+                correct = 0
+                total = 0
+                for x, y in test_loader:
+                    x, y = x.to(device), y.to(device)
+                    outputs = model(x)
+                    _, predicted = torch.max(outputs.data, 1)
+                    total += y.size(0)
+                    correct += (predicted == y).sum().item()
+                
+                accuracy = 100 * correct / total
+                status = "OK"
+                print(f"L = {length:<14} | {accuracy:>8.2f}% | {status:<10}")
+            except Exception as e:
+                # Handle models that can't process sequences longer than max_seq_len
+                status = "FAILED"
+                error_msg = str(e)[:30] + "..." if len(str(e)) > 30 else str(e)
+                print(f"L = {length:<14} | {'N/A':>8} | {status:<10} ({error_msg})")
+    print("="*50)
+
+
 # Run experiment
 if __name__ == "__main__":
     import sys
-    if len(sys.argv) > 1 and sys.argv[1] == "ablation":
-        print("Running ablation study")
-        ablation_study()
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "ablation":
+            print("Running ablation study")
+            # Set test_generalization=True to test length generalization after training
+            # Set use_warmup=True to use curriculum learning with warmup
+            ablation_study(test_generalization=True, use_warmup=False)
     else:
         train_holographic_experiment_deep()
