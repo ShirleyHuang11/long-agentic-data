@@ -16,7 +16,7 @@ from model import (
 )
 from utils import ocean_serenity, watermelon_sorbet
 
-def train_holographic_experiment_deep(num_nodes=16, path_depths=[8, 32, 128]):
+def train_holographic_experiment_deep(sequence_length=256, path_depths=[8, 32, 128]):
     """
     Modified experiment: significantly increase model depth, extend training time,
     to find the 'first-order phase transition' point
@@ -37,14 +37,14 @@ def train_holographic_experiment_deep(num_nodes=16, path_depths=[8, 32, 128]):
         print(f"Starting deep experiment: logical depth k = {depth}")
         
         # 1. Prepare data: keep data volume large enough to trigger phase transition
-        dataset = HolographicPointerDataset(num_samples=20000, num_nodes=num_nodes, path_length=depth)
+        dataset = HolographicPointerDataset(num_samples=20000, sequence_length=256, path_length=depth)
         loader = DataLoader(dataset, batch_size=128, shuffle=True)  # Increase batch_size to speed up training
 
         # 2. Modify network architecture: depth over width (Depth > Width)
         # According to the paper, processing data with high Epiplexity (logical depth)
         # requires deeper networks to decompress information
         model = HolographicTransformer(
-            num_nodes=num_nodes,
+            sequence_length=sequence_length,
             d_model=32,           # Reduce width (originally 64)
             nhead=4,
             dim_feedforward=64,   # Reduce feedforward network dimension
@@ -66,8 +66,10 @@ def train_holographic_experiment_deep(num_nodes=16, path_depths=[8, 32, 128]):
         
         for epoch in tqdm(range(epochs), desc=f"Training (depth={depth})"):
             epoch_loss = 0
-            for x, y in tqdm(loader, desc=f"Epoch {epoch+1}", leave=False):
-                x, y = x.to(device), y.to(device)
+            for data in tqdm(loader, desc=f"Epoch {epoch+1}", leave=False):
+                sequence, start_query, final_target = data
+                x = sequence.to(device)
+                y = final_target.to(device)
                 
                 logits = model(x) 
                 loss = criterion(logits, y)
@@ -113,13 +115,15 @@ def train_holographic_experiment_deep(num_nodes=16, path_depths=[8, 32, 128]):
 def train_with_curriculum(
     model, 
     device, 
-    num_nodes=16, 
+    sequence_length=256, 
     stages=None,
     lr=2e-3, 
     model_name="Model",
     use_scheduler=True,
     use_wandb=False,
-    wandb_config=None
+    wandb_config=None,
+    beta=0.0,
+    gamma=0.0
 ):
     """
     Unified curriculum learning function supporting multiple training stages.
@@ -127,7 +131,7 @@ def train_with_curriculum(
     Args:
         model: The model to train
         device: Training device
-        num_nodes: Number of nodes in the graph
+        sequence_length: Sequence length (vocabulary size for models)
         stages: List of stage configs, each as dict with:
             - path_length: k value for this stage
             - epochs: number of epochs for this stage
@@ -170,8 +174,10 @@ def train_with_curriculum(
         
         stage_dataset = HolographicPointerDataset(
             num_samples=num_samples,
-            num_nodes=num_nodes,
-            path_length=path_length
+            sequence_length=256,
+            path_length=path_length,
+            beta=beta,
+            gamma=gamma
         )
         stage_loader = DataLoader(stage_dataset, batch_size=batch_size, shuffle=True)
         
@@ -180,8 +186,10 @@ def train_with_curriculum(
             epoch_correct = 0
             epoch_total = 0
             
-            for x, y in stage_loader:
-                x, y = x.to(device), y.to(device)
+            for data in stage_loader:
+                sequence, start_query, final_target = data
+                x = sequence.to(device)
+                y = final_target.to(device)
                 
                 logits = model(x)
                 loss = criterion(logits, y)
@@ -230,7 +238,7 @@ def train_with_curriculum(
 
 
 # Backward compatibility: keep old function names as aliases
-def train_with_warmup(model, device, num_nodes=16, warmup_epochs=5, warmup_length=4, use_wandb=False, wandb_config=None, model_name="Model"):
+def train_with_warmup(model, device, sequence_length=256, warmup_epochs=5, warmup_length=4, use_wandb=False, wandb_config=None, model_name="Model"):
     """
     Legacy warmup function - now uses unified curriculum learning.
     Returns optimizer and criterion for backward compatibility.
@@ -238,7 +246,7 @@ def train_with_warmup(model, device, num_nodes=16, warmup_epochs=5, warmup_lengt
     stages = [
         {"path_length": warmup_length, "epochs": warmup_epochs, "num_samples": 5000, "batch_size": 64}
     ]
-    train_with_curriculum(model, device, num_nodes=num_nodes, stages=stages, lr=1e-3, use_scheduler=False, 
+    train_with_curriculum(model, device, sequence_length=sequence_length, stages=stages, lr=1e-3, use_scheduler=False, 
                           use_wandb=use_wandb, wandb_config=wandb_config, model_name=model_name)
     
     optimizer = optim.AdamW(model.parameters(), lr=1e-3, weight_decay=1e-4)
@@ -247,7 +255,7 @@ def train_with_warmup(model, device, num_nodes=16, warmup_epochs=5, warmup_lengt
     return optimizer, criterion
 
 
-def train_mamba_with_curriculum(model, device, num_nodes=16, epochs=50, lr=2e-3, model_name="Mamba", use_wandb=False, wandb_config=None):
+def train_mamba_with_curriculum(model, device, sequence_length=256, epochs=50, lr=2e-3, model_name="Mamba", use_wandb=False, wandb_config=None, beta=0.0, gamma=0.0):
     """
     Smooth Staircase Curriculum Learning:
     Guide the model to undergo a first-order phase transition through progressive difficulty,
@@ -272,14 +280,14 @@ def train_mamba_with_curriculum(model, device, num_nodes=16, epochs=50, lr=2e-3,
             {"path_length": 64,  "epochs": stage_epochs, "num_samples": 20000, "batch_size": 128},
             {"path_length": 128, "epochs": rem_epochs,   "num_samples": 20000, "batch_size": 128}
         ]
-    return train_with_curriculum(model, device, num_nodes=num_nodes, stages=stages, lr=lr, model_name=model_name, use_wandb=use_wandb, wandb_config=wandb_config)
+    return train_with_curriculum(model, device, sequence_length=sequence_length, stages=stages, lr=lr, model_name=model_name, use_wandb=use_wandb, wandb_config=wandb_config, beta=beta, gamma=gamma)
 
 
-def train_single_model(model, loader, device, epochs=50, lr=2e-3, model_name="Model", depth=None, use_warmup=False, num_nodes=16, use_wandb=False, wandb_config=None):
+def train_single_model(model, loader, device, epochs=50, lr=2e-3, model_name="Model", depth=None, use_warmup=False, sequence_length=256, use_wandb=False, wandb_config=None):
     """Train a single model and return loss and accuracy history"""
     # Apply warmup if requested
     if use_warmup:
-        optimizer, criterion = train_with_warmup(model, device, num_nodes=num_nodes, 
+        optimizer, criterion = train_with_warmup(model, device, sequence_length=sequence_length, 
                                                  use_wandb=use_wandb, wandb_config=wandb_config, model_name=model_name)
         # Continue with the warmup optimizer, but adjust learning rate for main training
         for param_group in optimizer.param_groups:
@@ -301,8 +309,10 @@ def train_single_model(model, loader, device, epochs=50, lr=2e-3, model_name="Mo
         epoch_correct = 0
         epoch_total = 0
         
-        for x, y in loader:
-            x, y = x.to(device), y.to(device)
+        for data in loader:
+            sequence, start_query, final_target = data
+            x = sequence.to(device)
+            y = final_target.to(device)
             
             logits = model(x)
             loss = criterion(logits, y)
@@ -346,7 +356,7 @@ def train_single_model(model, loader, device, epochs=50, lr=2e-3, model_name="Mo
     return {'losses': losses, 'accuracies': accuracies}
 
 
-def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=3, test_generalization=False, use_warmup=False, job_id="default", use_wandb=False, wandb_project="holographic-data", wandb_entity=None):
+def ablation_study(sequence_length=256, path_depths=[8, 32, 128], epochs=3, test_generalization=False, use_warmup=False, job_id="default", use_wandb=False, wandb_project="holographic-data", wandb_entity=None, beta=0.0, gamma=0.0):
     """
     Ablation study comparing multiple model variants:
     1. Standard Transformer (deep, narrow)
@@ -354,7 +364,7 @@ def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=3, test_genera
     3. Mamba (SSM-based)
     
     Args:
-        num_nodes: Number of nodes in the graph
+        sequence_length: Sequence length (vocabulary size for models)
         path_depths: List of logical depths to test
         epochs: Number of training epochs
         test_generalization: If True, test length generalization after training
@@ -374,7 +384,7 @@ def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=3, test_genera
         {
             "name": "Standard Transformer (16 layers)",
             "model_fn": lambda: HolographicTransformer(
-                num_nodes=num_nodes,
+                sequence_length=sequence_length,
                 d_model=32,
                 nhead=4,
                 dim_feedforward=64,
@@ -385,7 +395,7 @@ def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=3, test_genera
         {
             "name": "Mamba (SSM, 16 layers)",
             "model_fn": lambda: HolographicMamba(
-                num_nodes=num_nodes,
+                sequence_length=sequence_length,
                 d_model=128,
                 d_state=256,
                 num_layers=16
@@ -394,7 +404,7 @@ def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=3, test_genera
         # {
         #     "name": "LSTM Gated Network (4 layers)",
         #     "model_fn": lambda: GatedHolographicNetwork(
-        #         num_nodes=num_nodes,
+        #         sequence_length=sequence_length,
         #         d_model=128,
         #         num_layers=4,
         #         pad_id=0,
@@ -405,7 +415,7 @@ def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=3, test_genera
         # {
         #     "name": "Sparse Transformer (top_k=2)",
         #     "model_fn": lambda: SparseHolographicTransformer(
-        #         num_nodes=num_nodes,
+        #         sequence_length=sequence_length,
         #         d_model=32,
         #         nhead=4,
         #         dim_feedforward=64,
@@ -417,7 +427,7 @@ def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=3, test_genera
         # {
         #     "name": "Sparse Transformer (top_k=4)",
         #     "model_fn": lambda: SparseHolographicTransformer(
-        #         num_nodes=num_nodes,
+        #         sequence_length=sequence_length,
         #         d_model=32,
         #         nhead=4,
         #         dim_feedforward=64,
@@ -429,7 +439,7 @@ def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=3, test_genera
         # {
         #     "name": "Sparse Transformer (top_k=8)",
         #     "model_fn": lambda: SparseHolographicTransformer(
-        #         num_nodes=num_nodes,
+        #         sequence_length=sequence_length,
         #         d_model=32,
         #         nhead=4,
         #         dim_feedforward=64,
@@ -458,7 +468,7 @@ def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=3, test_genera
             entity=wandb_entity,
             name=job_id,
             config={
-                "num_nodes": num_nodes,
+                "sequence_length": sequence_length,
                 "path_depths": path_depths,
                 "epochs": epochs,
                 "test_generalization": test_generalization,
@@ -498,9 +508,10 @@ def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=3, test_genera
         mamba_model = mamba_config["model_fn"]()
         wandb_config_mamba = {"model_type": "Mamba", "training_type": "curriculum"} if use_wandb else None
         mamba_results = train_mamba_with_curriculum(
-            mamba_model, device, num_nodes=num_nodes, 
+            mamba_model, device, sequence_length=sequence_length, 
             epochs=epochs, model_name=mamba_config["name"],
-            use_wandb=use_wandb, wandb_config=wandb_config_mamba
+            use_wandb=use_wandb, wandb_config=wandb_config_mamba,
+            beta=beta, gamma=gamma
         )
         mamba_losses = mamba_results['losses']
         mamba_accuracies = mamba_results['accuracies']
@@ -549,7 +560,7 @@ def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=3, test_genera
         # Test length generalization if requested
         if test_generalization:
             print(f"\n  Testing length generalization for {mamba_config['name']}...")
-            test_length_generalization(mamba_model, device, num_nodes=num_nodes)
+            test_length_generalization(mamba_model, device, sequence_length=sequence_length)
     
     # Train other models per depth (standard training)
     for depth in path_depths:
@@ -562,8 +573,10 @@ def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=3, test_genera
         batch_size = 64 if epochs <= 5 else 128
         dataset = HolographicPointerDataset(
             num_samples=num_samples, 
-            num_nodes=num_nodes, 
-            path_length=depth
+            sequence_length=256, 
+            path_length=depth,
+            beta=beta,
+            gamma=gamma
         )
         loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
         
@@ -578,7 +591,7 @@ def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=3, test_genera
             results = train_single_model(
                 mamba_model_k32, loader, device, epochs=epochs,
                 model_name=mamba_config["name"], depth=depth,
-                use_warmup=use_warmup, num_nodes=num_nodes,
+                use_warmup=use_warmup, sequence_length=sequence_length,
                 use_wandb=use_wandb, wandb_config=wandb_config_mamba
             )
             all_results[depth][mamba_config["name"]] = results
@@ -587,7 +600,7 @@ def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=3, test_genera
             # Test length generalization if requested
             if test_generalization:
                 print(f"\n  Testing length generalization for {mamba_config['name']}...")
-                test_length_generalization(mamba_model_k32, device, num_nodes=num_nodes)
+                test_length_generalization(mamba_model_k32, device, sequence_length=sequence_length)
         
         for config in other_configs:
             print(f"\n  Training: {config['name']}")
@@ -596,7 +609,7 @@ def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=3, test_genera
             results = train_single_model(
                 model, loader, device, epochs=epochs,
                 model_name=config["name"], depth=depth,
-                use_warmup=use_warmup, num_nodes=num_nodes,
+                use_warmup=use_warmup, sequence_length=sequence_length,
                 use_wandb=use_wandb, wandb_config=wandb_config_model
             )
             
@@ -606,7 +619,7 @@ def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=3, test_genera
             # Test length generalization if requested
             if test_generalization:
                 print(f"\n  Testing length generalization for {config['name']}...")
-                test_length_generalization(model, device, num_nodes=num_nodes)
+                test_length_generalization(model, device, sequence_length=sequence_length)
     
     # Print summary table
     print_summary_table(all_results, path_depths)
@@ -882,7 +895,7 @@ def plot_ablation_results(all_results, path_depths, epochs=50, job_id="default")
     plt.show()
 
 
-def test_length_generalization(model, device, num_nodes=16, test_lengths=[32, 128, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072]):
+def test_length_generalization(model, device, sequence_length=256, test_lengths=[32, 128, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072]):
     """
     Validate Section 2.2 of the paper: Operator Isomorphism
     Test the model's logical preservation capability on unseen ultra-long sequences
@@ -900,15 +913,17 @@ def test_length_generalization(model, device, num_nodes=16, test_lengths=[32, 12
                 # Generate ultra-long test data
                 test_dataset = HolographicPointerDataset(
                     num_samples=1000, 
-                    num_nodes=num_nodes, 
+                    sequence_length=length, 
                     path_length=length
                 )
                 test_loader = DataLoader(test_dataset, batch_size=32)
                 
                 correct = 0
                 total = 0
-                for x, y in test_loader:
-                    x, y = x.to(device), y.to(device)
+                for data in test_loader:
+                    sequence, start_query, final_target = data
+                    x = sequence.to(device)
+                    y = final_target.to(device)
                     outputs = model(x)
                     _, predicted = torch.max(outputs.data, 1)
                     total += y.size(0)
@@ -930,7 +945,7 @@ if __name__ == "__main__":
     import sys
     # Simple argument parsing
     job_id = None
-    use_wandb = True
+    use_wandb = False
     wandb_project = "holographic-data"
     wandb_entity = "hanlin-ml"
     

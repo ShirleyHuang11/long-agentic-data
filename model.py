@@ -16,7 +16,8 @@ class HolographicTransformer(nn.Module):
 
     def __init__(
         self,
-        num_nodes: int = 16,
+        sequence_length: int = 256,
+        vocab_size: int = 1000,  # Vocabulary size for embedding (must match dataset vocab_size)
         d_model: int = 64,
         nhead: int = 4,
         dim_feedforward: int = 128,
@@ -29,15 +30,16 @@ class HolographicTransformer(nn.Module):
         super().__init__()
         if max_seq_len <= 0:
             raise ValueError("max_seq_len must be > 0")
-        if not (0 <= pad_id < num_nodes):
-            raise ValueError("pad_id must be in [0, num_nodes)")
+        if not (0 <= pad_id < vocab_size):
+            raise ValueError("pad_id must be in [0, vocab_size)")
 
-        self.num_nodes = num_nodes
+        self.sequence_length = sequence_length
+        self.vocab_size = vocab_size
         self.pad_id = pad_id
         self.causal = causal
         self.max_seq_len = max_seq_len
 
-        self.embedding = nn.Embedding(num_nodes, d_model, padding_idx=pad_id)
+        self.embedding = nn.Embedding(vocab_size, d_model, padding_idx=pad_id)
         self.pos_embedding = nn.Embedding(max_seq_len, d_model)
 
         enc_layer = nn.TransformerEncoderLayer(
@@ -51,7 +53,7 @@ class HolographicTransformer(nn.Module):
         self.transformer = nn.TransformerEncoder(enc_layer, num_layers=num_layers)
 
         self.final_norm = nn.LayerNorm(d_model)
-        self.fc_out = nn.Linear(d_model, num_nodes)
+        self.fc_out = nn.Linear(d_model, sequence_length)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -59,7 +61,7 @@ class HolographicTransformer(nn.Module):
             x: LongTensor [batch, seq_len] containing node indices (with pad_id for padding)
 
         Returns:
-            logits: FloatTensor [batch, num_nodes]
+            logits: FloatTensor [batch, sequence_length]
         """
         if x.dim() != 2:
             raise ValueError(f"x must be 2D [batch, seq_len], got shape {tuple(x.shape)}")
@@ -92,7 +94,7 @@ class HolographicTransformer(nn.Module):
         out = self.transformer(x_embed, mask=attn_mask, src_key_padding_mask=pad_mask)
         out = self.final_norm(out)
 
-        # Use last token representation for prediction: [batch, num_nodes]
+        # Use last token representation for prediction: [batch, sequence_length]
         logits = self.fc_out(out[:, -1, :])
         return logits
 
@@ -170,14 +172,15 @@ class SparseHolographicTransformer(nn.Module):
     Replacement for original model: Holographic Transformer using sparse attention mechanism
     """
     def __init__(
-        self, num_nodes=16, d_model=64, nhead=4, dim_feedforward=128, 
+        self, sequence_length=256, vocab_size=1000, d_model=64, nhead=4, dim_feedforward=128, 
         num_layers=8, max_seq_len=300, pad_id=0, top_k=4
     ):
         super().__init__()
-        self.num_nodes = num_nodes
+        self.sequence_length = sequence_length
+        self.vocab_size = vocab_size
         self.pad_id = pad_id
         
-        self.embedding = nn.Embedding(num_nodes, d_model, padding_idx=pad_id)
+        self.embedding = nn.Embedding(vocab_size, d_model, padding_idx=pad_id)
         self.pos_embedding = nn.Embedding(max_seq_len, d_model)
         
         # Stack custom sparse attention layers
@@ -187,7 +190,7 @@ class SparseHolographicTransformer(nn.Module):
         ])
         
         self.final_norm = nn.LayerNorm(d_model)
-        self.fc_out = nn.Linear(d_model, num_nodes)
+        self.fc_out = nn.Linear(d_model, sequence_length)
 
     def forward(self, x):
         B, L = x.shape
@@ -209,18 +212,20 @@ class GatedHolographicNetwork(nn.Module):
     """
     def __init__(
         self, 
-        num_nodes: int = 16, 
+        sequence_length: int = 256,
+        vocab_size: int = 1000,  # Vocabulary size for embedding (must match dataset vocab_size)
         d_model: int = 128, 
         num_layers: int = 4,   # Maintain sufficient physical depth to support multi-hop reasoning
         pad_id: int = 0,
         dropout: float = 0.1
     ):
         super().__init__()
-        self.num_nodes = num_nodes
+        self.sequence_length = sequence_length
+        self.vocab_size = vocab_size
         self.pad_id = pad_id
         
         # Token embedding layer (RNNs naturally have sequential order, no explicit positional encoding needed)
-        self.embedding = nn.Embedding(num_nodes, d_model, padding_idx=pad_id)
+        self.embedding = nn.Embedding(vocab_size, d_model, padding_idx=pad_id)
         
         # Core: use multi-layer LSTM to introduce dynamic gating mechanism (Dynamic Gating)
         # Forget Gate helps truncate useless information and avoid attention saturation
@@ -233,7 +238,7 @@ class GatedHolographicNetwork(nn.Module):
         )
         
         self.final_norm = nn.LayerNorm(d_model)
-        self.fc_out = nn.Linear(d_model, num_nodes)
+        self.fc_out = nn.Linear(d_model, sequence_length)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -339,10 +344,11 @@ class HolographicMamba(nn.Module):
     Holographic reasoning network based on Selective State Space Model (SSM)
     Completely abandons the Attention mechanism
     """
-    def __init__(self, num_nodes=16, d_model=64, d_state=16, num_layers=6):
+    def __init__(self, sequence_length=256, vocab_size=1000, d_model=64, d_state=16, num_layers=6):
         super().__init__()
-        self.num_nodes = num_nodes
-        self.embedding = nn.Embedding(num_nodes, d_model)
+        self.sequence_length = sequence_length
+        self.vocab_size = vocab_size
+        self.embedding = nn.Embedding(vocab_size, d_model)
         
         # Stack SSM blocks
         self.layers = nn.ModuleList([
@@ -350,7 +356,7 @@ class HolographicMamba(nn.Module):
         ])
         
         self.final_norm = nn.LayerNorm(d_model)
-        self.fc_out = nn.Linear(d_model, num_nodes)
+        self.fc_out = nn.Linear(d_model, sequence_length)
 
     def forward(self, x):
         # Note: SSM is inherently a directional sequence model, no Positional Embedding needed
