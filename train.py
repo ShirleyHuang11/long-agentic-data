@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 from torch.utils.data import DataLoader
 from tqdm import tqdm
+import wandb
 from data.pointer import HolographicPointerDataset
 from model import (
     HolographicTransformer, 
@@ -52,7 +53,7 @@ def train_holographic_experiment_deep(num_nodes=16, path_depths=[8, 32, 128]):
             max_seq_len=300       # Ensure it can accommodate sequence length for depth=128
         ).to(device)
         
-        optimizer = optim.AdamW(model.parameters(), lr=2e-3, weight_decay=1e-4)
+        optimizer = optim.AdamW(model.parameters(), lr=2e-3, weight_decay=1e-2)
         # Introduce scheduler: reduce learning rate after plateau to help model 
         # stabilize convergence after phase transition point
         scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5)
@@ -116,7 +117,9 @@ def train_with_curriculum(
     stages=None,
     lr=2e-3, 
     model_name="Model",
-    use_scheduler=True
+    use_scheduler=True,
+    use_wandb=False,
+    wandb_config=None
 ):
     """
     Unified curriculum learning function supporting multiple training stages.
@@ -208,12 +211,26 @@ def train_with_curriculum(
             if (epoch_in_stage + 1) % print_interval == 0 or epoch_in_stage == 0:
                 lr_str = f" | LR: {optimizer.param_groups[0]['lr']:.6f}" if scheduler else ""
                 tqdm.write(f"  Stage {stage_idx + 1} Epoch {current_epoch:02d}/{total_epochs} | Loss: {avg_loss:.4f} | Acc: {avg_accuracy:.2f}%{lr_str}")
+            
+            # Log to wandb
+            if use_wandb:
+                log_dict = {
+                    f"{model_name}/loss": avg_loss,
+                    f"{model_name}/accuracy": avg_accuracy,
+                    f"{model_name}/epoch": current_epoch,
+                    f"{model_name}/stage": stage_idx + 1,
+                    f"{model_name}/path_length": path_length,
+                    f"{model_name}/learning_rate": optimizer.param_groups[0]['lr']
+                }
+                if wandb_config:
+                    log_dict.update({f"{model_name}/{k}": v for k, v in wandb_config.items()})
+                wandb.log(log_dict, step=current_epoch)
     
     return {'losses': losses, 'accuracies': accuracies}
 
 
 # Backward compatibility: keep old function names as aliases
-def train_with_warmup(model, device, num_nodes=16, warmup_epochs=5, warmup_length=4):
+def train_with_warmup(model, device, num_nodes=16, warmup_epochs=5, warmup_length=4, use_wandb=False, wandb_config=None, model_name="Model"):
     """
     Legacy warmup function - now uses unified curriculum learning.
     Returns optimizer and criterion for backward compatibility.
@@ -221,7 +238,8 @@ def train_with_warmup(model, device, num_nodes=16, warmup_epochs=5, warmup_lengt
     stages = [
         {"path_length": warmup_length, "epochs": warmup_epochs, "num_samples": 5000, "batch_size": 64}
     ]
-    train_with_curriculum(model, device, num_nodes=num_nodes, stages=stages, lr=1e-3, use_scheduler=False)
+    train_with_curriculum(model, device, num_nodes=num_nodes, stages=stages, lr=1e-3, use_scheduler=False, 
+                          use_wandb=use_wandb, wandb_config=wandb_config, model_name=model_name)
     
     optimizer = optim.AdamW(model.parameters(), lr=1e-3, weight_decay=1e-4)
     criterion = nn.CrossEntropyLoss()
@@ -229,41 +247,40 @@ def train_with_warmup(model, device, num_nodes=16, warmup_epochs=5, warmup_lengt
     return optimizer, criterion
 
 
-def train_mamba_with_curriculum(model, device, num_nodes=16, epochs=50, lr=2e-3, model_name="Mamba"):
+def train_mamba_with_curriculum(model, device, num_nodes=16, epochs=50, lr=2e-3, model_name="Mamba", use_wandb=False, wandb_config=None):
     """
-    Stage-wise curriculum training for Mamba (uses unified curriculum function):
-    - Epoch 1-20: Train on k=8 data (let Mamba master basic jumps)
-    - Epoch 21-50: Switch to k=128 (solve SSM's "search for logical chains" problem)
+    Smooth Staircase Curriculum Learning:
+    Guide the model to undergo a first-order phase transition through progressive difficulty,
+    gradually extracting universal operators from rote memorization.
     """
-    # For testing: use smaller epochs if total epochs is small
     if epochs <= 5:
-        # Quick test: 2 epochs on k=8, 1 epoch on k=128
-        stage1_epochs = max(2, epochs // 2)
-        stage2_epochs = epochs - stage1_epochs
+        # Quick test mode
         stages = [
-            {"path_length": 8, "epochs": stage1_epochs, 
-             "num_samples": 1000, "batch_size": 64},  # Reduced data for speed
-            {"path_length": 128, "epochs": stage2_epochs, 
-             "num_samples": 1000, "batch_size": 64}
+            {"path_length": 8, "epochs": 2, "num_samples": 1000, "batch_size": 64},
+            {"path_length": 32, "epochs": 2, "num_samples": 1000, "batch_size": 64},
+            {"path_length": 128, "epochs": epochs - 4, "num_samples": 1000, "batch_size": 64}
         ]
     else:
-        # Normal training
-        stage1_epochs = max(20, int(epochs * 0.4))
-        stage2_epochs = epochs - stage1_epochs
+        # Full training mode: 5-stage smooth transition
+        stage_epochs = epochs // 5
+        rem_epochs = epochs - (stage_epochs * 4)  # Ensure total epochs remain unchanged
+        
         stages = [
-            {"path_length": 8, "epochs": stage1_epochs, 
-             "num_samples": 20000, "batch_size": 128},
-            {"path_length": 128, "epochs": stage2_epochs, 
-             "num_samples": 20000, "batch_size": 128}
+            {"path_length": 8,   "epochs": stage_epochs, "num_samples": 20000, "batch_size": 128},
+            {"path_length": 16,  "epochs": stage_epochs, "num_samples": 20000, "batch_size": 128},
+            {"path_length": 32,  "epochs": stage_epochs, "num_samples": 20000, "batch_size": 128},
+            {"path_length": 64,  "epochs": stage_epochs, "num_samples": 20000, "batch_size": 128},
+            {"path_length": 128, "epochs": rem_epochs,   "num_samples": 20000, "batch_size": 128}
         ]
-    return train_with_curriculum(model, device, num_nodes=num_nodes, stages=stages, lr=lr, model_name=model_name)
+    return train_with_curriculum(model, device, num_nodes=num_nodes, stages=stages, lr=lr, model_name=model_name, use_wandb=use_wandb, wandb_config=wandb_config)
 
 
-def train_single_model(model, loader, device, epochs=50, lr=2e-3, model_name="Model", depth=None, use_warmup=False, num_nodes=16):
+def train_single_model(model, loader, device, epochs=50, lr=2e-3, model_name="Model", depth=None, use_warmup=False, num_nodes=16, use_wandb=False, wandb_config=None):
     """Train a single model and return loss and accuracy history"""
     # Apply warmup if requested
     if use_warmup:
-        optimizer, criterion = train_with_warmup(model, device, num_nodes=num_nodes)
+        optimizer, criterion = train_with_warmup(model, device, num_nodes=num_nodes, 
+                                                 use_wandb=use_wandb, wandb_config=wandb_config, model_name=model_name)
         # Continue with the warmup optimizer, but adjust learning rate for main training
         for param_group in optimizer.param_groups:
             param_group['lr'] = lr
@@ -311,11 +328,25 @@ def train_single_model(model, loader, device, epochs=50, lr=2e-3, model_name="Mo
         print_interval = 1 if epochs <= 5 else 10
         if (epoch + 1) % print_interval == 0 or epoch == 0:
             tqdm.write(f"  Epoch {epoch+1:02d}/{epochs} | Loss: {avg_loss:.4f} | Acc: {avg_accuracy:.2f}%")
+        
+        # Log to wandb
+        if use_wandb:
+            log_dict = {
+                f"{model_name}/loss": avg_loss,
+                f"{model_name}/accuracy": avg_accuracy,
+                f"{model_name}/epoch": epoch + 1,
+                f"{model_name}/learning_rate": optimizer.param_groups[0]['lr']
+            }
+            if depth is not None:
+                log_dict[f"{model_name}/depth"] = depth
+            if wandb_config:
+                log_dict.update({f"{model_name}/{k}": v for k, v in wandb_config.items()})
+            wandb.log(log_dict, step=epoch + 1)
     
     return {'losses': losses, 'accuracies': accuracies}
 
 
-def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=3, test_generalization=False, use_warmup=False, job_id="default"):
+def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=3, test_generalization=False, use_warmup=False, job_id="default", use_wandb=False, wandb_project="holographic-data", wandb_entity=None):
     """
     Ablation study comparing multiple model variants:
     1. Standard Transformer (deep, narrow)
@@ -355,7 +386,7 @@ def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=3, test_genera
             "name": "Mamba (SSM, 16 layers)",
             "model_fn": lambda: HolographicMamba(
                 num_nodes=num_nodes,
-                d_model=64,
+                d_model=128,
                 d_state=256,
                 num_layers=16
             ).to(device)
@@ -420,6 +451,22 @@ def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=3, test_genera
         else:
             other_configs.append(config)
     
+    # Initialize wandb if enabled
+    if use_wandb:
+        wandb.init(
+            project=wandb_project,
+            entity=wandb_entity,
+            name=job_id,
+            config={
+                "num_nodes": num_nodes,
+                "path_depths": path_depths,
+                "epochs": epochs,
+                "test_generalization": test_generalization,
+                "use_warmup": use_warmup,
+                "job_id": job_id
+            }
+        )
+    
     # Train Mamba with curriculum learning (once, not per depth)
     if mamba_config:
         print(f"\n[{'='*60}]")
@@ -427,20 +474,33 @@ def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=3, test_genera
         print(f"[{'='*60}]")
         # Calculate stage epochs for display
         if epochs <= 5:
-            stage1_epochs_display = max(2, epochs // 2)
-            stage2_epochs_display = epochs - stage1_epochs_display
-            print(f"Stage 1: Epochs 1-{stage1_epochs_display} on k=8 (basic jumps)")
-            print(f"Stage 2: Epochs {stage1_epochs_display+1}-{epochs} on k=128 (logical chains)")
+            # Quick test mode: 3 stages
+            print(f"Stage 1: Epochs 1-2 on k=8")
+            print(f"Stage 2: Epochs 3-4 on k=32")
+            print(f"Stage 3: Epochs 5-{epochs} on k=128")
         else:
-            print(f"Stage 1: Epochs 1-20 on k=8 (basic jumps)")
-            print(f"Stage 2: Epochs 21-{epochs} on k=128 (logical chains)")
+            # Full training mode: 5-stage smooth transition
+            stage_epochs = epochs // 5
+            rem_epochs = epochs - (stage_epochs * 4)
+            current_epoch = 1
+            print(f"Stage 1: Epochs {current_epoch}-{current_epoch + stage_epochs - 1} on k=8")
+            current_epoch += stage_epochs
+            print(f"Stage 2: Epochs {current_epoch}-{current_epoch + stage_epochs - 1} on k=16")
+            current_epoch += stage_epochs
+            print(f"Stage 3: Epochs {current_epoch}-{current_epoch + stage_epochs - 1} on k=32")
+            current_epoch += stage_epochs
+            print(f"Stage 4: Epochs {current_epoch}-{current_epoch + stage_epochs - 1} on k=64")
+            current_epoch += stage_epochs
+            print(f"Stage 5: Epochs {current_epoch}-{epochs} on k=128")
         print(f"[{'='*60}]")
         print(f"Epochs: {epochs}")
         
         mamba_model = mamba_config["model_fn"]()
+        wandb_config_mamba = {"model_type": "Mamba", "training_type": "curriculum"} if use_wandb else None
         mamba_results = train_mamba_with_curriculum(
             mamba_model, device, num_nodes=num_nodes, 
-            epochs=epochs, model_name=mamba_config["name"]
+            epochs=epochs, model_name=mamba_config["name"],
+            use_wandb=use_wandb, wandb_config=wandb_config_mamba
         )
         mamba_losses = mamba_results['losses']
         mamba_accuracies = mamba_results['accuracies']
@@ -514,10 +574,12 @@ def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=3, test_genera
         if depth == 32 and mamba_config:
             print(f"\n  Training: {mamba_config['name']} (k=32, standard training)")
             mamba_model_k32 = mamba_config["model_fn"]()
+            wandb_config_mamba = {"model_type": "Mamba", "training_type": "standard", "depth": depth} if use_wandb else None
             results = train_single_model(
                 mamba_model_k32, loader, device, epochs=epochs,
                 model_name=mamba_config["name"], depth=depth,
-                use_warmup=use_warmup, num_nodes=num_nodes
+                use_warmup=use_warmup, num_nodes=num_nodes,
+                use_wandb=use_wandb, wandb_config=wandb_config_mamba
             )
             all_results[depth][mamba_config["name"]] = results
             print(f"  ✓ {mamba_config['name']}: Final loss = {results['losses'][-1]:.4f} | Final acc = {results['accuracies'][-1]:.2f}%")
@@ -530,11 +592,12 @@ def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=3, test_genera
         for config in other_configs:
             print(f"\n  Training: {config['name']}")
             model = config["model_fn"]()
-            
+            wandb_config_model = {"model_type": config["name"], "depth": depth} if use_wandb else None
             results = train_single_model(
                 model, loader, device, epochs=epochs,
                 model_name=config["name"], depth=depth,
-                use_warmup=use_warmup, num_nodes=num_nodes
+                use_warmup=use_warmup, num_nodes=num_nodes,
+                use_wandb=use_wandb, wandb_config=wandb_config_model
             )
             
             all_results[depth][config["name"]] = results
@@ -550,6 +613,18 @@ def ablation_study(num_nodes=16, path_depths=[8, 32, 128], epochs=3, test_genera
     
     # Plot results
     plot_ablation_results(all_results, path_depths, epochs, job_id=job_id)
+    
+    # Log final results to wandb
+    if use_wandb:
+        for depth in path_depths:
+            if depth in all_results:
+                for model_name, results in all_results[depth].items():
+                    if isinstance(results, dict):
+                        wandb.log({
+                            f"final/{model_name}/depth_{depth}/loss": results['losses'][-1],
+                            f"final/{model_name}/depth_{depth}/accuracy": results['accuracies'][-1]
+                        })
+        wandb.finish()
     
     return all_results
 
@@ -853,19 +928,30 @@ def test_length_generalization(model, device, num_nodes=16, test_lengths=[32, 12
 # Run experiment
 if __name__ == "__main__":
     import sys
-    # Simple argument parsing for job_id
+    # Simple argument parsing
     job_id = None
+    use_wandb = True
+    wandb_project = "holographic-data"
+    wandb_entity = "hanlin-ml"
+    
     if len(sys.argv) > 1:
         for i, arg in enumerate(sys.argv):
             if arg == '--job-id' and i + 1 < len(sys.argv):
                 job_id = sys.argv[i + 1]
-                break
+            elif arg == '--wandb':
+                use_wandb = True
+            elif arg == '--wandb-project' and i + 1 < len(sys.argv):
+                wandb_project = sys.argv[i + 1]
+            elif arg == '--wandb-entity' and i + 1 < len(sys.argv):
+                wandb_entity = sys.argv[i + 1]
     
     if len(sys.argv) > 1 and sys.argv[1] == "ablation":
-        print("Running ablation study (quick test with 3 epochs)")
+        print("Running ablation study")
         if job_id:
             print(f"Job ID: {job_id}")
-        # Quick test: 3 epochs, no generalization test, no warmup for speed
-        ablation_study(epochs=3, test_generalization=True, use_warmup=True, job_id=job_id)
+        if use_wandb:
+            print(f"W&B enabled: project={wandb_project}, entity={wandb_entity}")
+        ablation_study(epochs=50, test_generalization=True, use_warmup=True, job_id=job_id, 
+                      use_wandb=use_wandb, wandb_project=wandb_project, wandb_entity=wandb_entity)
     else:
         train_holographic_experiment_deep()

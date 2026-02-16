@@ -4,6 +4,7 @@ logs
 plot*
 *.sh
 *.md
+wandb
 
 bio
 scratch
