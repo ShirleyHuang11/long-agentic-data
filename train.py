@@ -37,7 +37,7 @@ def train_holographic_experiment_deep(sequence_length=256, path_depths=[8, 32, 1
         print(f"Starting deep experiment: logical depth k = {depth}")
         
         # 1. Prepare data: keep data volume large enough to trigger phase transition
-        dataset = HolographicPointerDataset(num_samples=20000, sequence_length=256, path_length=depth)
+        dataset = HolographicPointerDataset(num_samples=20000, sequence_length=sequence_length, path_length=depth)
         loader = DataLoader(dataset, batch_size=128, shuffle=True, num_workers=8)  # Increase batch_size to speed up training
 
         # 2. Modify network architecture: depth over width (Depth > Width)
@@ -67,7 +67,7 @@ def train_holographic_experiment_deep(sequence_length=256, path_depths=[8, 32, 1
         for epoch in tqdm(range(epochs), desc=f"Training (depth={depth})"):
             epoch_loss = 0
             for data in tqdm(loader, desc=f"Epoch {epoch+1}", leave=False):
-                sequence, start_query, final_target = data
+                sequence, final_target = data
                 x = sequence.to(device)
                 y = final_target.to(device)
                 
@@ -215,7 +215,7 @@ def train_with_curriculum(
             optimizer.zero_grad()  # Zero gradients at the start of epoch
             
             for batch_idx, data in enumerate(stage_loader):
-                sequence, start_query, final_target = data
+                sequence, final_target = data
                 x = sequence.to(device)
                 y = final_target.to(device)
                 
@@ -391,7 +391,7 @@ def train_single_model(model, loader, device, epochs=50, lr=2e-3, model_name="Mo
         optimizer.zero_grad()  # Zero gradients at the start of epoch
         
         for batch_idx, data in enumerate(loader):
-            sequence, start_query, final_target = data
+            sequence, final_target = data
             x = sequence.to(device)
             y = final_target.to(device)
             
@@ -492,50 +492,6 @@ def ablation_study(sequence_length=256, path_depths=[8, 32, 128], epochs=3, test
                 num_layers=8, # 16
             ).to(device)
         },
-        # {
-        #     "name": "LSTM Gated Network (4 layers)",
-        #     "model_fn": lambda: GatedHolographicNetwork(
-        #         sequence_length=sequence_length,
-        #         d_model=128,
-        #         num_layers=4,
-        #         pad_id=0,
-        #         dropout=0.1
-        #     ).to(device)
-        # },
-        # Sparse Transformer variants commented out for this ablation study
-        # {
-        #     "name": "Sparse Transformer (top_k=2)",
-        #     "model_fn": lambda: SparseHolographicTransformer(
-        #         sequence_length=sequence_length,
-        #         d_model=32,
-        #         nhead=4,
-        #         dim_feedforward=64,
-        #         num_layers=16,
-        #         top_k=2
-        #     ).to(device)
-        # },
-        # {
-        #     "name": "Sparse Transformer (top_k=4)",
-        #     "model_fn": lambda: SparseHolographicTransformer(
-        #         sequence_length=sequence_length,
-        #         d_model=32,
-        #         nhead=4,
-        #         dim_feedforward=64,
-        #         num_layers=16,
-        #         top_k=4
-        #     ).to(device)
-        # },
-        # {
-        #     "name": "Sparse Transformer (top_k=8)",
-        #     "model_fn": lambda: SparseHolographicTransformer(
-        #         sequence_length=sequence_length,
-        #         d_model=32,
-        #         nhead=4,
-        #         dim_feedforward=64,
-        #         num_layers=16,
-        #         top_k=8
-        #     ).to(device)
-        # },
     ]
     
     all_results = {}  # {depth: {model_name: {'losses': [...], 'accuracies': [...]}}}
@@ -663,7 +619,7 @@ def ablation_study(sequence_length=256, path_depths=[8, 32, 128], epochs=3, test
         batch_size = 64 if epochs <= 5 else 128
         dataset = HolographicPointerDataset(
             num_samples=num_samples, 
-            sequence_length=256, 
+            sequence_length=sequence_length, 
             path_length=depth,
             beta=beta,
             gamma=gamma
@@ -1020,7 +976,7 @@ def test_length_generalization(model, device, sequence_length=256, test_lengths=
                 correct = 0
                 total = 0
                 for data in test_loader:
-                    sequence, start_query, final_target = data
+                    sequence, final_target = data
                     x = sequence.to(device)
                     y = final_target.to(device)
                     outputs = model(x)
