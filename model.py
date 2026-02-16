@@ -17,19 +17,25 @@ class HolographicTransformer(nn.Module):
     def __init__(
         self,
         sequence_length: int = 256,
-        vocab_size: int = 1000,  # Vocabulary size for embedding (must match dataset vocab_size)
+        vocab_size: int = None,  # Vocabulary size for embedding (auto-calculated if None)
         d_model: int = 64,
         nhead: int = 4,
         dim_feedforward: int = 128,
         num_layers: int = 4,
-        max_seq_len: int = 50,
         pad_id: int = 0,
         causal: bool = False,
         dropout: float = 0.1,
     ):
         super().__init__()
-        if max_seq_len <= 0:
-            raise ValueError("max_seq_len must be > 0")
+        if sequence_length <= 0:
+            raise ValueError("sequence_length must be > 0")
+        
+        # FIX 1: Auto-calculate vocab_size if not provided
+        # vocab_size must be >= sequence_length + 1 to accommodate position tokens (1..seq_len)
+        # padding=0, position tokens start from 1
+        if vocab_size is None:
+            vocab_size = max(1000, sequence_length + 1)
+        
         if not (0 <= pad_id < vocab_size):
             raise ValueError("pad_id must be in [0, vocab_size)")
 
@@ -37,10 +43,9 @@ class HolographicTransformer(nn.Module):
         self.vocab_size = vocab_size
         self.pad_id = pad_id
         self.causal = causal
-        self.max_seq_len = max_seq_len
 
         self.embedding = nn.Embedding(vocab_size, d_model, padding_idx=pad_id)
-        self.pos_embedding = nn.Embedding(max_seq_len, d_model)
+        self.pos_embedding = nn.Embedding(sequence_length, d_model)
 
         enc_layer = nn.TransformerEncoderLayer(
             d_model=d_model,
@@ -69,10 +74,10 @@ class HolographicTransformer(nn.Module):
             x = x.long()
 
         B, L = x.shape
-        if L > self.max_seq_len:
+        if L > self.sequence_length:
             raise ValueError(
-                f"seq_len ({L}) exceeds max_seq_len ({self.max_seq_len}). "
-                f"Increase max_seq_len or truncate inputs."
+                f"seq_len ({L}) exceeds sequence_length ({self.sequence_length}). "
+                f"Increase sequence_length or truncate inputs."
             )
 
         # Positions: [batch, seq_len]
@@ -172,16 +177,19 @@ class SparseHolographicTransformer(nn.Module):
     Replacement for original model: Holographic Transformer using sparse attention mechanism
     """
     def __init__(
-        self, sequence_length=256, vocab_size=1000, d_model=64, nhead=4, dim_feedforward=128, 
-        num_layers=8, max_seq_len=300, pad_id=0, top_k=4
+        self, sequence_length=256, vocab_size=None, d_model=64, nhead=4, dim_feedforward=128, 
+        num_layers=8, pad_id=0, top_k=4
     ):
         super().__init__()
+        # FIX 1: Auto-calculate vocab_size if not provided
+        if vocab_size is None:
+            vocab_size = max(1000, sequence_length + 1)
         self.sequence_length = sequence_length
         self.vocab_size = vocab_size
         self.pad_id = pad_id
         
         self.embedding = nn.Embedding(vocab_size, d_model, padding_idx=pad_id)
-        self.pos_embedding = nn.Embedding(max_seq_len, d_model)
+        self.pos_embedding = nn.Embedding(sequence_length, d_model)
         
         # Stack custom sparse attention layers
         self.layers = nn.ModuleList([
@@ -213,13 +221,16 @@ class GatedHolographicNetwork(nn.Module):
     def __init__(
         self, 
         sequence_length: int = 256,
-        vocab_size: int = 1000,  # Vocabulary size for embedding (must match dataset vocab_size)
+        vocab_size: int = None,  # Vocabulary size for embedding (auto-calculated if None)
         d_model: int = 128, 
         num_layers: int = 4,   # Maintain sufficient physical depth to support multi-hop reasoning
         pad_id: int = 0,
         dropout: float = 0.1
     ):
         super().__init__()
+        # FIX 1: Auto-calculate vocab_size if not provided
+        if vocab_size is None:
+            vocab_size = max(1000, sequence_length + 1)
         self.sequence_length = sequence_length
         self.vocab_size = vocab_size
         self.pad_id = pad_id
@@ -344,8 +355,11 @@ class HolographicMamba(nn.Module):
     Holographic reasoning network based on Selective State Space Model (SSM)
     Completely abandons the Attention mechanism
     """
-    def __init__(self, sequence_length=256, vocab_size=1000, d_model=64, d_state=16, num_layers=6):
+    def __init__(self, sequence_length=256, vocab_size=None, d_model=64, d_state=16, num_layers=6):
         super().__init__()
+        # FIX 1: Auto-calculate vocab_size if not provided
+        if vocab_size is None:
+            vocab_size = max(1000, sequence_length + 1)
         self.sequence_length = sequence_length
         self.vocab_size = vocab_size
         self.embedding = nn.Embedding(vocab_size, d_model)

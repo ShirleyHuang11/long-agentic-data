@@ -38,7 +38,7 @@ def train_holographic_experiment_deep(sequence_length=256, path_depths=[8, 32, 1
         
         # 1. Prepare data: keep data volume large enough to trigger phase transition
         dataset = HolographicPointerDataset(num_samples=20000, sequence_length=256, path_length=depth)
-        loader = DataLoader(dataset, batch_size=128, shuffle=True)  # Increase batch_size to speed up training
+        loader = DataLoader(dataset, batch_size=128, shuffle=True, num_workers=8)  # Increase batch_size to speed up training
 
         # 2. Modify network architecture: depth over width (Depth > Width)
         # According to the paper, processing data with high Epiplexity (logical depth)
@@ -48,10 +48,10 @@ def train_holographic_experiment_deep(sequence_length=256, path_depths=[8, 32, 1
             d_model=32,           # Reduce width (originally 64)
             nhead=4,
             dim_feedforward=64,   # Reduce feedforward network dimension
-            num_layers=16,        # Significantly increase depth (originally 4) -> 
+            num_layers=16        # Significantly increase depth (originally 4) -> 
                                    # physically provides sufficient multi-hop reasoning capability
-            max_seq_len=300       # Ensure it can accommodate sequence length for depth=128
         ).to(device)
+        model = torch.compile(model)
         
         optimizer = optim.AdamW(model.parameters(), lr=2e-3, weight_decay=1e-2)
         # Introduce scheduler: reduce learning rate after plateau to help model 
@@ -123,7 +123,9 @@ def train_with_curriculum(
     use_wandb=False,
     wandb_config=None,
     beta=0.0,
-    gamma=0.0
+    gamma=0.0,
+    global_batch_size=None,
+    device_batch_size=None
 ):
     """
     Unified curriculum learning function supporting multiple training stages.
@@ -136,13 +138,15 @@ def train_with_curriculum(
             - path_length: k value for this stage
             - epochs: number of epochs for this stage
             - num_samples: number of samples (default: 20000)
-            - batch_size: batch size (default: 128)
+            - batch_size: batch size per device (default: 128)
         lr: Learning rate
         model_name: Name for logging
         use_scheduler: Whether to use learning rate scheduler
+        global_batch_size: Global batch size across all devices (if None, uses device_batch_size)
+        device_batch_size: Batch size per device (if None, uses stage batch_size)
     
     Returns:
-        dict: Dictionary with 'losses' and 'accuracies' lists
+        dict: Dictionary with 'losses', 'accuracies', 'optimizer', and 'criterion'
     """
     # Default stages for Mamba (if not provided)
     if stages is None:
@@ -157,6 +161,9 @@ def train_with_curriculum(
     criterion = nn.CrossEntropyLoss()
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5) if use_scheduler else None
     
+    # Determine number of devices (for gradient accumulation calculation)
+    num_devices = torch.cuda.device_count() if torch.cuda.is_available() else 1
+    
     losses = []
     accuracies = []
     model.train()
@@ -168,9 +175,26 @@ def train_with_curriculum(
         path_length = stage["path_length"]
         stage_epochs = stage["epochs"]
         num_samples = stage.get("num_samples", 20000)
-        batch_size = stage.get("batch_size", 128)
+        stage_batch_size = stage.get("batch_size", 128)
+        
+        # Determine actual batch sizes and gradient accumulation steps
+        if device_batch_size is not None:
+            actual_device_batch_size = device_batch_size
+        else:
+            actual_device_batch_size = stage_batch_size
+        
+        if global_batch_size is not None:
+            # Calculate gradient accumulation steps
+            effective_batch_size = actual_device_batch_size * num_devices
+            num_grad_accum_steps = max(1, global_batch_size // effective_batch_size)
+            if global_batch_size % effective_batch_size != 0:
+                tqdm.write(f"  Warning: global_batch_size ({global_batch_size}) not divisible by effective_batch_size ({effective_batch_size}). Using {num_grad_accum_steps} accumulation steps.")
+        else:
+            num_grad_accum_steps = 1
         
         print(f"\n>>> Stage {stage_idx + 1}: Training on k={path_length} (Epochs {current_epoch + 1}-{current_epoch + stage_epochs})")
+        if num_grad_accum_steps > 1:
+            print(f"  Device batch size: {actual_device_batch_size}, Global batch size: {global_batch_size if global_batch_size else 'N/A'}, Gradient accumulation steps: {num_grad_accum_steps}")
         
         stage_dataset = HolographicPointerDataset(
             num_samples=num_samples,
@@ -179,14 +203,18 @@ def train_with_curriculum(
             beta=beta,
             gamma=gamma
         )
-        stage_loader = DataLoader(stage_dataset, batch_size=batch_size, shuffle=True)
+        stage_loader = DataLoader(stage_dataset, batch_size=actual_device_batch_size, shuffle=True, num_workers=8)
+        
+        print(f"  Dataset size: {len(stage_dataset)}, Batches per epoch: {len(stage_loader)}")
         
         for epoch_in_stage in tqdm(range(stage_epochs), desc=f"{model_name} Stage {stage_idx + 1} (k={path_length})", leave=False):
             epoch_loss = 0
             epoch_correct = 0
             epoch_total = 0
             
-            for data in stage_loader:
+            optimizer.zero_grad()  # Zero gradients at the start of epoch
+            
+            for batch_idx, data in enumerate(stage_loader):
                 sequence, start_query, final_target = data
                 x = sequence.to(device)
                 y = final_target.to(device)
@@ -194,16 +222,27 @@ def train_with_curriculum(
                 logits = model(x)
                 loss = criterion(logits, y)
                 
-                optimizer.zero_grad()
+                # Scale loss by accumulation steps to maintain gradient magnitude
+                loss = loss / num_grad_accum_steps
                 loss.backward()
-                torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
-                optimizer.step()
                 
-                epoch_loss += loss.item()
-                # Calculate accuracy
+                # Calculate accuracy (before scaling)
                 _, predicted = torch.max(logits.data, 1)
                 epoch_total += y.size(0)
                 epoch_correct += (predicted == y).sum().item()
+                epoch_loss += loss.item() * num_grad_accum_steps  # Unscale for logging
+                
+                # Update weights every num_grad_accum_steps
+                if (batch_idx + 1) % num_grad_accum_steps == 0:
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+                    optimizer.step()
+                    optimizer.zero_grad()
+            
+            # Handle remaining gradients if batch count is not divisible by num_grad_accum_steps
+            if len(stage_loader) % num_grad_accum_steps != 0:
+                torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+                optimizer.step()
+                optimizer.zero_grad()
             
             avg_loss = epoch_loss / len(stage_loader)
             avg_accuracy = 100.0 * epoch_correct / epoch_total
@@ -234,7 +273,7 @@ def train_with_curriculum(
                     log_dict.update({f"{model_name}/{k}": v for k, v in wandb_config.items()})
                 wandb.log(log_dict, step=current_epoch)
     
-    return {'losses': losses, 'accuracies': accuracies}
+    return {'losses': losses, 'accuracies': accuracies, 'optimizer': optimizer, 'criterion': criterion}
 
 
 # Backward compatibility: keep old function names as aliases
@@ -242,20 +281,28 @@ def train_with_warmup(model, device, sequence_length=256, warmup_epochs=5, warmu
     """
     Legacy warmup function - now uses unified curriculum learning.
     Returns optimizer and criterion for backward compatibility.
+    
+    FIX: Now properly returns the optimizer from curriculum training to preserve
+    optimizer state (momentum, Adam's second moments) for true warmup continuation.
     """
     stages = [
         {"path_length": warmup_length, "epochs": warmup_epochs, "num_samples": 5000, "batch_size": 64}
     ]
-    train_with_curriculum(model, device, sequence_length=sequence_length, stages=stages, lr=1e-3, use_scheduler=False, 
+    results = train_with_curriculum(model, device, sequence_length=sequence_length, stages=stages, lr=1e-3, use_scheduler=False, 
                           use_wandb=use_wandb, wandb_config=wandb_config, model_name=model_name)
     
-    optimizer = optim.AdamW(model.parameters(), lr=1e-3, weight_decay=1e-4)
-    criterion = nn.CrossEntropyLoss()
+    # FIX: Reuse the optimizer from curriculum training to preserve state
+    optimizer = results['optimizer']
+    criterion = results['criterion']
+    
+    # Optionally adjust learning rate for main training (preserves optimizer state)
+    # The caller can modify lr if needed: optimizer.param_groups[0]['lr'] = new_lr
+    
     print(">>> Ready for formal training on holographic depth")
     return optimizer, criterion
 
 
-def train_mamba_with_curriculum(model, device, sequence_length=256, epochs=50, lr=2e-3, model_name="Mamba", use_wandb=False, wandb_config=None, beta=0.0, gamma=0.0):
+def train_mamba_with_curriculum(model, device, sequence_length=256, epochs=50, lr=2e-3, model_name="Mamba", use_wandb=False, wandb_config=None, beta=0.0, gamma=0.0, global_batch_size=None, device_batch_size=None):
     """
     Smooth Staircase Curriculum Learning:
     Guide the model to undergo a first-order phase transition through progressive difficulty,
@@ -280,11 +327,28 @@ def train_mamba_with_curriculum(model, device, sequence_length=256, epochs=50, l
             {"path_length": 64,  "epochs": stage_epochs, "num_samples": 20000, "batch_size": 128},
             {"path_length": 128, "epochs": rem_epochs,   "num_samples": 20000, "batch_size": 128}
         ]
-    return train_with_curriculum(model, device, sequence_length=sequence_length, stages=stages, lr=lr, model_name=model_name, use_wandb=use_wandb, wandb_config=wandb_config, beta=beta, gamma=gamma)
+    return train_with_curriculum(model, device, sequence_length=sequence_length, stages=stages, lr=lr, model_name=model_name, use_wandb=use_wandb, wandb_config=wandb_config, beta=beta, gamma=gamma, global_batch_size=global_batch_size, device_batch_size=device_batch_size)
 
 
-def train_single_model(model, loader, device, epochs=50, lr=2e-3, model_name="Model", depth=None, use_warmup=False, sequence_length=256, use_wandb=False, wandb_config=None):
-    """Train a single model and return loss and accuracy history"""
+def train_single_model(model, loader, device, epochs=50, lr=2e-3, model_name="Model", depth=None, use_warmup=False, sequence_length=256, use_wandb=False, wandb_config=None, global_batch_size=None, device_batch_size=None):
+    """
+    Train a single model and return loss and accuracy history
+    
+    Args:
+        model: Model to train
+        loader: DataLoader for training data
+        device: Training device
+        epochs: Number of training epochs
+        lr: Learning rate
+        model_name: Name for logging
+        depth: Logical depth (for logging)
+        use_warmup: Whether to use warmup
+        sequence_length: Sequence length
+        use_wandb: Whether to use wandb
+        wandb_config: Wandb config dict
+        global_batch_size: Global batch size across all devices (if None, uses device_batch_size)
+        device_batch_size: Batch size per device (if None, uses loader batch_size)
+    """
     # Apply warmup if requested
     if use_warmup:
         optimizer, criterion = train_with_warmup(model, device, sequence_length=sequence_length, 
@@ -298,6 +362,21 @@ def train_single_model(model, loader, device, epochs=50, lr=2e-3, model_name="Mo
     
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5)
     
+    # Determine number of devices and gradient accumulation steps
+    num_devices = torch.cuda.device_count() if torch.cuda.is_available() else 1
+    actual_device_batch_size = device_batch_size if device_batch_size is not None else loader.batch_size
+    
+    if global_batch_size is not None:
+        effective_batch_size = actual_device_batch_size * num_devices
+        num_grad_accum_steps = max(1, global_batch_size // effective_batch_size)
+        if global_batch_size % effective_batch_size != 0:
+            print(f"  Warning: global_batch_size ({global_batch_size}) not divisible by effective_batch_size ({effective_batch_size}). Using {num_grad_accum_steps} accumulation steps.")
+    else:
+        num_grad_accum_steps = 1
+    
+    if num_grad_accum_steps > 1:
+        print(f"  Device batch size: {actual_device_batch_size}, Global batch size: {global_batch_size if global_batch_size else 'N/A'}, Gradient accumulation steps: {num_grad_accum_steps}")
+    
     losses = []
     accuracies = []
     model.train()
@@ -309,7 +388,9 @@ def train_single_model(model, loader, device, epochs=50, lr=2e-3, model_name="Mo
         epoch_correct = 0
         epoch_total = 0
         
-        for data in loader:
+        optimizer.zero_grad()  # Zero gradients at the start of epoch
+        
+        for batch_idx, data in enumerate(loader):
             sequence, start_query, final_target = data
             x = sequence.to(device)
             y = final_target.to(device)
@@ -317,16 +398,27 @@ def train_single_model(model, loader, device, epochs=50, lr=2e-3, model_name="Mo
             logits = model(x)
             loss = criterion(logits, y)
             
-            optimizer.zero_grad()
+            # Scale loss by accumulation steps to maintain gradient magnitude
+            loss = loss / num_grad_accum_steps
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
-            optimizer.step()
             
-            epoch_loss += loss.item()
-            # Calculate accuracy
+            # Calculate accuracy (before scaling)
             _, predicted = torch.max(logits.data, 1)
             epoch_total += y.size(0)
             epoch_correct += (predicted == y).sum().item()
+            epoch_loss += loss.item() * num_grad_accum_steps  # Unscale for logging
+            
+            # Update weights every num_grad_accum_steps
+            if (batch_idx + 1) % num_grad_accum_steps == 0:
+                torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+                optimizer.step()
+                optimizer.zero_grad()
+        
+        # Handle remaining gradients if batch count is not divisible by num_grad_accum_steps
+        if len(loader) % num_grad_accum_steps != 0:
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+            optimizer.step()
+            optimizer.zero_grad()
         
         avg_loss = epoch_loss / len(loader)
         avg_accuracy = 100.0 * epoch_correct / epoch_total
@@ -356,7 +448,7 @@ def train_single_model(model, loader, device, epochs=50, lr=2e-3, model_name="Mo
     return {'losses': losses, 'accuracies': accuracies}
 
 
-def ablation_study(sequence_length=256, path_depths=[8, 32, 128], epochs=3, test_generalization=False, use_warmup=False, job_id="default", use_wandb=False, wandb_project="holographic-data", wandb_entity=None, beta=0.0, gamma=0.0):
+def ablation_study(sequence_length=256, path_depths=[8, 32, 128], epochs=3, test_generalization=False, use_warmup=False, job_id="default", use_wandb=False, wandb_project="holographic-data", wandb_entity=None, beta=0.0, gamma=0.0, global_batch_size=None, device_batch_size=None):
     """
     Ablation study comparing multiple model variants:
     1. Standard Transformer (deep, narrow)
@@ -388,17 +480,16 @@ def ablation_study(sequence_length=256, path_depths=[8, 32, 128], epochs=3, test
                 d_model=32,
                 nhead=4,
                 dim_feedforward=64,
-                num_layers=16,
-                max_seq_len=300
+                num_layers=16
             ).to(device)
         },
         {
-            "name": "Mamba (SSM, 16 layers)",
+            "name": f"Mamba (SSM, 8 layers)",
             "model_fn": lambda: HolographicMamba(
                 sequence_length=sequence_length,
-                d_model=128,
-                d_state=256,
-                num_layers=16
+                d_model=32, # 128,
+                d_state=64, # 256,
+                num_layers=8, # 16
             ).to(device)
         },
         # {
@@ -420,7 +511,6 @@ def ablation_study(sequence_length=256, path_depths=[8, 32, 128], epochs=3, test
         #         nhead=4,
         #         dim_feedforward=64,
         #         num_layers=16,
-        #         max_seq_len=300,
         #         top_k=2
         #     ).to(device)
         # },
@@ -432,7 +522,6 @@ def ablation_study(sequence_length=256, path_depths=[8, 32, 128], epochs=3, test
         #         nhead=4,
         #         dim_feedforward=64,
         #         num_layers=16,
-        #         max_seq_len=300,
         #         top_k=4
         #     ).to(device)
         # },
@@ -444,7 +533,6 @@ def ablation_study(sequence_length=256, path_depths=[8, 32, 128], epochs=3, test
         #         nhead=4,
         #         dim_feedforward=64,
         #         num_layers=16,
-        #         max_seq_len=300,
         #         top_k=8
         #     ).to(device)
         # },
@@ -506,12 +594,14 @@ def ablation_study(sequence_length=256, path_depths=[8, 32, 128], epochs=3, test
         print(f"Epochs: {epochs}")
         
         mamba_model = mamba_config["model_fn"]()
+        mamba_model = torch.compile(mamba_model)
         wandb_config_mamba = {"model_type": "Mamba", "training_type": "curriculum"} if use_wandb else None
         mamba_results = train_mamba_with_curriculum(
             mamba_model, device, sequence_length=sequence_length, 
             epochs=epochs, model_name=mamba_config["name"],
             use_wandb=use_wandb, wandb_config=wandb_config_mamba,
-            beta=beta, gamma=gamma
+            beta=beta, gamma=gamma,
+            global_batch_size=global_batch_size, device_batch_size=device_batch_size
         )
         mamba_losses = mamba_results['losses']
         mamba_accuracies = mamba_results['accuracies']
@@ -578,7 +668,7 @@ def ablation_study(sequence_length=256, path_depths=[8, 32, 128], epochs=3, test
             beta=beta,
             gamma=gamma
         )
-        loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+        loader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=8)
         
         if depth not in all_results:
             all_results[depth] = {}
@@ -587,12 +677,14 @@ def ablation_study(sequence_length=256, path_depths=[8, 32, 128], epochs=3, test
         if depth == 32 and mamba_config:
             print(f"\n  Training: {mamba_config['name']} (k=32, standard training)")
             mamba_model_k32 = mamba_config["model_fn"]()
+            mamba_model_k32 = torch.compile(mamba_model_k32)
             wandb_config_mamba = {"model_type": "Mamba", "training_type": "standard", "depth": depth} if use_wandb else None
             results = train_single_model(
                 mamba_model_k32, loader, device, epochs=epochs,
                 model_name=mamba_config["name"], depth=depth,
                 use_warmup=use_warmup, sequence_length=sequence_length,
-                use_wandb=use_wandb, wandb_config=wandb_config_mamba
+                use_wandb=use_wandb, wandb_config=wandb_config_mamba,
+                global_batch_size=global_batch_size, device_batch_size=device_batch_size
             )
             all_results[depth][mamba_config["name"]] = results
             print(f"  ✓ {mamba_config['name']}: Final loss = {results['losses'][-1]:.4f} | Final acc = {results['accuracies'][-1]:.2f}%")
@@ -605,12 +697,14 @@ def ablation_study(sequence_length=256, path_depths=[8, 32, 128], epochs=3, test
         for config in other_configs:
             print(f"\n  Training: {config['name']}")
             model = config["model_fn"]()
+            model = torch.compile(model)
             wandb_config_model = {"model_type": config["name"], "depth": depth} if use_wandb else None
             results = train_single_model(
                 model, loader, device, epochs=epochs,
                 model_name=config["name"], depth=depth,
                 use_warmup=use_warmup, sequence_length=sequence_length,
-                use_wandb=use_wandb, wandb_config=wandb_config_model
+                use_wandb=use_wandb, wandb_config=wandb_config_model,
+                global_batch_size=global_batch_size, device_batch_size=device_batch_size
             )
             
             all_results[depth][config["name"]] = results
@@ -895,14 +989,18 @@ def plot_ablation_results(all_results, path_depths, epochs=50, job_id="default")
     plt.show()
 
 
-def test_length_generalization(model, device, sequence_length=256, test_lengths=[32, 128, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072]):
+def test_length_generalization(model, device, sequence_length=256, test_lengths=[32, 128, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072], fixed_path_length=128):
     """
     Validate Section 2.2 of the paper: Operator Isomorphism
     Test the model's logical preservation capability on unseen ultra-long sequences
+    
+    FIX 3: path_length should be fixed (k), while sequence_length (L) varies
+    This tests length generalization: same logical depth k, but longer sequences L
     """
     model.eval()
     print("\n" + "="*50)
     print("LENGTH GENERALIZATION TEST (Zero-shot)")
+    print(f"Fixed path_length (k) = {fixed_path_length}, varying sequence_length (L)")
     print("="*50)
     print(f"{'Test Length (L)':<20} | {'Accuracy':<10} | {'Status':<10}")
     print("-" * 50)
@@ -910,11 +1008,12 @@ def test_length_generalization(model, device, sequence_length=256, test_lengths=
     with torch.no_grad():
         for length in test_lengths:
             try:
-                # Generate ultra-long test data
+                # FIX 3: Use fixed path_length, not length
+                # This tests if model can generalize to longer sequences with same logical depth
                 test_dataset = HolographicPointerDataset(
                     num_samples=1000, 
                     sequence_length=length, 
-                    path_length=length
+                    path_length=fixed_path_length  # Fixed k, not length
                 )
                 test_loader = DataLoader(test_dataset, batch_size=32)
                 
@@ -925,15 +1024,37 @@ def test_length_generalization(model, device, sequence_length=256, test_lengths=
                     x = sequence.to(device)
                     y = final_target.to(device)
                     outputs = model(x)
-                    _, predicted = torch.max(outputs.data, 1)
-                    total += y.size(0)
-                    correct += (predicted == y).sum().item()
+                    
+                    # FIX 3: Handle variable output dimensions
+                    # If model was trained on sequence_length=256, outputs have 256 classes
+                    # But test data might have length > 256, so targets are in [0, length-1]
+                    # We need to either:
+                    # 1. Truncate targets to [0, sequence_length-1] if length > sequence_length
+                    # 2. Or use a model that supports variable output dimensions
+                    # For now, we'll truncate: only test if length <= sequence_length
+                    if length > sequence_length:
+                        # Only test samples where target < sequence_length
+                        valid_mask = y < sequence_length
+                        if valid_mask.sum() == 0:
+                            continue  # Skip this batch if no valid samples
+                        y_valid = y[valid_mask]
+                        outputs_valid = outputs[valid_mask]
+                        _, predicted = torch.max(outputs_valid.data, 1)
+                        total += y_valid.size(0)
+                        correct += (predicted == y_valid).sum().item()
+                    else:
+                        _, predicted = torch.max(outputs.data, 1)
+                        total += y.size(0)
+                        correct += (predicted == y).sum().item()
                 
-                accuracy = 100 * correct / total
-                status = "OK"
-                print(f"L = {length:<14} | {accuracy:>8.2f}% | {status:<10}")
+                if total > 0:
+                    accuracy = 100 * correct / total
+                    status = "OK"
+                    print(f"L = {length:<14} | {accuracy:>8.2f}% | {status:<10}")
+                else:
+                    print(f"L = {length:<14} | {'N/A':>8} | SKIPPED (no valid samples)")
             except Exception as e:
-                # Handle models that can't process sequences longer than max_seq_len
+                # Handle models that can't process sequences longer than sequence_length
                 status = "FAILED"
                 error_msg = str(e)[:30] + "..." if len(str(e)) > 30 else str(e)
                 print(f"L = {length:<14} | {'N/A':>8} | {status:<10} ({error_msg})")
@@ -949,6 +1070,10 @@ if __name__ == "__main__":
     wandb_project = "holographic-data"
     wandb_entity = "hanlin-ml"
     
+    global_batch_size = None
+    device_batch_size = 32
+    sequence_length = 128
+    
     if len(sys.argv) > 1:
         for i, arg in enumerate(sys.argv):
             if arg == '--job-id' and i + 1 < len(sys.argv):
@@ -959,6 +1084,10 @@ if __name__ == "__main__":
                 wandb_project = sys.argv[i + 1]
             elif arg == '--wandb-entity' and i + 1 < len(sys.argv):
                 wandb_entity = sys.argv[i + 1]
+            elif arg == '--global-batch-size' and i + 1 < len(sys.argv):
+                global_batch_size = int(sys.argv[i + 1])
+            elif arg == '--device-batch-size' and i + 1 < len(sys.argv):
+                device_batch_size = int(sys.argv[i + 1])
     
     if len(sys.argv) > 1 and sys.argv[1] == "ablation":
         print("Running ablation study")
@@ -966,7 +1095,8 @@ if __name__ == "__main__":
             print(f"Job ID: {job_id}")
         if use_wandb:
             print(f"W&B enabled: project={wandb_project}, entity={wandb_entity}")
-        ablation_study(epochs=50, test_generalization=True, use_warmup=True, job_id=job_id, 
-                      use_wandb=use_wandb, wandb_project=wandb_project, wandb_entity=wandb_entity)
+        ablation_study(sequence_length=sequence_length, epochs=50, test_generalization=True, use_warmup=True, job_id=job_id, 
+                      use_wandb=use_wandb, wandb_project=wandb_project, wandb_entity=wandb_entity,
+                      global_batch_size=global_batch_size, device_batch_size=device_batch_size)
     else:
         train_holographic_experiment_deep()

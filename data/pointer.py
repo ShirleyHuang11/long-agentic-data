@@ -16,8 +16,10 @@ class HolographicPointerDataset(Dataset):
         self.beta = beta                  # β: Controls jump locality (larger values favor nearby tokens)
         self.gamma = gamma                # γ: Noise ratio (higher values = more noise, sparser information)
         
-        # Vocabulary definition (simplified)
-        self.vocab_size = 1000
+        # Vocabulary definition
+        # FIX 1: vocab_size must be >= seq_len + 1 to accommodate position tokens (1..seq_len)
+        # padding=0, position tokens start from 1
+        self.vocab_size = max(1000, sequence_length + 1)
         self.noise_tokens = list(range(100, self.vocab_size)) 
 
     def __len__(self):
@@ -50,13 +52,20 @@ class HolographicPointerDataset(Dataset):
         sequence = [random.choice(self.noise_tokens) for _ in range(self.seq_len)]
         
         # Embed logical pointers: A -> B, B -> C
+        # FIX 1: Shift position tokens by +1 to avoid conflict with pad_id=0
+        # padding=0, position tokens start from 1 (1..seq_len)
         for i in range(self.path_length):
             curr_pos = path_positions[i]
             next_pos = path_positions[i+1]
-            # Encode mapping relationship with special token: e.g., token_id = next_pos (simplified)
-            sequence[curr_pos] = next_pos 
-            
-        start_query = path_positions[0]
+            # Encode mapping: token_id = next_pos + 1 (to avoid pad_id=0 conflict)
+            sequence[curr_pos] = next_pos + 1 
+        
+        # FIX 2: Inject start_query into sequence at position 0
+        # This tells the model where to start following the chain
+        start_query = path_positions[0] + 1  # Also shift by +1
+        sequence[0] = start_query  # Inject at position 0
+        
+        # final_target remains as position class (0..seq_len-1) for classification
         final_target = path_positions[-1]
         
         return torch.tensor(sequence, dtype=torch.long), torch.tensor(start_query, dtype=torch.long), torch.tensor(final_target, dtype=torch.long)
