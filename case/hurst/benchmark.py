@@ -23,8 +23,8 @@ ENCODE_BATCH_SIZE = 16  # chunks per batch for progress bar
 # Datasets: (display_name, path, subset_name or None, split, context_lengths for gamma)
 # https://huggingface.co/datasets/Salesforce/wikitext
 DATASET_CONFIGS = [
-    ("TinyStories", "roneneldan/TinyStories", None, f"train[:{NUM_SAMPLES}]", [64, 128, 256, 512]),
-    ("WikiText-2", "Salesforce/wikitext", "wikitext-2-raw-v1", f"train[:{NUM_SAMPLES}]", [128, 512]),
+    # ("TinyStories", "roneneldan/TinyStories", None, f"train[:{NUM_SAMPLES}]", [64, 128, 256, 512]),
+    ("WikiText-2", "Salesforce/wikitext", "wikitext-2-raw-v1", f"train[:{NUM_SAMPLES}]", [32, 64, 128, 256]), # 2, 4, 8, 16
 ]
 
 
