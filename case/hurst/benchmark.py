@@ -2,6 +2,7 @@ import numpy as np
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from datasets import load_dataset
+from sentence_transformers import SentenceTransformer
 from sklearn.decomposition import PCA
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
@@ -10,18 +11,38 @@ from tqdm import tqdm
 # ==========================================
 # 0. Base setup aligned with paper settings
 # ==========================================
-# Use TinyStories dataset and GPT-2 architecture as in the paper
 MODEL_NAME = "gpt2"
-DATASET_NAME = "roneneldan/TinyStories"
-NUM_SAMPLES = 1000  # subset of stories for statistical analysis
+NUM_SAMPLES = 1000  # subset for statistical analysis
 MAX_LAG_BETA = 100  # max lag for estimating beta and H
-CONTEXT_LENGTHS = [64, 128, 256, 512]  # context horizons for gamma
 
-print(f"Loading Model ({MODEL_NAME}) and Dataset ({DATASET_NAME})...")
+# Hurst signal: same embedding as language.py (Snowflake Arctic Embed M)
+EMBEDDING_MODEL = "Snowflake/snowflake-arctic-embed-m"
+CHUNK_SIZE = 128  # characters per chunk for sequence of embeddings
+ENCODE_BATCH_SIZE = 16  # chunks per batch for progress bar
+
+# Datasets: (display_name, path, subset_name or None, split, context_lengths for gamma)
+# https://huggingface.co/datasets/Salesforce/wikitext
+DATASET_CONFIGS = [
+    ("TinyStories", "roneneldan/TinyStories", None, f"train[:{NUM_SAMPLES}]", [64, 128, 256, 512]),
+    ("WikiText-2", "Salesforce/wikitext", "wikitext-2-raw-v1", f"train[:{NUM_SAMPLES}]", [128, 512]),
+]
+
+
+def load_corpus(display_name, path, subset, split):
+    """Load dataset and return single text corpus. TinyStories: join with EOS; WikiText: join with space."""
+    if subset:
+        ds = load_dataset(path, subset, split=split)
+    else:
+        ds = load_dataset(path, split=split)
+    texts = ds["text"]
+    if "TinyStories" in display_name:
+        return " <|endoftext|> ".join(texts)
+    return " ".join(texts)
+
+
+print(f"Loading Model ({MODEL_NAME})...")
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 model = AutoModelForCausalLM.from_pretrained(MODEL_NAME)
-dataset = load_dataset(DATASET_NAME, split=f"train[:{NUM_SAMPLES}]")
-text_corpus = " ".join(dataset['text'])
 
 # ==========================================
 # 1. Paper method A: Compute Gamma (conditional entropy decay with context)
@@ -52,11 +73,25 @@ def compute_gamma(text, context_lengths):
     def entropy_decay_func(n, A, gamma, H_inf):
         return A * np.power(n, -gamma) + H_inf
     
-    # Initial guess: A=1.0, gamma=0.5, H_inf=min(entropies)
-    popt, _ = curve_fit(entropy_decay_func, context_lengths, entropies, 
-                        p0=(1.0, 0.5, min(entropies)), maxfev=5000)
-    gamma_val = popt[1]
+    try:
+        # A must be positive; gamma typically in (0, 2); H_inf must not exceed the smallest observed entropy
+        lower_bounds = [0.01, 0.01, 0.0]
+        upper_bounds = [10.0, 2.0, min(entropies) + 0.1]
+        popt, _ = curve_fit(entropy_decay_func, context_lengths, entropies, 
+                            bounds=(lower_bounds, upper_bounds), maxfev=10000)
+        gamma_val = popt[1]
+    except Exception as e:
+        print(f"Curve fit failed: {e}. Falling back to simple log-log regression.")
+        # Fallback: log-linear regression
+        H_inf_guess = min(entropies) * 0.95
+        log_n = np.log(context_lengths)
+        log_H = np.log([e - H_inf_guess for e in entropies])
+        slope, _ = np.polyfit(log_n, log_H, 1)
+        gamma_val = -slope
+
+    print(f"-> Entropies over contexts: {[float(round(e, 3)) for e in entropies]}")
     print(f"-> Estimated Gamma: {gamma_val:.4f}")
+    
     return gamma_val, entropies
 
 # ==========================================
@@ -72,24 +107,37 @@ def get_hurst_exponent(time_series, max_lag=100):
     m = np.polyfit(np.log(lags), np.log(tau), 1)
     return m[0]
 
+# Extract 1D embedding signal using Snowflake Arctic Embed M (same as language.py)
+def extract_embedding_signal(text):
+    """Chunk text, encode with Snowflake Arctic Embed M, reduce to 1D via PCA."""
+    print("Loading Snowflake Arctic Embed M and extracting embeddings for Hurst...")
+    emb_model = SentenceTransformer(EMBEDDING_MODEL)
+    chunks = [
+        text[i : i + CHUNK_SIZE].strip()
+        for i in range(0, len(text), CHUNK_SIZE)
+        if text[i : i + CHUNK_SIZE].strip()
+    ]
+    if not chunks:
+        raise ValueError("No non-empty chunks from text.")
+    all_embeddings = []
+    for i in tqdm(
+        range(0, len(chunks), ENCODE_BATCH_SIZE),
+        desc="Encoding chunks",
+        unit="batch",
+    ):
+        batch = chunks[i : i + ENCODE_BATCH_SIZE]
+        emb = emb_model.encode(batch)
+        all_embeddings.append(np.asarray(emb, dtype=np.float64))
+    embeddings = np.vstack(all_embeddings)
+    pca = PCA(n_components=1)
+    signal = pca.fit_transform(embeddings).flatten()
+    return signal
+
 # Paper: C(r) ~ r^(-beta); physically beta = 2 - 2H
 def compute_hurst_and_beta(text):
     print("\n--- Computing Hurst (H) and Beta (Correlation Decay) ---")
-    # For speed, extract static embeddings by word/token chunks
-    words = text.split()[:5000] 
-    vocab_embeddings = model.transformer.wte.weight.detach().numpy()
-    
-    # Map text to a continuous embedding signal
-    signal_embs = []
-    for w in words:
-        tok = tokenizer.encode(w)
-        if tok:
-            signal_embs.append(vocab_embeddings[tok[0]])
-    signal_embs = np.array(signal_embs)
-    
-    # PCA to 1D stationary semantic fluctuation (fGN)
-    pca = PCA(n_components=1)
-    signal = pca.fit_transform(signal_embs).flatten()
+    # Use Snowflake Arctic Embed M for embedding signal (same as language.py)
+    signal = extract_embedding_signal(text)
     
     # 2.1 Compute Beta (direct fit to autocorrelation)
     lags_beta = np.arange(1, MAX_LAG_BETA)
@@ -104,6 +152,8 @@ def compute_hurst_and_beta(text):
     
     popt_beta, _ = curve_fit(power_law, valid_lags, valid_corr, p0=(1.0, 0.5))
     beta_direct = popt_beta[1]
+    
+    # beta_direct, beta_from_hurst = 0.0992, 0.9092
     
     # 2.2 Hurst via shared estimation (language.py style: integrate then log-log slope)
     hurst_val = get_hurst_exponent(signal, max_lag=MAX_LAG_BETA)
@@ -120,23 +170,30 @@ def compute_hurst_and_beta(text):
 # ==========================================
 # 3. Results summary and theory alignment
 # ==========================================
-if __name__ == "__main__":
-    gamma, _ = compute_gamma(text_corpus, CONTEXT_LENGTHS)
+def run_and_report(display_name, text_corpus, context_lengths):
+    """Run gamma + Hurst/beta on corpus and print report for this dataset."""
+    gamma, _ = compute_gamma(text_corpus, context_lengths)
     H, beta_direct, beta_from_hurst = compute_hurst_and_beta(text_corpus)
-    
-    # Paper prediction for scaling-law exponent alpha_D
     alpha_from_direct = gamma / (2 * beta_direct)
-    alpha_from_hurst  = gamma / (2 * beta_from_hurst)
-    
-    print("\n" + "="*50)
-    print(" 🎯 FINAL SCALING LAW PREDICTION (Cagnetta et al. 2026)")
-    print("="*50)
-    print(f"1. Dataset: TinyStories (Highly structured, logical language)")
-    print(f"2. Information Decay (Gamma):  {gamma:.4f} (How fast context helps)")
+    alpha_from_hurst = gamma / (2 * beta_from_hurst)
+    print("\n" + "=" * 50)
+    print(f" 🎯 {display_name} — SCALING LAW PREDICTION (Cagnetta et al. 2026)")
+    print("=" * 50)
+    print(f"1. Dataset: {display_name}")
+    print(f"2. Information Decay (Gamma):  {gamma:.4f}")
     print(f"3. Correlation Decay (Beta):   {beta_from_hurst:.4f} (via Hurst) vs {beta_direct:.4f} (Direct)")
-    print("-"*50)
+    print("-" * 50)
     print(f"Predicted Scaling Exponent (alpha = gamma / 2*beta):")
-    print(f" => Alpha (Using Hurst logic): {alpha_from_hurst:.4f}")
-    print(f" => Alpha (Using Direct Fit):  {alpha_from_direct:.4f}")
-    print("="*50)
-    print("Interpretation: A higher alpha means steeper, more efficient scaling.")
+    print(f" Alpha (from Cagnetta et al. 2026): {alpha_from_hurst:.4f}")
+    print(f" => Alpha (Using Hurst logic):     {alpha_from_hurst:.4f}")
+    print(f" => Alpha (Using Direct Fit):      {alpha_from_direct:.4f}")
+    print("=" * 50)
+    return gamma, H, beta_direct, beta_from_hurst, alpha_from_hurst, alpha_from_direct
+
+
+if __name__ == "__main__":
+    for display_name, path, subset, split, context_lengths in DATASET_CONFIGS:
+        print(f"\n{'-'*60}\n# {display_name} ({path}), context_lengths={context_lengths}\n{'-'*60}")
+        text_corpus = load_corpus(display_name, path, subset, split)
+        run_and_report(display_name, text_corpus, context_lengths)
+    print("\nInterpretation: A higher alpha means steeper, more efficient scaling.")
