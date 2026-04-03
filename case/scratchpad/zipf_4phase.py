@@ -107,16 +107,16 @@ class StandardMamba(nn.Module):
         out = self.final_norm(out)
         return self.fc(out)
 
-def run_physics_simulation():
+def run_physics_simulation(train_steps=501):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     gen = PhaseTransitionDataGen()
     
-    # Four physical anchor regimes (train_steps optional; default 501)
+    # Four physical anchor regimes
     regimes = {
-        # "🟢 Natural (Wikipedia)": {"beta": 2.0, "gamma": 0.8},
-        # "🟠 CoT (reasoning with explanations)": {"beta": 0.5, "gamma": 0.4},
-        "🟡 Edge of Chaos (o1/sweet spot)": {"beta": 0.05, "gamma": 0.05, "train_steps": 2000},
-        # "🔴 The Abyss (topological collapse zone)": {"beta": 0.0, "gamma": 0.0}
+        "🟢 Natural (Wikipedia)": {"beta": 2.0, "gamma": 0.8, "train_steps": train_steps},
+        "🟠 CoT (reasoning with explanations)": {"beta": 0.5, "gamma": 0.4, "train_steps": train_steps},
+        "🟡 Edge of Chaos (o1/sweet spot)": {"beta": 0.05, "gamma": 0.05, "train_steps": train_steps},
+        "🔴 The Abyss (topological collapse zone)": {"beta": 0.0, "gamma": 0.0, "train_steps": train_steps}
     }
     
     train_len = 256
@@ -219,4 +219,5 @@ def run_physics_simulation():
     print("=" * 60)
 
 if __name__ == "__main__":
-    run_physics_simulation()
+    import fire
+    fire.Fire(run_physics_simulation)

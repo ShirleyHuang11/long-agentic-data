@@ -471,12 +471,20 @@ def ablation_study(sequence_length=256, path_depths=[8, 32, 128], epochs=3, test
         device = torch.device("cpu")
     print(f"Using device: {device}")
     
+    # Calculate max_test_length to use as context length for models to avoid bugs
+    # Default test_lengths from test_length_generalization
+    default_test_lengths = [32, 128, 512, 1024, 2048, 4096, 8192, 16384, 32768]
+    max_test_length = max(default_test_lengths) if test_generalization else sequence_length
+    # Use max_test_length as the context length for model initialization
+    model_context_length = max(max_test_length, sequence_length)
+    print(f"Using model context length: {model_context_length} (max_test_length={max_test_length}, sequence_length={sequence_length})")
+    
     # Define model variants to test
     model_configs = [
         {
             "name": "Standard Transformer (16 layers)",
             "model_fn": lambda: HolographicTransformer(
-                sequence_length=sequence_length,
+                sequence_length=model_context_length,
                 d_model=32,
                 nhead=4,
                 dim_feedforward=64,
@@ -486,7 +494,7 @@ def ablation_study(sequence_length=256, path_depths=[8, 32, 128], epochs=3, test
         {
             "name": f"Mamba (SSM, 8 layers)",
             "model_fn": lambda: HolographicMamba(
-                sequence_length=sequence_length,
+                sequence_length=model_context_length,
                 d_model=32, # 128,
                 d_state=64, # 256,
                 num_layers=8, # 16
@@ -606,7 +614,7 @@ def ablation_study(sequence_length=256, path_depths=[8, 32, 128], epochs=3, test
         # Test length generalization if requested
         if test_generalization:
             print(f"\n  Testing length generalization for {mamba_config['name']}...")
-            test_length_generalization(mamba_model, device, sequence_length=sequence_length)
+            test_length_generalization(mamba_model, device, sequence_length=model_context_length)
     
     # Train other models per depth (standard training)
     for depth in path_depths:
@@ -648,7 +656,7 @@ def ablation_study(sequence_length=256, path_depths=[8, 32, 128], epochs=3, test
             # Test length generalization if requested
             if test_generalization:
                 print(f"\n  Testing length generalization for {mamba_config['name']}...")
-                test_length_generalization(mamba_model_k32, device, sequence_length=sequence_length)
+                test_length_generalization(mamba_model_k32, device, sequence_length=model_context_length)
         
         for config in other_configs:
             print(f"\n  Training: {config['name']}")
@@ -669,7 +677,7 @@ def ablation_study(sequence_length=256, path_depths=[8, 32, 128], epochs=3, test
             # Test length generalization if requested
             if test_generalization:
                 print(f"\n  Testing length generalization for {config['name']}...")
-                test_length_generalization(model, device, sequence_length=sequence_length)
+                test_length_generalization(model, device, sequence_length=model_context_length)
     
     # Print summary table
     print_summary_table(all_results, path_depths)
