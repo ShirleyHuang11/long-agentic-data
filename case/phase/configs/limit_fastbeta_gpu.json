@@ -1,0 +1,17 @@
+{
+  "vocab_size": 60,
+  "train_len": 64,
+  "eval_lengths": [64, 96, 128, 192, 256, 384],
+  "d_model": 96,
+  "nhead": 4,
+  "ff_mult": 4,
+  "num_layers": 3,
+  "dropout": 0.1,
+  "train_steps": 1200,
+  "train_batch_size": 256,
+  "eval_batch_size": 256,
+  "eval_batches": 12,
+  "lr": 0.0008,
+  "grad_clip": 1.0,
+  "deterministic": false
+}
