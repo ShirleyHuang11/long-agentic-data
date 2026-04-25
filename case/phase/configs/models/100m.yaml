@@ -1,0 +1,35 @@
+# 100M-scale TinyCausalTransformer preset.
+# Architecture is sized at ~100.83M non-embedding params, just above the
+# MIN_NON_EMBED_PARAMS=100M floor enforced by phase_sweep.build_config:
+#   d_model=1024, num_layers=8, ff_mult=4, nhead=16  →  ~100.83M non-embed.
+# Context bumped to train_len=512, eval up to 2048 (4× extrapolation).
+# Batch sizes reduced to absorb the L² attention cost on H200/A100 at seq=2048.
+# Loaded by utils.load_config when default.yaml has `model_preset: 100m`.
+# All fields here become cfg.model.<name>; overridable on the CLI as
+#   `model.train_steps=10000` etc.
+
+# ---- Architecture ----
+vocab_size: 60
+d_model: 1024
+nhead: 16
+ff_mult: 4
+num_layers: 8
+dropout: 0.1
+
+# ---- Training ----
+train_len: 512
+eval_lengths: [512, 1024, 2048]
+train_steps: 5000
+train_batch_size: 32
+eval_batch_size: 8
+eval_batches: 8
+lr: 3e-4
+warmup_steps: 100        # linear warmup steps before cosine decay
+lr_min_ratio: 0.1        # cosine decays from 1.0× peak to this fraction
+grad_clip: 1.0
+deterministic: false
+
+# ---- Rényi diagnostics on raw token sequences ----
+renyi_seq_len: 12000
+renyi_qs: [0.5, 1.0, 2.0]
+renyi_orders: [1, 2, 3]

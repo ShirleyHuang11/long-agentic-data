@@ -4,8 +4,10 @@
 Designed for reproducible large sweeps used in paper-grade experiments.
 """
 
-import random
+import math
+import sys
 import time
+from pathlib import Path
 from typing import Dict, List, Sequence, Tuple
 
 import numpy as np
@@ -13,26 +15,15 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from model import (  # noqa: F401 — re-exported for callers
+    MIN_NON_EMBED_PARAMS,
+    TinyCausalTransformer,
+    count_non_embedding_params,
+)
+from utils import set_all_seeds  # noqa: F401 — re-exported for callers
+
 EPS = 1e-8
-
-
-def parse_float_list(s: str) -> List[float]:
-    return [float(x.strip()) for x in s.split(",") if x.strip()]
-
-
-def parse_int_list(s: str) -> List[int]:
-    return [int(x.strip()) for x in s.split(",") if x.strip()]
-
-
-def set_all_seeds(seed: int, deterministic: bool = False) -> None:
-    random.seed(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(seed)
-    if deterministic:
-        torch.use_deterministic_algorithms(True)
-        torch.backends.cudnn.benchmark = False
 
 
 def _renyi_entropy_from_counts(counts: np.ndarray, q: float) -> float:
@@ -186,41 +177,6 @@ class AlgorithmicKVGenerator:
         return torch.tensor(x_batch), torch.tensor(y_batch), torch.tensor(m_batch)
 
 
-class TinyCausalTransformer(nn.Module):
-    def __init__(
-        self,
-        vocab_size: int = 60,
-        d_model: int = 64,
-        nhead: int = 4,
-        ff_mult: int = 2,
-        num_layers: int = 2,
-        max_ctx_tokens: int = 1024,
-        dropout: float = 0.1,
-    ) -> None:
-        super().__init__()
-        self.embedding = nn.Embedding(vocab_size, d_model)
-        self.pos_emb = nn.Parameter(torch.randn(1, max_ctx_tokens, d_model) * 0.01)
-
-        layer = nn.TransformerEncoderLayer(
-            d_model=d_model,
-            nhead=nhead,
-            dim_feedforward=ff_mult * d_model,
-            dropout=dropout,
-            batch_first=True,
-            activation="gelu",
-        )
-        self.transformer = nn.TransformerEncoder(layer, num_layers=num_layers)
-        self.fc = nn.Linear(d_model, vocab_size)
-        self.register_buffer("mask", torch.nn.Transformer.generate_square_subsequent_mask(max_ctx_tokens))
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        seq_len = x.size(1)
-        emb = self.embedding(x) + self.pos_emb[:, :seq_len, :]
-        causal_mask = self.mask[:seq_len, :seq_len]
-        out = self.transformer(emb, mask=causal_mask, is_causal=True)
-        return self.fc(out)
-
-
 def next_token_loss_and_acc(logits: torch.Tensor, targets: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
     """Standard next-token prediction objective used in pre-training."""
     loss = F.cross_entropy(logits.reshape(-1, logits.size(-1)), targets.reshape(-1), reduction="mean")
@@ -299,8 +255,23 @@ def train_one_model(
     train_steps = int(config["train_steps"])
     train_batch_size = int(config["train_batch_size"])
     grad_clip = float(config["grad_clip"])
+    warmup_steps = int(config.get("warmup_steps", 0) or 0)
+    lr_min_ratio = float(config.get("lr_min_ratio", 0.1) or 0.0)
 
     opt = torch.optim.AdamW(model.parameters(), lr=lr)
+
+    # Linear warmup over `warmup_steps`, then cosine decay from 1.0× to
+    # `lr_min_ratio`× of peak lr across the remaining steps.
+    def _lr_lambda(step: int) -> float:
+        if warmup_steps > 0 and step < warmup_steps:
+            return float(step + 1) / float(warmup_steps)
+        decay_steps = max(1, train_steps - warmup_steps)
+        progress = (step - warmup_steps) / decay_steps
+        progress = min(max(progress, 0.0), 1.0)
+        cosine = 0.5 * (1.0 + math.cos(math.pi * progress))
+        return lr_min_ratio + (1.0 - lr_min_ratio) * cosine
+
+    scheduler = torch.optim.lr_scheduler.LambdaLR(opt, lr_lambda=_lr_lambda)
 
     t0 = time.time()
     train_loss_curve: List[float] = []
@@ -322,6 +293,7 @@ def train_one_model(
         if grad_clip > 0:
             torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
         opt.step()
+        scheduler.step()
 
     train_time = float(time.time() - t0)
     if len(train_loss_curve) == 0:
@@ -369,35 +341,3 @@ def train_one_model(
     }
 
 
-def choose_device(device_arg: str) -> torch.device:
-    if device_arg == "cpu":
-        return torch.device("cpu")
-    if device_arg == "cuda":
-        if not torch.cuda.is_available():
-            raise RuntimeError("--device cuda requested but CUDA is not available")
-        return torch.device("cuda")
-    # auto
-    return torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-
-def default_config_dict() -> Dict[str, object]:
-    return {
-        "vocab_size": 60,
-        "train_len": 64,
-        "eval_lengths": [64, 128, 256],
-        "d_model": 64,
-        "nhead": 4,
-        "ff_mult": 2,
-        "num_layers": 2,
-        "dropout": 0.1,
-        "train_steps": 500,
-        "train_batch_size": 128,
-        "eval_batch_size": 128,
-        "eval_batches": 8,
-        "lr": 1e-3,
-        "grad_clip": 1.0,
-        "deterministic": False,
-        "renyi_seq_len": 12000,
-        "renyi_qs": [0.5, 1.0, 2.0],
-        "renyi_orders": [1, 2, 3],
-    }

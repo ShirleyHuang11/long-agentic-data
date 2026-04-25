@@ -1,0 +1,66 @@
+# Single hierarchical config for case/phase/ entry points.
+# Override on the CLI with OmegaConf dotlist:
+#   python case/phase/phase_sweep.py plan.name=corners sweep.out_dir=case/phase/runs/foo
+#
+# Variants (formerly separate yamls) are now one-line overrides:
+#   smoke:        plan.name=corners sweep.seeds=[1] sweep.device=cuda \
+#                 model.train_steps=50 sweep.no_tqdm=true
+#                 # NB: the 100M-param floor in phase_sweep.build_config rejects
+#                 # CPU-friendly small models, so smoke needs a GPU.
+#   standard:     plan.name=standard sweep.device=cuda
+#   alpha_iso:    plan.name=alpha_iso plan.alpha=0.4 sweep.device=cuda
+#   refine:       plan.name=refine plan.beta=2.0 plan.gamma=0.3 sweep.device=cuda
+#
+# Model presets live in configs/models/<name>.yaml and are loaded into
+# `cfg.model` at config time. Swap with `model_preset=200m`; tweak individual
+# fields with `model.train_steps=10000` etc.
+#
+# Default I/O folders all live under case/phase/ and cascade off plan.name via
+# OmegaConf interpolation, so overriding plan.name reroutes outputs automatically.
+
+# (β, γ) selection — shared by data_generator.py and phase_sweep.py.
+plan:
+  name: standard           # standard | corners | alpha_iso | beta_axis | gamma_axis | fast_beta | refine | recommended | all
+  alpha: 0.4               # α for alpha_iso
+  beta: 0.4                # β anchor for refine / gamma_axis
+  gamma: 0.3               # γ anchor for refine / beta_axis
+  p: 2.0                   # exponent for fast_beta (β = γ^p)
+  n: 10                    # number of points for 1-D plans
+
+# Training execution — phase_sweep.py.
+sweep:
+  seeds: [1, 2, 3]
+  out_dir: case/phase/runs/${plan.name}
+  device: auto             # cpu | cuda | auto
+  long_len: null           # if set, eval at exactly {train_len, long_len}
+  no_plot: false
+  no_tqdm: false
+
+# Model + training preset, loaded from configs/models/${model_preset}.yaml
+# into cfg.model. The preset must keep non-embedding params ≥ 100M
+# (enforced by phase_sweep.build_config).
+model_preset: 100m
+
+# data_generator.py CLI extras.
+data:
+  as_cli: false            # print --betas/--gammas comma strings
+  as_pairs: false          # print b1:g1,b2:g2,... pair string
+  out: null                # optional JSON dump of the plan(s)
+  sample: false            # draw a small sample per (β, γ) and print stats
+  seq_len: 256
+  seed: 1
+
+# Phase-diagram plotting — plot_phase_diagram.py.
+plot:
+  in_summary: ${sweep.out_dir}/run_summary.csv
+  out_dir: ${sweep.out_dir}
+  phase_mode: fixed        # fixed | quantile
+  thresholds:              # used when phase_mode=fixed
+    chaos_train: 0.20
+    chaos_long: 0.10
+    rote_train: 0.40
+    rote_gap: 0.10
+    super_long: 0.50
+    super_ret: 0.85
+  long_acc_contour: 0.20   # long_acc level for the boundary contour
+  annotate: false          # print metric value inside each cell
