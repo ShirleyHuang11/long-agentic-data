@@ -482,6 +482,74 @@ This re-creates an iteration-12-style decisive test: the iter-13 vs
 iter-19 fits make opposite predictions for two specific cells. The
 pilot jobs will land the verdict.
 
+## Result 9b — first complement cell falls below 5-cell fit's prediction
+
+(Added in iteration 33. Refines Result 9 — does NOT supersede.)
+
+The first row of `standard_complement` landed at `(β=0.8, γ=0.05)`,
+extending the emergent strip to its lowest β yet observed:
+
+```
+observed:     train_acc = 0.205  (just-emergent, 0.005 above threshold)
+              long_acc  = 0.082
+5-cell fit:   train_acc = 0.232  (overestimate by 0.027)
+iter-13 fit:  train_acc = 0.248  (overestimate by 0.043)
+```
+
+Both pre-data fits over-predicted train_acc at this β=0.8 cell.
+Phase classification (emergent) is correct, but the magnitude is off.
+
+### Re-fit on 6 emergent cells (now including the N=1 β=0.8 point)
+
+```
+train_acc(β, γ) = 0.228 + 0.0645·log(β) − 0.120·γ      (R² = 0.9960)
+```
+
+| (β, γ) | observed | 5-cell fit pred | 6-cell fit pred |
+|---|---:|---:|---:|
+| (0.8, 0.05) | 0.205 | 0.232 (off 0.027) | 0.208 (off 0.003) |
+| (1.4, 0.21) | 0.230 | 0.231 (off 0.001) | 0.225 (off 0.005) |
+| (1.4, 0.255) | 0.223 | 0.222 (off 0.001) | 0.219 (off 0.004) |
+| (1.4, 0.30) | 0.212 | 0.213 (off 0.001) | 0.214 (off 0.002) |
+| (1.4, 0.345) | 0.205 | 0.204 (off 0.000) | 0.209 (off 0.004) |
+| (8, 0.02) | 0.359 | 0.360 (off 0.001) | 0.360 (off 0.001) |
+
+The 5-cell fit had near-perfect R² because **5 points × 3 free parameters
+is barely overdetermined**. The 6-cell fit's slightly higher residual
+(max 0.0057) is more honest. Coefficients shift:
+
+* β-slope: 0.0523 → 0.0645  (more sensitive to log β)
+* γ-slope: -0.197 → -0.120  (less sensitive to γ)
+* intercept: 0.254 → 0.228
+
+Implication for upcoming standard_complement cells: predictions for cells
+already covered by the verifier (P25 at β=3.2, γ=0.525) shift but
+**classifications don't** — the 6-cell fit still predicts P25 cell
+emergent (train_acc=0.240, vs 5-cell fit's 0.212). Both fits agree.
+
+The new cell will get more seeds (single-cell pilots `pilot_b4p0_g0p2`
+will not actually re-test β=0.8 cells; only standard_complement does
+each β=0.8 cell N=1, and complement is 1-seed by design). Fit will
+stabilize as more cells across the (β, γ) plane land.
+
+### Why this matters for the paper
+
+The 5-cell fit's R²=0.9999 was a **statistical artifact** of being
+nearly-saturated. The 6-cell fit's slightly higher residual reveals
+some genuine non-linearity that the 5-cell fit hid. Honest paper
+framing: "the linear law fits the data within a few percent" — not
+"the linear law fits the data exactly". Result 9's headline (held-out
+γ=0.39 prediction error 0.001) survives because it's a within-strip
+test where the linear law works best; out-of-strip extrapolation
+(β=0.8) is a real generalization regime where the fit shows its
+limits.
+
+The 6-cell fit also re-validates P25: both fits agree (β=3.2, γ=0.525)
+should be emergent, with the new fit predicting train_acc=0.240
+instead of 0.212. When that cell lands (~ row 25 of complement, in
+~13 hours), we'll have a 3rd cross-validation of the fit's
+extrapolation.
+
 ## Result 10 — emergent cells are still actively learning at 5000 steps
 
 (Added in iteration 23 from re-analysis of `aulc_train_to_final_norm`
