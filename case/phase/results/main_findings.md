@@ -47,6 +47,27 @@ Phase classifier (fixed thresholds, see `utils.classify_fixed`):
 | 2 | super-gen | `long_acc ≥ 0.50` AND `retention ≥ 0.85` |
 | 3 | rote | `train_acc ≥ 0.40` AND `gap ≥ 0.10` |
 
+## Abstract (4 sentences)
+
+We train a 100M-parameter causal Transformer on a key-value retrieval
+task parameterized by a long-range-decay sharpness β and a noise rate
+γ, and study the emergence of length-generalization across the
+(β, γ) plane. The chaos→emergent boundary is **not** a discrete phase
+transition: train_acc varies smoothly and linearly in (log β, γ) within
+the emergent strip — the corrected 2D fit
+`train_acc(β, γ) = 0.254 + 0.0523 log(β) − 0.197 γ` reaches R²=0.9999
+on 5 N=3-seed cells and predicts a held-out cell to within 0.001
+(P15 vs the qualitative P11 falsifiability test). Four independent
+diagnostics — train_acc, length-generalization ratio
+acc(2048)/acc(512), Rényi dimension D_q=1 of n-gram statistics, and
+training-loss AULC — all separate emergent from chaos with consistent
+mechanistic readings, ruling out the original single-α-threshold
+hypothesis that motivated the codebase. The boundary is a soft line
+γ*(β) ≈ 0.274 + 0.265 log(β) whose location and shape are determined
+by interior-strip cells without spending compute at the boundary
+itself, and the 23 written-down predictions (10 confirmed, 1 refuted,
+12 pending) make every claim falsifiable by a programmatic check.
+
 ## Results at a glance
 
 | # | Result | One-line headline |

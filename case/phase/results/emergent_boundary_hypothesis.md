@@ -543,6 +543,22 @@ arrive around iteration 22 (~5 hours from now).
 
 ### Why two linear laws together imply a 2-parameter (a, b) model
 
+> **CORRECTION (iter 19).** The combination below was *wrong* — it
+> mixed an emergent-cells γ-axis fit with a chaos-cells β-axis fit.
+> The "interaction term" / "rote-reclassification" interpretations
+> below are accordingly **not** needed. See `main_findings.md` Result 9
+> for the corrected 2D fit:
+>
+> ```
+> train_acc(β, γ) = 0.254 + 0.0523 · log(β) − 0.197 · γ
+> R² = 0.9999    max |resid| = 0.001
+> ```
+>
+> All 5 emergent cells — including (β=8, γ=0.02) — are explained by
+> this single linear surface with sub-0.001 residual. The text below
+> is preserved as a record of the iteration-13 reasoning that
+> produced the (now-superseded) prediction P11.
+
 Combining iterations 11 and 13 produces:
 
 ```
@@ -566,18 +582,17 @@ Observed: train_acc=0.359 (3 seeds at β=8, γ=0.02 in corners).
 **Predicted 0.305, observed 0.359 — off by 0.054**, well outside the
 tight error bars of either component fit (each was within 0.01).
 
-Implication: **the 2D fit is not separable as `a₁·log(β) + a₂·γ`** at the
-extreme corners. There is interaction. The (β=8, γ=0.02) cell is
-"more emergent than the linear model predicts" — an interaction term
-favouring the high-β / low-γ regime.
+Implication (now KNOWN to be wrong): "the 2D fit is not separable as
+`a₁·log(β) + a₂·γ` at the extreme corners. There is interaction. The
+(β=8, γ=0.02) cell is more emergent than the linear model predicts."
 
-Two possible refinements for the paper:
-1. Add an interaction term `a₃ · log(β) · γ` (single extra free parameter).
-2. Treat the (β=8, γ=0.02) cell as anomalous "rote-like" rather than
+Two possible refinements for the paper (also superseded by Result 9):
+1. ~~Add an interaction term `a₃ · log(β) · γ` (single extra free parameter).~~
+2. ~~Treat the (β=8, γ=0.02) cell as anomalous "rote-like" rather than
    "emergent" — the gap=0.218 there is far higher than any other emergent
    cell (max gap=0.142 in refine_b2p0_g0p3). The 4-class classifier
    may need the rote train_acc cutoff lowered from 0.40 to 0.30 to
-   capture this regime.
+   capture this regime.~~
 
 ### Refresh of γ* bracket map after iter-12
 
