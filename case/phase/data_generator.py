@@ -332,8 +332,23 @@ class PhaseDataGenerator:
 # -------------------- CLI ----------------------------------------------------
 
 
+def _standard_from_cfg(c) -> SweepPlan:
+    """Build standard_grid honoring optional plan.n_beta/n_gamma/beta_range/
+    gamma_range overrides. Defaults match the original 7×7 grid."""
+    kwargs = {}
+    if hasattr(c, "n_beta") and c.get("n_beta") is not None:
+        kwargs["n_beta"] = int(c.n_beta)
+    if hasattr(c, "n_gamma") and c.get("n_gamma") is not None:
+        kwargs["n_gamma"] = int(c.n_gamma)
+    if hasattr(c, "beta_range") and c.get("beta_range") is not None:
+        kwargs["beta_range"] = tuple(float(x) for x in c.beta_range)
+    if hasattr(c, "gamma_range") and c.get("gamma_range") is not None:
+        kwargs["gamma_range"] = tuple(float(x) for x in c.gamma_range)
+    return standard_grid(**kwargs)
+
+
 _FACTORIES = {
-    "standard": lambda c: standard_grid(),
+    "standard": _standard_from_cfg,
     "corners": lambda c: boundary_corners(),
     "alpha_iso": lambda c: alpha_iso(c.alpha, n=c.n),
     "beta_axis": lambda c: beta_axis(c.gamma, n=c.n),
