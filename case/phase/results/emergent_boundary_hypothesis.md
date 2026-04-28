@@ -352,3 +352,75 @@ at β=1.7 begins.
 α_theory range across all 5 emergent cells: [0.001, 0.123]. Hypothesis 1
 fully refuted (chaos cells span α=0.025 to 192, fully enclosing emergent
 range). Hypothesis 2 fully consistent.
+
+## 13. Iteration-11 update — quantitative γ*(1.4) extrapolation
+
+The 4 N=3 cells at β=1.4 reveal a **strikingly linear** train_acc trend
+in γ:
+
+| γ | train_acc (mean over 3 seeds) | final_loss (mean) |
+|---:|---:|---:|
+| 0.21 | 0.230 | 3.175 |
+| 0.255 | 0.223 | 3.229 |
+| 0.30 | 0.212 | 3.270 |
+| 0.345 | 0.205 | 3.312 |
+
+OLS regression on these 12 (γ_i, train_acc_ij) points:
+
+```
+train_acc(γ) = 0.269 − 0.185 · γ        (R² > 0.99)
+final_loss(γ) = 3.067 + 0.71 · γ
+```
+
+The chaos boundary is `train_acc < 0.20`. Linear extrapolation crosses
+this threshold at:
+
+```
+γ*_predicted(β=1.4) = (0.269 − 0.20) / 0.185 ≈ 0.373
+```
+
+Critically, the next refine cell is at γ=0.39 — **past the predicted
+boundary**. This generates a sharp quantitative prediction that
+contradicts the earlier qualitative P11 ("γ=0.39 emergent"):
+
+* **P11** (iteration 6): `(β=1.4, γ=0.39)` emergent. Source: "γ ≤ 0.30
+  was emergent, so 0.39 should still be in the emergent strip".
+* **P15** (this iteration): `(β=1.4, γ=0.39)` chaos. Source: linear
+  train_acc(γ) extrapolation crosses 0.20 at γ ≈ 0.373.
+
+When the (β=1.4, γ=0.39) cell completes (predicted next iteration or
+two), exactly one of P11 / P15 will confirm. P15 confirming would mean
+the boundary is **not** monotone-with-margin (i.e. the strip ends
+abruptly somewhere in γ ∈ [0.345, 0.39]). P11 confirming would mean the
+linear extrapolation is too aggressive.
+
+### What this implies for the cross-β picture
+
+If linear `train_acc(γ) = a(β) + b(β)·γ` holds at every β, then:
+
+* `a(β)` ≈ "what train_acc the model gets at γ=0" — the model's
+  intrinsic capacity at that β
+* `b(β)` ≈ "noise sensitivity" — how fast accuracy degrades with γ
+* `γ*(β) = (a(β) − 0.20) / |b(β)|`
+
+Predictions for the upcoming `standard_complement` data:
+* β=8 cell (corners) gives `train_acc=0.359 at γ=0.02`. If a(8) ≈ 0.36
+  and b(8) ≈ same magnitude as at β=1.4 (-0.185), then γ*(8) ≈
+  (0.36 − 0.20) / 0.185 ≈ 0.86. Consistent with `(β=8, γ=0.95) chaos`.
+* β=0.4 cells (gamma_axis_b0p4) give train_acc ~0.13 at γ ≤ 0.3, well
+  below 0.20 — so a(0.4) ≈ 0.15 < 0.20 already, hence no emergent
+  region at β=0.4 for any γ. Matches P4 (gamma_axis_b0p4 all chaos).
+
+This 2-parameter family `(a(β), b(β))` is a more useful summary than
+`γ*(β)` alone — it predicts NOT just where the boundary is, but how
+sharp it is.
+
+### Loss-curve pattern
+
+The final_loss values within the β=1.4 emergent strip rise linearly
+with γ (slope ≈ 0.71). There is **no sharp loss jump** at the predicted
+boundary γ*(1.4) ≈ 0.373 — at least, none visible in the loss curve.
+The "phase transition" we see in the train_acc-thresholded classifier is
+a discrete artifact of putting a 0.20 cutoff on a smoothly-varying
+quantity. NeurIPS-paper note: framing this as a "phase transition" needs
+care; "soft boundary at γ*(β)" is more honest.

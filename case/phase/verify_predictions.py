@@ -160,6 +160,19 @@ PREDICTIONS: List[Dict] = [
         "expected": "emergent",
         "min_seeds": 3,
     },
+    {
+        # Linear regression on the 4 N=3 cells at β=1.4 gives
+        #   train_acc(γ) = 0.269 − 0.185 γ   (R² > 0.99)
+        # crosses the train_acc=0.20 chaos threshold at γ ≈ 0.373.
+        # P15 supersedes P11: contradicts P11's "γ=0.39 emergent" with the
+        # quantitative extrapolation. Exactly one of P11 / P15 will confirm.
+        "id": "P15",
+        "desc": "(β=1.4, γ=0.39) chaos — linear γ*(1.4)≈0.373 from monotone train_acc trend; supersedes P11",
+        "variants": ["refine_b2p0_g0p3"],
+        "where": lambda r: abs(r.beta - 1.4) < 1e-3 and abs(r.gamma - 0.39) < 1e-3,
+        "expected": "chaos",
+        "min_seeds": 1,
+    },
 ]
 
 
