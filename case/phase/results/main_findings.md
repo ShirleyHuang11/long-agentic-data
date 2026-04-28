@@ -311,6 +311,71 @@ P20 prediction (added to verifier): when any new emergent cell lands
 from PENDING jobs (`pilot-b4p0-g0p2`, `standard_complement`,
 `gamma_axis_b8p0`), it should have `r(2048/512) ∈ [0.36, 0.42]`.
 
+## Result 8 — Rényi dimension of training-data n-gram statistics correlates with phase
+
+(Added in iteration 19, from re-analysis of the `renyi_D_rate_q*` and
+`renyi_H_order3_q*` columns that `phase_core.estimate_renyi_dimensions_from_tokens`
+writes to every `run_summary.csv` row.)
+
+The Rényi dimension `D_q` is computed on a **single 12000-token
+diagnostic sample** of the dataset itself (independent of the trained
+model), per `phase_core.compute_dataset_renyi_dimensions`. It measures
+how the n-gram entropy scales with n; lower D ⇒ more structure /
+repetition, higher D ⇒ more uniform / random.
+
+Across the 44 N=3 cells we have:
+
+| regime | n | mean D_q=1 | std |
+|---|---:|---:|---:|
+| emergent (5) | 5 | **0.625** | 0.019 |
+| chaos (39) | 39 | **0.659** | 0.010 |
+
+Δ = 0.034 with chaos std 0.010 → **~3.4 σ separation**. The `D_q=0.5`
+and `D_q=2` columns show the same pattern (slightly different scale).
+
+Mechanistic reading:
+
+* High β + low γ ⇒ retrieval distribution sharply concentrates on
+  recent KV pairs, the same KV pair gets re-used many times in a long
+  diagnostic sequence ⇒ **more repetitive n-gram structure ⇒ lower D**.
+* Low β + high γ ⇒ retrieval is uniform, plus γ-fraction noise tokens
+  ⇒ **more uniform / random sequences ⇒ higher D**.
+
+The (β=8, γ=0.02) corner is striking: D_q=1 = 0.587, H_3 = 8.50 — both
+*outlier-low* among emergent cells. The data at this corner is
+significantly more structured than any other cell in the experiment.
+Yet under Result 7's length-gen lens, this corner has identical
+mechanism (r ≈ 0.394) to the (β=1.4) strip cells (r ≈ 0.385–0.394).
+
+**Two independent diagnostics, two consistent stories:**
+
+1. The data at emergent cells is statistically more structured (lower D).
+2. The model's retrieval mechanism at emergent cells is the same
+   regardless of which cell in the strip — degrades 60 % at 4× length.
+
+The (β=8, γ=0.02) corner is the easy-data extreme of the strip (much
+lower D), which is why absolute train_acc is higher there. But the
+*mechanism* is uniform across the strip.
+
+For the paper this is a satisfying result: a **data-side** diagnostic
+(D, computed without training a model) and a **model-side** diagnostic
+(length-gen ratio, computed from a trained model's eval acc) both
+identify the same emergent strip. The phase classification is not just
+a model artifact; the phase boundary lives in the data's statistical
+structure.
+
+### What this rules out
+
+A confound worry: maybe the model "fits" the same way everywhere but
+accuracy varies because the data is harder/easier. Result 8 partially
+addresses this: yes, the data IS easier at the (β=8, γ=0.02) corner
+(lower D). But Result 3's linear law `train_acc(γ | β=1.4)` shows
+train_acc varies smoothly with γ at *fixed* β, so along this direction
+the data's D barely changes (D rises from 0.633 to 0.636 across
+γ ∈ [0.21, 0.345]), yet train_acc drops monotonically by 0.025. So
+data-difficulty isn't the only knob. Both data complexity and the
+model's retrieval-mechanism quality matter.
+
 ## Reproducibility
 
 * Data: `case/phase/runs/<variant>/run_summary.csv` — committed via the
