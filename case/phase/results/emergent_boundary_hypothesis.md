@@ -281,3 +281,31 @@ Currently shows: 43 unique (β, γ) cells, 5 emergent + 38 chaos.
 | 9008462 (`standard_complement`) | PENDING (Priority) | 2 h+ | continue waiting; this is the most informative pending job |
 | 9016098 (`gamma_axis_b8p0`) | PENDING (Priority) | 0.5 h | continue waiting; small enough to backfill |
 | 8493207 (`phase-report`) | PENDING (Dependency) | n/a | unchanged — fires when all 11 sweeps end |
+
+## 11. Iteration-9 update — falsifiability automation
+
+Added `case/phase/verify_predictions.py`. It encodes 13 predictions
+from §5 / §9 / §10 as a structured table, evaluates each against the
+current `runs/*/run_summary.csv` data using the same
+`utils.classify_fixed` rule the rest of the pipeline uses, and writes a
+markdown report to `results/predictions_verification.md`.
+
+Status as of iter 9 (2026-04-28 00:21 EDT, hour 9.85 elapsed):
+
+```
+confirmed:  8
+pending:    5  (P7 alpha_iso_0p1 β>1.5, P9 beta_axis_g0p3 β>1.0,
+                P11 refine_b2p0 γ=0.39, P12 complement, P13 gamma_axis_b8p0)
+refuted:    0
+```
+
+**Hypothesis 2 has 0 refutations across the 8 testable predictions
+that have data.** The 5 pending predictions are exactly the cells that
+will arrive in the next 1-2 days. If any of them refutes, the hypothesis
+needs revision; we have a programmatic check rather than a manual one,
+which removes confirmation-bias risk.
+
+To extend the verification table when new hypotheses emerge or when new
+sweeps are submitted, edit the `PREDICTIONS` list at the top of
+`verify_predictions.py`. Each prediction is `(id, desc, variants, where,
+expected, min_seeds)` — fully self-contained, easy to grep.
