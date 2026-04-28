@@ -248,6 +248,69 @@ verified. The pending jobs together would resolve all the empty
 regions; with cancellation, recovery is gated on those PENDING jobs
 starting.
 
+## Result 7 — length-generalization ratio cleanly separates retrieval mechanism
+
+(Added in iteration 18 from re-analysis of `raw_metrics.csv`.)
+
+Each row of `raw_metrics.csv` records `acc(eval_len)` at `eval_len ∈
+{512, 1024, 2048}` for one (β, γ, seed). Train sequence length is 512,
+so 2048 is a 4× extrapolation. Define the **length-generalization
+ratio** `r = acc(2048) / acc(512)`. We average over 3 seeds per cell.
+
+Across 41 cells with `n_seeds ≥ 3 AND acc(512) ≥ 0.05`:
+
+| regime | n_cells | acc(512) range | r(2048/512) range |
+|---|---:|---:|---:|
+| **emergent** (P-classifier) | 5 | [0.205, 0.359] | **[0.378, 0.394]** (very tight) |
+| **chaos with measurable acc** | 32 | [0.077, 0.157] | [0.41, 0.53] (median ≈ 0.47) |
+| **chaos at β ≈ 0** (fast_beta_p3) | 3 | [0.054, 0.057] | [0.75, 0.77] (length-invariant noise) |
+| **chaos at β ≈ 0** (fast_beta_p2) | 4 | [0.099, 0.101] | [0.49, 0.51] |
+
+**Length-gen ratio cleanly separates mechanism, not just train_acc.**
+
+* `r ≈ 0.39` (emergent strip): the model genuinely learns retrieval at
+  train length 512, and that retrieval is **disproportionately broken**
+  at longer eval sequences. Attention quality diluted by 4× length
+  produces a 60 % accuracy drop.
+* `r ≈ 0.47` (chaos with weak learning): the model partially retrieves
+  but the absolute level is below the chaos threshold. Length-gen ratio
+  is intermediate — a mix of "what little retrieval there is decays
+  with length" and "noise-baseline floor stable across length".
+* `r ≈ 0.77` (no retrieval, β ≈ 0): the model can't localize past KV
+  pairs because their distribution is uniform in distance. Predictions
+  collapse to noise-baseline marginal which is by construction
+  length-invariant.
+
+This refines Result 4. Previously the (β=8, γ=0.02) cell looked
+qualitatively different from the (β=1.4, γ ∈ [0.21, 0.345]) emergent
+strip because of larger absolute accuracy and gap. With the length-gen
+lens, **they're the same mechanism**:
+
+| (β, γ) | acc(512) | r(2048/512) |
+|---|---:|---:|
+| (8, 0.02) | 0.359 | **0.394** |
+| (1.4, 0.21) | 0.230 | **0.385** |
+| (1.4, 0.255) | 0.223 | **0.378** |
+| (1.4, 0.30) | 0.212 | **0.394** |
+| (1.4, 0.345) | 0.205 | **0.394** |
+
+Identical length-gen ratios. The "high-β corner is rote-like" reading
+from Result 4 looks **wrong** under this lens. The corner is the same
+emergent phase, just at higher activation level (different intercept
+in the linear model). The earlier 2D-fit anomaly (predicted 0.305,
+observed 0.359 at β=8, γ=0.02) more likely reflects the linear-fit's
+γ-axis structure not extending cleanly to γ=0.02 at this β, rather
+than a phase change.
+
+For the paper: report length-gen ratio as a complementary diagnostic.
+A predicted-emergent cell should have r ≈ 0.39 ± 0.02. If not, the
+classifier is wrong about that cell's phase. This is a cleaner test
+than the train_acc < 0.20 threshold.
+
+P20 prediction (added to verifier): when any new emergent cell lands
+from PENDING jobs (`pilot-b4p0-g0p2`, `standard_complement`,
+`gamma_axis_b8p0`), it should have `r(2048/512) ∈ [0.36, 0.42]`.
+
 ## Reproducibility
 
 * Data: `case/phase/runs/<variant>/run_summary.csv` — committed via the
