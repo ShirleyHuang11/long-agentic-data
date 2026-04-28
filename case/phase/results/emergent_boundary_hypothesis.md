@@ -166,3 +166,64 @@ None this iteration. The 4-cell summary was extracted via the existing
 cross-variant aggregation in `aggregate_report.py`. No new compute
 submitted; no factories or plotters changed. The boundary hypothesis
 emerged purely from re-reading existing data.
+
+## 9. Iteration-7 data (2026-04-27 23:21 EDT, hour 8.9 of running sweeps)
+
+### 9a. New cell observed: (β=8, γ=0.95) — chaos
+
+`corners` finished its 10th row, opening cell 4 of 5: `(β=8, γ=0.95)`.
+First seed (n_seeds=1 so far):
+
+| (β, γ) | seed | α_theory | train_acc | long_acc | gap | retention | phase |
+|---|---:|---:|---:|---:|---:|---:|---|
+| (8, 0.95) | 1 | 0.0594 | 0.048 | 0.049 | -0.002 | 1.04 | **chaos** |
+
+`gap = -0.002` and `retention = 1.04` are interesting on their own:
+when γ is so high (95 % noise tokens), even the model's "best" behaviour
+on training-length and on long-length sequences is statistically
+indistinguishable from baseline next-token-prediction over the noise
+distribution. Both train_acc and long_acc collapse to ~0.05 ≈ 1/19
+(uniform over noise tokens) plus an ~ε contribution from the rare
+key/value tokens.
+
+### 9b. What this resolves about γ*(β=8)
+
+Combined with `(β=8, γ=0.02) → emergent` (3 seeds, train_acc=0.359):
+
+```
+γ*(β=8) ∈ (0.02, 0.95)        — bounds before this iteration
+γ*(β=8) ∈ (0.02, 0.95)        — bounds after this iteration (interval unchanged
+                                because corners doesn't sample interior γ)
+```
+
+So the corners variant alone **can never tighten** γ*(β=8). To make
+progress we need a γ-axis sweep at β=8 with intermediate γ values.
+
+### 9c. Action: submitted phase-gamma_axis_b8p0 (job 9016098)
+
+```
+plan.name=gamma_axis  plan.beta=8.0  plan.n=5
+sweep.seeds=[1]
+```
+
+5 cells (γ ∈ {0.02, 0.265, 0.51, 0.755, 1.0}) × 1 seed × 51 min ≈ **4.3 h**.
+Smaller than the 24-h complement, plausibly more likely to backfill
+into a small slot. Both jobs are PENDING `(Priority)` as of submission.
+
+When 9016098 finishes, γ*(β=8) is bracketed to within one γ step of
+0.265 — enough to decide whether the boundary is monotone in β
+(my hypothesis) or roughly flat in β (alternative).
+
+### 9d. Hypothesis status
+
+| prediction (from §5) | status |
+|---|---|
+| `(β=0.4, γ=0.02)` chaos despite low α_theory | confirmed (iter 6) |
+| `(β=8, γ=0.95)` should be chaos (γ exceeds γ*(8)) | **confirmed iter 7, seed 1** |
+| `gamma_axis_b0p4` all chaos at β=0.4 | partial — 3 cells, all chaos. Consistent. |
+| `alpha_iso_1p0` all chaos | partial — 3 cells (β ∈ [0.01, 0.020]), all chaos. Consistent. |
+| `alpha_iso_0p1` chaos at low β, emergent at β > ~1 | not yet — running has only β ∈ [0.10, 0.20] |
+| `refine_b2p0_g0p3` β > 1.4 cells emergent for γ ≤ 0.30 | not yet — still on β=1.4 (largest γ cell pending) |
+| `beta_axis_g0p3` emergent at β > 1.0 | not yet — running has β ∈ [0.05, 0.121] |
+
+Two predictions confirmed; five still pending. None refuted.
