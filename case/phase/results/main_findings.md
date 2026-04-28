@@ -446,6 +446,43 @@ This re-creates an iteration-12-style decisive test: the iter-13 vs
 iter-19 fits make opposite predictions for two specific cells. The
 pilot jobs will land the verdict.
 
+## Result 10 — emergent cells are still actively learning at 5000 steps
+
+(Added in iteration 23 from re-analysis of `aulc_train_to_final_norm`
+column.)
+
+`aulc_train_to_final_norm` measures the average distance between each
+training-step loss and the **final** loss, normalized by step count.
+Lower AULC ⇒ model converged early; higher AULC ⇒ model still
+moving away from "final" plateau when training ended.
+
+| regime | n | mean AULC | std | mean (final − best) loss |
+|---|---:|---:|---:|---:|
+| emergent (5) | 5 | **0.0395** | 0.0021 | 0.031 |
+| chaos (39) | 39 | 0.0292 | 0.0075 | 0.022 |
+
+**Emergent cells have 35 % higher AULC than chaos cells, with 4× tighter
+inter-cell std**. Mechanistic reading: chaos cells reach their plateau
+quickly (model "gives up" early on too-hard data), whereas emergent
+cells are still actively descending. The (final − best) overshoot is
+also higher in emergent — the model's loss curve genuinely keeps
+moving in the second half of training.
+
+This **predicts** that the user-submitted `pilot-30k-b1p4-g0p345`
+(job 9029967, 6× more training at the just-emergent (β=1.4, γ=0.345)
+cell) should:
+
+* shift train_acc somewhat upward (expected ~+0.02 to +0.05 from
+  0.205, scaling roughly with AULC);
+* not flip phase to rote (rote needs train_acc ≥ 0.40, requiring 2× the
+  current train_acc — implausible from AULC=0.04);
+* keep length-gen ratio r ≈ 0.39 (mechanism unchanged).
+
+P24 logged in verifier with this prediction. Refutation would mean
+either (a) 5k steps was massively under-trained (changes the entire
+boundary location story), or (b) more compute lets the model escape
+to a fundamentally different basin. Both are interesting outcomes.
+
 ## Reproducibility
 
 * Data: `case/phase/runs/<variant>/run_summary.csv` — committed via the

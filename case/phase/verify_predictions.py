@@ -272,6 +272,28 @@ PREDICTIONS: List[Dict] = [
         "expected": "emergent",
         "min_seeds": 1,
     },
+    {
+        # User-submitted pilot (job 9029967) trains the same (β=1.4, γ=0.345)
+        # cell but for 30000 steps (6× the 5000-step default). Tests
+        # whether 5000 steps already captures the model's capacity at
+        # this cell or if more compute pushes train_acc up.
+        # AULC analysis (iter-23, Result 10) shows emergent cells have
+        # AULC≈0.04 — model is still learning at end-of-training. So 6×
+        # more steps may improve train_acc, but the loss reduction
+        # potential is bounded by AULC × 5000-step plateau.
+        # The 5k baseline at this cell is train_acc=0.205 (just-emergent).
+        # Predict 30k stays emergent: small monotone train_acc rise but
+        # no jump to rote (which would need train_acc ≥ 0.40). If 30k
+        # gives train_acc ≥ 0.40, the 5k-based phase boundary is
+        # fundamentally compromised and we'd need to redo the analysis
+        # at the longer training horizon.
+        "id": "P24",
+        "desc": "(β=1.4, γ=0.345, 30k steps) emergent — 5k loss-mostly-converged; 6× more should slightly improve but not flip phase",
+        "variants": ["pilot_30k_b1p4_g0p345"],
+        "where": lambda r: True,
+        "expected": "emergent",
+        "min_seeds": 1,
+    },
 ]
 
 
