@@ -152,6 +152,14 @@ PREDICTIONS: List[Dict] = [
         "expected": "any",  # structural
         "min_seeds": 1,
     },
+    {
+        "id": "P14",
+        "desc": "(β=1.4, γ=0.345) emergent at N=3 seeds — robustness of γ*(1.4) lower bound",
+        "variants": ["refine_b2p0_g0p3"],
+        "where": lambda r: abs(r.beta - 1.4) < 1e-3 and abs(r.gamma - 0.345) < 1e-3,
+        "expected": "emergent",
+        "min_seeds": 3,
+    },
 ]
 
 

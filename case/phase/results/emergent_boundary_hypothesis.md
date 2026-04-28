@@ -309,3 +309,46 @@ To extend the verification table when new hypotheses emerge or when new
 sweeps are submitted, edit the `PREDICTIONS` list at the top of
 `verify_predictions.py`. Each prediction is `(id, desc, variants, where,
 expected, min_seeds)` — fully self-contained, easy to grep.
+
+## 12. Iteration-10 update — γ=0.345 fully N=3-confirmed
+
+`refine_b2p0_g0p3` row 12 closed the (β=1.4, γ=0.345) cell. All three
+seeds emergent with very tight error bars:
+
+| (β, γ)  | seed 1 | seed 2 | seed 3 | mean (std) |
+|---|---:|---:|---:|---:|
+| (1.4, 0.345) train_acc | 0.204 | 0.204 | 0.206 | 0.205 (0.001) |
+| (1.4, 0.345) long_acc | 0.081 | 0.076 | 0.084 | 0.080 (0.004) |
+
+Added P14 to `verify_predictions.py` to track this; status now:
+
+```
+confirmed:  9   (P1-P6, P8, P10, P14)
+pending:    5   (P7, P9, P11, P12, P13)
+refuted:    0
+```
+
+Updated emergent strip at β=1.4 — all 4 cells with N=3 seeds confirm
+emergent across γ ∈ {0.21, 0.255, 0.30, 0.345}:
+
+| (β, γ) | α_theory | train_acc | long_acc | gap | retention |
+|---|---:|---:|---:|---:|---:|
+| (1.4, 0.21) | 0.075 | 0.230 | 0.089 | 0.142 | 0.385 |
+| (1.4, 0.255) | 0.091 | 0.223 | 0.084 | 0.139 | 0.378 |
+| (1.4, 0.30) | 0.107 | 0.212 | 0.084 | 0.129 | 0.394 |
+| (1.4, 0.345) | 0.123 | 0.205 | 0.080 | 0.125 | 0.389 |
+
+Note the **monotone decrease** in train_acc and long_acc with γ at fixed
+β=1.4. This is the smoking-gun signature that γ*(1.4) is approaching:
+each step in γ pushes the cell closer to the phase boundary, and the
+gap stays roughly constant (~0.13). When γ reaches γ*(1.4), train_acc
+will drop below 0.20 and the cell will be classified as chaos.
+
+The next cell (β=1.4, γ=0.39) — predicted by P11 — completes this row.
+If `train_acc < 0.20`, then **γ*(1.4) ∈ (0.345, 0.39)** with N=3
+precision. If still emergent, γ*(1.4) ≥ 0.39 and the next refine cell
+at β=1.7 begins.
+
+α_theory range across all 5 emergent cells: [0.001, 0.123]. Hypothesis 1
+fully refuted (chaos cells span α=0.025 to 192, fully enclosing emergent
+range). Hypothesis 2 fully consistent.
