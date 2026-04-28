@@ -550,6 +550,71 @@ instead of 0.212. When that cell lands (~ row 25 of complement, in
 ~13 hours), we'll have a 3rd cross-validation of the fit's
 extrapolation.
 
+### Iteration-39: 5 β=0.8 cells reveal γ-slope is robust, log(β)-slope is concave
+
+After 5 cells of standard_complement landed at β=0.8 with γ ∈ {0.05,
+0.208, 0.367, 0.525, 0.683}, OLS on the local γ-axis at β=0.8 gives:
+
+```
+train_acc(γ | β=0.8) = 0.219 − 0.181·γ
+```
+
+Compare with the established β=1.4 strip fit:
+```
+train_acc(γ | β=1.4) = 0.272 − 0.185·γ
+```
+
+**The γ-slopes at β=0.8 and β=1.4 are within 0.005 of each other**.
+This is a clean empirical finding: **γ-sensitivity is roughly
+β-independent within and at the lower edge of the emergent strip**.
+
+The 6-cell fit's reported γ-slope of −0.120 was wrong: it was being
+pulled by the (β=8, γ=0.02) corner (one cell, single γ value, can't
+constrain γ-axis at β=8). Excluding that anchor and doing two
+independent γ-axis fits (at β=0.8 and β=1.4) gives a consistent
+γ-slope of ≈ −0.183.
+
+#### log(β) sensitivity is NOT robust — concave in log(β)
+
+Intercepts at γ=0:
+
+| β | intercept | log(β) | source |
+|---|---:|---:|---|
+| 0.8 | 0.219 | -0.223 | OLS on 5 cells |
+| 1.4 | 0.272 | +0.336 | OLS on 4 cells |
+| 8 | ~0.363 | +2.079 | one cell, γ=0.02 implied via -0.183 slope |
+
+Slope between β=0.8 and β=1.4: `(0.272 − 0.219) / (0.336 − (−0.223)) ≈ 0.095`
+Slope between β=1.4 and β=8: `(0.363 − 0.272) / (2.079 − 0.336) ≈ 0.052`
+
+The log(β)-sensitivity is **almost 2× steeper** in the lower-β half
+than the upper-β half. The relationship between train_acc and log(β)
+is **concave**, not linear. This means linear-in-log(β) extrapolation
+breaks predictably:
+
+* extrapolating from β ∈ [1.4, 8] strip data DOWN to β=0.8 (the
+  iter-19 5-cell fit's slope of 0.0523) under-estimates how much
+  intercept actually drops → predicts train_acc too high.
+* extrapolating from β ∈ [0.8, 1.4] data UP to β=8 (the slope 0.095
+  of this iteration's local fit) over-estimates intercept rise →
+  also predicts train_acc too high.
+
+The 6-cell fit's compromise log(β)-slope of 0.0645 is an averaged
+approximation, but the underlying structure is concave.
+
+#### Implication for the paper
+
+We should retire "linear in (log β, γ)" framing in favour of
+**"linear in γ, concave in log(β)"**. The simplest concave-log(β)
+fit that captures both regimes is something like
+`train_acc ≈ a − k/β + slope_γ·γ` (1/β term saturates at high β),
+or a piecewise-linear-in-log(β) model with a knee around β ≈ 1.5.
+
+A cleaner test will come when complement reaches β=1.6, β=3.2, β=6.4
+cells (rows 8-28 of the sweep). With γ-slope known to be ≈ -0.183 and
+intercept measurable at each β from one or more low-γ cells, the
+intercept-vs-log(β) curve becomes the paper's primary scaling law.
+
 ### Iteration-34 validation: 6-cell fit wins again at β=0.8
 
 Second complement row landed: `(β=0.8, γ=0.208, N=1)` train_acc=0.180 → chaos.
