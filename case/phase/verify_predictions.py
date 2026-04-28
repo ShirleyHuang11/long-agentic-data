@@ -234,6 +234,44 @@ PREDICTIONS: List[Dict] = [
         "expected": "chaos",
         "min_seeds": 1,
     },
+    {
+        # iter-19 corrected fit on the 5 emergent cells:
+        #   train_acc(β, γ) = 0.254 + 0.0523·log(β) − 0.197·γ   (R²=0.9999)
+        # predicts train_acc(4, 0.6) = 0.254 + 0.0725 − 0.118 = 0.214 ⇒ emergent.
+        # Direct contradiction with P18 (chaos at 0.182 from iter-13 fit).
+        # Whichever fit extrapolates better wins when 9033655 lands.
+        "id": "P21",
+        "desc": "(β=4.0, γ=0.6) emergent — corrected (iter-19) 2D fit predicts train_acc≈0.214; supersedes P18",
+        "variants": ["pilot_b4p0_g0p6"],
+        "where": lambda r: True,
+        "expected": "emergent",
+        "min_seeds": 1,
+    },
+    {
+        # iter-19 corrected fit predicts train_acc(6.4, 0.7) = 0.215 ⇒ emergent.
+        # Direct contradiction with P19. Same falsifiability test as P21
+        # but at higher β.
+        "id": "P22",
+        "desc": "(β=6.4, γ=0.7) emergent — corrected (iter-19) 2D fit predicts train_acc≈0.215; supersedes P19",
+        "variants": ["pilot_b6p4_g0p7"],
+        "where": lambda r: True,
+        "expected": "emergent",
+        "min_seeds": 1,
+    },
+    {
+        # iter-19 corrected fit predicts γ*(β=8) ≈ 0.825. So at β=8,
+        # γ=0.755 should still be just emergent: train_acc(8, 0.755) =
+        # 0.254 + 0.109 − 0.149 = 0.214. Job 9016098 (gamma_axis_b8p0)
+        # samples γ ∈ {0.02, 0.265, 0.51, 0.755, 1.0} at β=8; the
+        # boundary should fall between γ=0.755 (emergent) and γ=1.0
+        # (chaos), confirming the quantitative formula.
+        "id": "P23",
+        "desc": "(β=8, γ=0.755) emergent — corrected fit predicts γ*(β=8)≈0.825 (from γ*(β)≈0.274+0.265·log(β))",
+        "variants": ["gamma_axis_b8p0"],
+        "where": lambda r: abs(r.beta - 8.0) < 1e-3 and abs(r.gamma - 0.755) < 1e-3,
+        "expected": "emergent",
+        "min_seeds": 1,
+    },
 ]
 
 
