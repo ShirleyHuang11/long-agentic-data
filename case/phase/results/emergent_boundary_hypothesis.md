@@ -424,3 +424,73 @@ The "phase transition" we see in the train_acc-thresholded classifier is
 a discrete artifact of putting a 0.20 cutoff on a smoothly-varying
 quantity. NeurIPS-paper note: framing this as a "phase transition" needs
 care; "soft boundary at γ*(β)" is more honest.
+
+## 14. Iteration-12 update — P15 confirmed, P11 refuted
+
+**The judgement cell `(β=1.4, γ=0.39, seed 1)` arrived.** Observed values
+vs the linear-extrapolation predictions made in iteration 11:
+
+| quantity | predicted (linear) | observed (seed 1) | error |
+|---|---:|---:|---:|
+| train_acc | 0.197 | 0.191 | 0.006 |
+| final_loss | 3.344 | 3.353 | 0.009 |
+| classifier output | chaos | **chaos** | ✓ |
+
+The linear model `train_acc(γ) = 0.269 − 0.185γ` predicted both quantities
+within 1 % at a held-out point. The discrete chaos/emergent classification
+agrees with the prediction.
+
+**P11 refuted, P15 confirmed.** This is the first refuted prediction in
+the loop — the falsifiability machinery (programmatic verification rather
+than narrative rationalization) caught a hypothesis that did not survive
+contact with new data.
+
+What the refutation actually means scientifically:
+
+* P11 was the *qualitative* prior: "γ=0.39 should still be in the
+  emergent strip because γ ≤ 0.345 was emergent". Without the linear
+  model, the natural inertia is to expect monotone continuation.
+* P15 incorporated the iteration-10 observation that train_acc declines
+  linearly with γ at fixed β=1.4 (R² > 0.99 over 4 cells × 3 seeds),
+  and **extrapolated** that line one γ-step beyond the observed range.
+* The linear model's accuracy on a *held-out* γ vindicates the
+  parameterization and refutes the "monotone-with-margin" mental model.
+
+This sharpens the boundary statement from "γ*(1.4) ≥ 0.345" to
+**γ*(1.4) ∈ (0.345, 0.39)** — a 0.045-wide bracket — at the cost of
+discovering that the strip is not as wide as P11 supposed.
+
+### Updated bracket map
+
+| β | γ* lower | γ* upper | width |
+|---:|---:|---:|---:|
+| 1.4 | 0.345 (3-seed emergent) | 0.39 (1-seed chaos) | 0.045 |
+| 8 | 0.02 (3-seed emergent) | 0.95 (1-seed chaos) | 0.93 |
+
+The β=1.4 bracket is now **20× tighter** than the β=8 bracket. This
+demonstrates the value of the running `refine_b2p0_g0p3` and the pending
+`gamma_axis_b8p0` (job 9016098) for boundary mapping.
+
+### Predicted: same cell at seed 2 and 3
+
+If the linear model holds at the seed level too, both should give
+train_acc near 0.19, putting the cell well into the chaos region with
+N=3. The verifier (P15) currently shows confirmed at N=1; will check
+again next iteration.
+
+### Why the linear `train_acc(γ)` matters
+
+This is the first quantitative law obtained from the experiment, and
+it generalizes one γ-step beyond its training range with sub-percent
+error. Two papers' worth of corollary:
+
+1. **Boundary location is not arbitrary**. γ*(β) is determined by
+   intercept and slope of `train_acc(γ)` at fixed β. Both can be
+   estimated from interior cells without ever testing the boundary.
+2. **Soft transition, not phase transition**. The accuracy drop at γ*
+   is a 1 % step — the smooth underlying function happens to cross the
+   classifier's hard 0.20 cutoff. Reporting this as a "phase transition"
+   would be physics-language abuse.
+
+These observations should appear in the writeup's main text, not the
+appendix.
