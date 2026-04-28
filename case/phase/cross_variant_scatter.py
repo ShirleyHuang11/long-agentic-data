@@ -117,6 +117,52 @@ def overlay_alpha_lines(ax, betas, gammas, alphas=(0.1, 0.4, 1.0)) -> None:
                         verticalalignment="center")
 
 
+def fit_emergent_boundary(cells: pd.DataFrame, threshold: float = 0.20):
+    """Re-fit the corrected 2D linear law on current emergent cells.
+
+    Returns (intercept_a, log_beta_coef_b, gamma_coef_c, n_used, R2)
+    or (None, None, None, 0, None) if fewer than 3 emergent cells with
+    n_seeds_total ≥ 3 are available.
+
+    Boundary line: train_acc = threshold ⇒
+       γ*(β) = (a + b·log(β) − threshold) / (−c)
+    """
+    em = cells[(cells["phase_code"] == 1) & (cells["n_seeds_total"] >= 3)]
+    if len(em) < 3:
+        return None, None, None, 0, None
+    log_b = np.log(em["beta"].to_numpy())
+    g = em["gamma"].to_numpy()
+    y = em["train_acc_mean"].to_numpy()
+    X = np.column_stack([np.ones(len(em)), log_b, g])
+    coef, *_ = np.linalg.lstsq(X, y, rcond=None)
+    pred = X @ coef
+    r2 = 1 - ((y - pred) ** 2).sum() / max(((y - y.mean()) ** 2).sum(), 1e-12)
+    return float(coef[0]), float(coef[1]), float(coef[2]), int(len(em)), float(r2)
+
+
+def overlay_boundary(ax, cells: pd.DataFrame, threshold: float = 0.20):
+    """Overlay the predicted chaos→emergent boundary γ*(β) on the scatter.
+
+    Only draws when ≥3 emergent cells with N=3 seeds are available to
+    fit the 2D linear law. Returns (a, b, c, n) used so the plotter can
+    annotate.
+    """
+    a, b, c, n, r2 = fit_emergent_boundary(cells, threshold)
+    if a is None:
+        return None
+    if c >= 0:  # boundary slope must be negative for line to make sense
+        return None
+    bgrid = np.geomspace(cells["beta"].min(), cells["beta"].max(), 200)
+    gstar = (a + b * np.log(bgrid) - threshold) / (-c)
+    m = (gstar >= cells["gamma"].min()) & (gstar <= cells["gamma"].max())
+    if not m.any():
+        return None
+    ax.plot(bgrid[m], gstar[m], color="#cc4422", linestyle="--",
+            linewidth=1.6, alpha=0.85, zorder=4,
+            label=f"γ*(β) fit: train_acc={threshold:.2f}  (n_em={n}, R²={r2:.3f})")
+    return (a, b, c, n)
+
+
 def plot_scatter(cells: pd.DataFrame, thresholds, out_path: Path) -> None:
     cells = cells.copy()
     cells["phase_code"] = cells.apply(lambda r: _phase_code(r, thresholds), axis=1)
@@ -134,6 +180,7 @@ def plot_scatter(cells: pd.DataFrame, thresholds, out_path: Path) -> None:
                    alpha=0.85, zorder=3)
 
     overlay_alpha_lines(ax, cells["beta"], cells["gamma"])
+    overlay_boundary(ax, cells, threshold=float(thresholds.chaos_train))
     ax.set_xscale("log")
     ax.set_xlabel("β  (long-range decay sharpness)")
     ax.set_ylabel("γ  (noise fraction)")
