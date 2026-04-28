@@ -27,7 +27,11 @@ mkdir -p case/phase/logs case/phase/runs
 source /n/netscratch/kempner_sham_lab/Lab/hanlinzhang/envs/flow/bin/activate
 
 RUN_NAME="${RUN_NAME:-sweep_${SLURM_JOB_ID}}"
-OVERRIDES="${OVERRIDES:-}"
+if [ -n "${OVERRIDES_B64:-}" ]; then
+    OVERRIDES="$(printf '%s' "${OVERRIDES_B64}" | base64 -d)"
+else
+    OVERRIDES="${OVERRIDES:-}"
+fi
 OUT_DIR="${OUT_DIR:-case/phase/runs/${RUN_NAME}}"
 
 echo "[SLURM] job_id=${SLURM_JOB_ID}  host=$(hostname)"

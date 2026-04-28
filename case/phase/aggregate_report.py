@@ -26,6 +26,9 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from utils import classify_fixed  # single source of truth for thresholds
+
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 RUNS_DIR = REPO_ROOT / "case" / "phase" / "runs"
@@ -52,19 +55,17 @@ EXPECTED_SEEDS = 3
 # -------------------- phase classification ----------------------------------
 
 
+_CODE_TO_LABEL = {0: "chaos", 1: "emergent", 2: "super_gen", 3: "rote"}
+
+
 def classify_phase(row) -> str:
-    """Fixed-threshold 4-phase classifier on per-cell means."""
-    train = float(row["train_acc_mean"])
-    long = float(row["long_acc_mean"])
-    gap = float(row["gap_mean"])
-    ret = float(row["retention_mean"])
-    if train < 0.20 and long < 0.10:
-        return "chaos"
-    if train >= 0.40 and gap >= 0.10:
-        return "rote"
-    if long >= 0.50 and ret >= 0.85:
-        return "super_gen"
-    return "emergent"
+    """Fixed-threshold 4-phase classifier on per-cell means.
+
+    Delegates to ``utils.classify_fixed`` so the chaos/rote/super-gen
+    thresholds live in exactly one place. Returns the string label this
+    file's downstream filters expect.
+    """
+    return _CODE_TO_LABEL[classify_fixed(row)]
 
 
 def aggregate_cells(df: pd.DataFrame) -> pd.DataFrame:
@@ -306,6 +307,55 @@ def section_refine(infos: List[Dict[str, object]]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def section_top_nonchaos(infos: List[Dict[str, object]]) -> str:
+    """Surface the cells that escape `chaos`, sorted by long_acc.
+
+    Without this, a single emergent corner like (β=8, γ=0.02) inside
+    `corners` is invisible: the unusual-cell rules below only fire on
+    rote-with-collapse / contradictory / high-seed-variance patterns.
+    """
+    lines = ["## 5b. Top non-chaos cells across all variants (by long_acc)\n"]
+    rows: List[Dict[str, object]] = []
+    for info in infos:
+        if "agg" not in info:
+            continue
+        agg: pd.DataFrame = info["agg"]
+        nonchaos = agg[agg["phase"] != "chaos"]
+        for _, r in nonchaos.iterrows():
+            rows.append({
+                "variant": info["variant"],
+                "beta": float(r["beta"]),
+                "gamma": float(r["gamma"]),
+                "alpha_theory": float(r["alpha_theory"]),
+                "n_seeds": int(r["n_seeds"]),
+                "train_acc": float(r["train_acc_mean"]),
+                "long_acc": float(r["long_acc_mean"]),
+                "gap": float(r["gap_mean"]),
+                "retention": float(r["retention_mean"]),
+                "phase": str(r["phase"]),
+            })
+    if not rows:
+        lines.append("_All aggregated cells classified as `chaos`. "
+                     "Either the model is undertrained at every (β, γ) "
+                     "or the fixed thresholds need recalibration "
+                     "(try `plot.phase_mode=quantile`)._\n")
+        return "\n".join(lines)
+
+    rows.sort(key=lambda r: r["long_acc"], reverse=True)
+    lines.append(f"{len(rows)} cell(s) escaped chaos. Top {min(15, len(rows))} by long_acc:\n")
+    lines.append("| variant | β | γ | α_theory | n_seeds | train_acc | long_acc | gap | retention | phase |")
+    lines.append("|---|---:|---:|---:|---:|---:|---:|---:|---:|---|")
+    for r in rows[:15]:
+        lines.append(
+            f"| `{r['variant']}` | {fmt_float(r['beta'])} | "
+            f"{fmt_float(r['gamma'])} | {fmt_float(r['alpha_theory'])} | "
+            f"{r['n_seeds']} | {fmt_float(r['train_acc'])} | "
+            f"{fmt_float(r['long_acc'])} | {fmt_float(r['gap'])} | "
+            f"{fmt_float(r['retention'])} | {r['phase']} |"
+        )
+    return "\n".join(lines) + "\n"
+
+
 def section_unusual(infos: List[Dict[str, object]]) -> str:
     lines = ["## 6. Unusual cells worth deeper investigation\n"]
     pieces: List[str] = []
@@ -372,6 +422,7 @@ def main() -> None:
     parts.append(section_alpha_iso(infos))
     parts.append(section_fast_beta(infos))
     parts.append(section_refine(infos))
+    parts.append(section_top_nonchaos(infos))
     parts.append(section_unusual(infos))
 
     REPORT_PATH.write_text("\n".join(parts))
