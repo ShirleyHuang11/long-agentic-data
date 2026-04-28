@@ -615,6 +615,42 @@ cells (rows 8-28 of the sweep). With γ-slope known to be ≈ -0.183 and
 intercept measurable at each β from one or more low-γ cells, the
 intercept-vs-log(β) curve becomes the paper's primary scaling law.
 
+#### β=0.8 row complete: γ-slope confirmed at -0.184
+
+After iteration 43, all 7 γ values at β=0.8 are observed:
+
+| γ | train_acc | residual vs 7-pt fit |
+|---:|---:|---:|
+| 0.05 | 0.205 | -0.005 |
+| 0.208 | 0.180 | -0.001 |
+| 0.367 | 0.162 | +0.011 |
+| 0.525 | 0.126 | +0.004 |
+| 0.683 | 0.089 | -0.004 |
+| 0.842 | 0.042 | -0.022 |
+| 1.0 | 0.049 | +0.014 |
+
+7-point OLS: `train_acc(γ | β=0.8) = 0.219 − 0.184·γ`
+
+The γ-slope of -0.184 is within 0.001 of the β=1.4 strip's slope of
+-0.185. The intermediate iter-41 estimate of -0.203 (from 6 cells,
+omitting γ=1.0) was over-pulled by the unusually low γ=0.842 reading
+(observed 0.042 vs fit 0.064 — outlier of -0.022). The γ=1.0 reading
+of 0.049 is meaningfully *above* the linear extrapolation 0.035 —
+explained by a noise-token random-baseline floor at ~1/19 ≈ 0.053
+(vocab has 19 noise tokens; at γ=1.0 the model can do no better than
+guessing uniformly over noise).
+
+So the underlying structure is:
+* `train_acc ≈ a(β) − b · γ` for γ ∈ [0.05, ~0.85]
+* `b ≈ 0.184` is constant across β (β-invariant γ-sensitivity)
+* train_acc bottoms out at the noise-token random baseline ≈ 0.053
+  for γ approaching 1.0
+* `a(β)` is concave in log(β) per the iteration-39 cross-β analysis
+
+The "linear in γ, concave in log(β)" framing for the paper is now
+confirmed at two distinct β values with all γ ∈ [0.05, 1.0] sampled
+at β=0.8.
+
 ### Iteration-34 validation: 6-cell fit wins again at β=0.8
 
 Second complement row landed: `(β=0.8, γ=0.208, N=1)` train_acc=0.180 → chaos.
