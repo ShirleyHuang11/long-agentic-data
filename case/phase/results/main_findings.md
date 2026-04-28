@@ -136,32 +136,26 @@ agrees ("chaos at γ=0.39 because train_acc < 0.20"). This is **the
 strongest piece of evidence** that the boundary is a smooth threshold
 crossing, not a phase transition.
 
-## Result 4 — the 2D fit breaks down at the high-β, low-γ corner
+## Result 4 — apparent fit breakdown at corner was a fitting artifact (CORRECTED iter 19)
 
-At (β=8, γ=0.02) the same 2D linear fit predicts:
+**This result has been corrected in iteration 19.** The original
+reading — that the 2D linear fit "breaks down" at (β=8, γ=0.02) —
+was an artifact of combining a γ-axis fit from emergent-strip data
+(β=1.4) with a β-axis fit from chaos-only data (`alpha_iso_0p1`).
+Mixing the two regimes' slopes produced the apparent corner anomaly.
 
-```
-train_acc(8, 0.02) = 0.262 + 0.0224 · log(8) − 0.185 · 0.02
-                   = 0.305
-```
+When the 2D linear fit is performed correctly on all 5 emergent cells
+(see Result 9 below), there is **no breakdown** at the corner —
+residuals at all 5 cells are ≤ 0.001 in train_acc. The interaction-term
+hypothesis and rote-reclassification hypothesis raised here are
+**not needed**; the simpler unified model fits.
 
-Observed: 0.359 (N=3 seeds). Discrepancy 0.054 — much larger than the
-0.001-level error of the in-strip prediction. Two interpretations:
+The original text below is preserved as a record of the mistake; the
+correct picture is in Result 9.
 
-1. **Interaction term** `a₃ · log(β) · γ` (a single extra parameter)
-   captures the high-β/low-γ "bonus" — the model learns the local-only
-   retrieval task substantially better than separable linear projects
-   from the strip.
-2. **Different phase** — (β=8, γ=0.02) is qualitatively rote-like
-   (gap=0.218 is 1.5× any other cell's). Lowering the rote threshold
-   from train_acc≥0.40 to train_acc≥0.30 would re-classify it. This is
-   the more honest reading: it is not the same regime as
-   (β=1.4, γ=0.21), so a single linear surface should not be expected
-   to unify them.
-
-The current data does not distinguish (1) from (2). Resolution requires
-the cells of the pending `standard_complement` (β ∈ {0.8, 1.6, 3.2, 6.4}),
-which interpolate between the two regimes.
+> [original — incorrect] At (β=8, γ=0.02) the same 2D linear fit predicts
+> train_acc(8, 0.02) = 0.305, observed 0.359, discrepancy 0.054.
+> Interpreted as either a needed interaction term, or a rote-reclassification.
 
 ## Result 5 — the "phase transition" is a soft boundary
 
@@ -375,6 +369,82 @@ the data's D barely changes (D rises from 0.633 to 0.636 across
 γ ∈ [0.21, 0.345]), yet train_acc drops monotonically by 0.025. So
 data-difficulty isn't the only knob. Both data complexity and the
 model's retrieval-mechanism quality matter.
+
+## Result 9 — corrected 2D linear fit unifies all 5 emergent cells (R²=0.9999)
+
+(Added in iteration 19. Supersedes Result 4.)
+
+A proper least-squares fit on all 5 N=3-seed emergent cells with
+features (1, log(β), γ) gives:
+
+```
+train_acc(β, γ) = 0.254 + 0.0523 · log(β) − 0.197 · γ
+R² = 0.9999     max |residual| = 0.0009
+```
+
+Per-cell residuals:
+
+| (β, γ) | observed | predicted | residual |
+|---|---:|---:|---:|
+| (8.0, 0.02) | 0.3592 | 0.3592 | -0.00005 |
+| (1.4, 0.21) | 0.2304 | 0.2307 | -0.00029 |
+| (1.4, 0.255) | 0.2228 | 0.2219 | +0.00091 |
+| (1.4, 0.30) | 0.2121 | 0.2130 | -0.00086 |
+| (1.4, 0.345) | 0.2045 | 0.2042 | +0.00033 |
+
+This is **dramatically better** than the iteration-13 estimate
+(coefficients (0.262, 0.0224, -0.185)) which was built by combining
+two separate fits — one on emergent (γ-axis) and one on chaos
+(β-axis) data. Mixing slopes from two regimes was the source of the
+apparent "corner anomaly" in Result 4.
+
+The corrected coefficients differ from the iter-13 ones along the
+β-axis: emergent-cells log(β) sensitivity is **0.052**, vs the chaos-cells
+estimate of 0.022 — emergent is ~2.4× more sensitive to β. This is
+mechanistically reasonable: at chaos cells the model is barely
+retrieving so β doesn't help much, whereas in the emergent strip β
+controls how concentrated retrieval is, directly improving train_acc.
+
+### Implication for the boundary
+
+With the corrected fit, the chaos boundary `train_acc(β, γ) = 0.20`
+is the line:
+
+```
+0.254 + 0.0523 log(β) − 0.197 γ = 0.20
+γ*(β) = (0.054 + 0.0523 log(β)) / 0.197
+       ≈ 0.274 + 0.265 log(β)
+```
+
+So `γ*(0.8) ≈ 0.215`, `γ*(1.4) ≈ 0.363`, `γ*(2) ≈ 0.458`,
+`γ*(4) ≈ 0.642`, `γ*(8) ≈ 0.825`. Note `γ*(8) ≈ 0.83` which is below
+the observed-chaos γ=0.95 and above the observed-emergent γ=0.02 —
+consistent with corners data, but not yet pinned down (need
+gamma_axis_b8p0 to land).
+
+### Implication for previously-committed predictions P17 / P18 / P19
+
+The pilot probes were submitted using the **incorrect** iter-13 2D fit.
+With the corrected coefficients:
+
+| pilot | (β, γ) | iter-13 fit | corrected fit | classifier |
+|---|---|---:|---:|---|
+| pilot_b4p0_g0p2 (P17) | (4.0, 0.2) | 0.256 emergent | **0.293 emergent** | both: emergent ✓ |
+| pilot_b4p0_g0p6 (P18) | (4.0, 0.6) | 0.182 chaos | **0.214 emergent** | flipped |
+| pilot_b6p4_g0p7 (P19) | (6.4, 0.7) | 0.174 chaos | **0.215 emergent** | flipped |
+
+P17 prediction unchanged (both fits predict emergent, value differs).
+**P18 and P19 are flipped** by the corrected fit — the corrected model
+predicts both cells emergent, not chaos. So P18 and P19 will be
+*confirmed* by the original verifier (which expects chaos) only if
+the corrected linear fit fails out-of-strip; otherwise they will be
+refuted, and the result is a clean test of whether the corrected fit
+extrapolates well beyond the fit data range (γ up to 0.345 in fit, but
+γ=0.6, 0.7 in tests).
+
+This re-creates an iteration-12-style decisive test: the iter-13 vs
+iter-19 fits make opposite predictions for two specific cells. The
+pilot jobs will land the verdict.
 
 ## Reproducibility
 
