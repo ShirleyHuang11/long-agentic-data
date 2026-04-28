@@ -1,0 +1,168 @@
+---
+title: Emergent-region boundary in (β, γ) plane — empirical hypothesis from partial sweeps
+date: 2026-04-27
+status: hypothesis_with_partial_evidence
+data_snapshot: 2026-04-27 22:51 EDT (33 cells aggregated, 4 emergent)
+authoritative_data: case/phase/runs/<variant>/run_summary.csv
+---
+
+# Emergent-region boundary in (β, γ) plane — empirical hypothesis
+
+## 0. Executive summary
+
+After 8h21m of running 11 parallel A100 sweeps, **33 unique (β, γ) cells**
+have been aggregated. **4 are emergent**, 29 are chaos. The α_theory
+parameter γ/(2β) — the originally-suggested theoretical knob — does
+**not** alone separate the two phases. A simple **conjunction**
+`β ≥ ~1.0 AND α_theory ≤ ~0.11` is consistent with every cell observed
+so far.
+
+This is a hypothesis. The full standard sweep (when complete or
+complemented by job 9008462) will refute or refine it. Below I document
+the data, the negative result on a simpler hypothesis, and the predictions
+that distinguish hypotheses.
+
+## 1. Data
+
+Phase classification uses the fixed thresholds in
+`utils.classify_fixed`: chaos iff `train_acc < 0.20 AND long_acc < 0.10`.
+Per-cell aggregation by (β, γ) groups across seeds.
+
+### 1a. Emergent cells
+
+| variant | β | γ | α_theory | n_seeds | train_acc | long_acc | gap | retention |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `corners` | 8.000 | 0.020 | 0.00125 | 3 | 0.359 | 0.141 | 0.218 | 0.394 |
+| `refine_b2p0_g0p3` | 1.400 | 0.210 | 0.07500 | 3 | 0.230 | 0.089 | 0.142 | 0.385 |
+| `refine_b2p0_g0p3` | 1.400 | 0.255 | 0.09107 | 3 | 0.223 | 0.084 | 0.139 | 0.378 |
+| `refine_b2p0_g0p3` | 1.400 | 0.300 | 0.10714 | 3 | 0.212 | 0.084 | 0.129 | 0.394 |
+
+All 4 cells have **3 independent seeds**. Inter-seed `long_acc` std is
+typically 0.01–0.02; the emergent classification is not seed-dependent.
+
+### 1b. Chaos cells closest to the boundary (top 5 chaos cells by long_acc)
+
+| variant | β | γ | α_theory | train_acc | long_acc | gap |
+|---|---:|---:|---:|---:|---:|---:|
+| `gamma_axis_b0p4` | 0.40 | 0.020 | 0.0250 | 0.157 | 0.065 | 0.092 |
+| `gamma_axis_b0p4` | 0.40 | 0.109 | 0.1364 | 0.150 | 0.062 | 0.088 |
+| `alpha_iso_0p1` | 0.204 | 0.041 | 0.0999 | 0.130 | 0.060 | 0.069 |
+| `alpha_iso_0p1` | 0.100 | 0.020 | 0.1000 | 0.115 | 0.059 | 0.056 |
+| `gamma_axis_b0p4` | 0.40 | 0.198 | 0.2475 | 0.139 | 0.058 | 0.081 |
+
+Note that all 5 closest-to-boundary chaos cells have **β ∈ [0.1, 0.4]**
+(no chaos cell with β > 1.0 has been observed because no `β > 1, low-γ`
+cell has run yet that lies near the boundary; refine_b2p0_g0p3's
+β=1.4 cells *are* the only β > 1 + low-γ cells, and all are emergent).
+
+## 2. Hypothesis 1 (refuted): "α_theory < α* threshold predicts emergent"
+
+The natural reading of the codebase — `alpha_theory = γ/(2β)` is computed
+per-cell, and the `alpha_iso` plans target this directly — is that
+emergent obtains for `α_theory < α*` for some critical α*.
+
+**Refutation**: cell `(β=0.4, γ=0.02)` has `α_theory=0.025`,
+**lower than 3 of 4 emergent cells**, yet it is firmly in the chaos
+region (`train_acc=0.157, long_acc=0.065`). If α_theory were the sole
+predictor, this cell would be emergent.
+
+The α_theory range of chaos cells [0.025, 192] **fully encloses** the
+α_theory range of emergent cells [0.001, 0.107]. There is no α* threshold
+that classifies all observed cells correctly.
+
+## 3. Hypothesis 2 (consistent so far): conjunction β ≥ β* ∧ γ ≤ γ*(β)
+
+**Statement**: A cell is emergent iff β exceeds some critical β* AND γ is
+below some β-dependent ceiling γ*(β). Specifically:
+
+* `β ≥ ~1.0` is necessary. All chaos cells with `β ∈ [0.1, 0.4]` have
+  modest train_acc (0.13–0.16) but never cross the chaos→emergent
+  threshold. Cells at (β=0.4, γ=0.02) and (β=0.1, γ=0.02) — both
+  low-γ but low-β — fail.
+* At `β = 1.4`, γ up to 0.30 succeeds (3/3 cells emergent at γ ∈
+  {0.21, 0.255, 0.30}). At `β = 8`, only γ = 0.02 has been tested; it
+  succeeds.
+* The boundary `γ*(β)` should be non-decreasing in β: more long-range
+  decay sharpness lets the model tolerate more noise. From the partial
+  data:
+  ```
+  γ*(β=1.4)  ≥ 0.30   (upper bound not yet reached)
+  γ*(β=8)    ≥ 0.02   (only one cell tested at this β)
+  ```
+
+**This hypothesis is testable** against incoming data — see §5.
+
+## 4. Why is this scientifically meaningful?
+
+If hypothesis 2 holds in the full grid, the qualitative narrative is:
+
+* **β controls the "discoverability" of the retrieval task**. Sharp
+  long-range decay means most retrievals are near-neighbour, which is
+  what the inductive bias of a causal Transformer with positional
+  encoding favours. As β → 0 (uniform long-range), retrievals are
+  uniformly distributed in distance and the model cannot localise the
+  relevant past KV pair.
+* **γ controls the SNR of the retrieval signal**. As γ → 1, the
+  sequence is mostly noise; even a sharp-β retrieval has too few
+  retrieval anchors per context to learn from.
+* The two effects **multiply**: failure on either axis kills emergence.
+  This is a 2D phase boundary, **not** a 1D scaling law in α_theory.
+
+A theory paper would frame this as: the apparent α_theory critical line
+is a low-β projection of a 2D boundary that requires *both* a sharpness
+condition on β and a noise-budget condition on γ.
+
+## 5. Specific predictions for future iterations
+
+| variant | cell | when arriving | prediction |
+|---|---|---|---|
+| `alpha_iso_0p1` | β=0.961, γ=0.192 (cell ~6 of 12) | iter ~14 (hour ~20) | borderline / weak emergent |
+| `alpha_iso_0p1` | β=1.512, γ=0.302 (cell ~7 of 12) | iter ~16 (hour ~22) | **emergent** (matches refine_b2p0 evidence) |
+| `alpha_iso_0p1` | β=2.379+ | iter ~17+ | emergent |
+| `alpha_iso_0p4` | β > 1.0 cells | iter ~14+ | mixed; α_theory at 0.4 is well above the 0.11 ceiling, so my hypothesis says **chaos** even for high β |
+| `alpha_iso_1p0` | all cells | iter ~30 (full) | all chaos (α_theory = 1.0 exceeds ceiling everywhere) |
+| `gamma_axis_b0p4` | all cells | iter ~30 | all chaos (β=0.4 below β* threshold) |
+| `beta_axis_g0p3` | β > 1.0 cells | iter ~17+ | **emergent** (validates β* ≈ 1.0) |
+| `refine_b0p4_g0p3` | all cells | iter ~30 | all chaos (β=0.4 below β*) |
+| `refine_b2p0_g0p3` | β ∈ {1.7, 2.0, 2.3, 2.6} | iter ~12+ | emergent at γ ≤ 0.30, possibly extending to γ = 0.39 |
+| `standard_complement` (9008462) | β ∈ {0.8, 1.6, 3.2, 6.4} × γ ∈ all 7 | depends on PENDING start | **boundary mapped explicitly** — γ* should rise with β |
+
+## 6. What the standard_complement sweep will distinguish
+
+Critical data: at each β ∈ {1.6, 3.2, 6.4}, identify the **largest γ**
+for which the cell is still emergent. This determines γ*(β) — the
+ceiling. Combined with low-β cells from the running standard, the full
+2D boundary is recoverable.
+
+If hypothesis 2 holds, expect γ*(β) to be roughly:
+
+| β | predicted γ*(β) |
+|---:|---:|
+| 0.8 | ~0.05 (just escaping chaos) |
+| 1.6 | ~0.35 (consistent with β=1.4 → 0.30) |
+| 3.2 | ~0.55 (interpolating) |
+| 6.4 | ~0.55 (saturating) |
+
+If γ*(6.4) is much higher than γ*(0.8), we have a β-monotone ceiling and
+the conjunction model holds. If γ*(β) is roughly constant ≈ 0.3, the
+"β-only" hypothesis holds (i.e. β > β* is the only requirement, γ is a
+secondary modifier). The complement sweep distinguishes these.
+
+## 7. What this is NOT
+
+* This is not yet a phase diagram. 33 cells out of an eventual 250+ is
+  too sparse for a heatmap.
+* This is not yet a trained-model claim. Loss is converged at
+  5000 steps, so "emergent" is a statement about the architecture's
+  best-effort generalisation at this size — not about training horizon.
+* This is not yet ablated. We do not know if a Mamba/RoPE/larger model
+  shifts the boundary. Shifting would *also* support the architecture-
+  centric story.
+
+## 8. Code touched in support of this analysis
+
+None this iteration. The 4-cell summary was extracted via the existing
+`section_top_nonchaos` table (added in commit 3a655f5) and the
+cross-variant aggregation in `aggregate_report.py`. No new compute
+submitted; no factories or plotters changed. The boundary hypothesis
+emerged purely from re-reading existing data.
