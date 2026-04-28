@@ -86,9 +86,31 @@ def aggregate_cells(df: pd.DataFrame) -> pd.DataFrame:
 # -------------------- per-variant summary -----------------------------------
 
 
+def _expected_total_for(name: str, csv_path: Path) -> int:
+    """Resolve expected total rows for a variant.
+
+    Priority: sweep_meta.json (authoritative — written by phase_sweep at
+    run start/end with the resolved plan + seeds), then EXPECTED_PAIRS
+    fallback table (× EXPECTED_SEEDS), then 0 (signals "unknown" so the
+    completion column shows n/a).
+    """
+    meta_path = csv_path.parent / "sweep_meta.json"
+    if meta_path.exists():
+        try:
+            import json
+            meta = json.loads(meta_path.read_text())
+            n_pairs = int(meta.get("plan", {}).get("n_pairs", 0))
+            n_seeds = len(meta.get("seeds", []) or [])
+            if n_pairs > 0 and n_seeds > 0:
+                return n_pairs * n_seeds
+        except (OSError, ValueError, KeyError):
+            pass
+    return EXPECTED_PAIRS.get(name, 0) * EXPECTED_SEEDS
+
+
 def variant_summary(name: str, csv_path: Path) -> Dict[str, object]:
     info: Dict[str, object] = {"variant": name}
-    expected_total = EXPECTED_PAIRS.get(name, 0) * EXPECTED_SEEDS
+    expected_total = _expected_total_for(name, csv_path)
     info["expected"] = expected_total
     info["row_count"] = 0
     if not csv_path.exists():
@@ -408,8 +430,16 @@ def main() -> None:
         print(f"[warn] no runs dir; wrote empty report to {REPORT_PATH}")
         return
 
+    # Discover variants from filesystem (any subdir with run_summary.csv)
+    # and union with the EXPECTED_PAIRS table — picks up ad-hoc variants
+    # like `standard_complement` that aren't in the static table.
+    discovered = sorted({
+        d.name for d in RUNS_DIR.iterdir()
+        if d.is_dir() and (d / "run_summary.csv").exists()
+    } | set(EXPECTED_PAIRS))
+
     infos: List[Dict[str, object]] = []
-    for name in sorted(EXPECTED_PAIRS):
+    for name in discovered:
         csv_path = RUNS_DIR / name / "run_summary.csv"
         infos.append(variant_summary(name, csv_path))
 

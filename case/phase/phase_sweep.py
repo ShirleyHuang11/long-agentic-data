@@ -163,6 +163,19 @@ def run_sweep(plan: dg.SweepPlan, seeds: Sequence[int],
     total = len(jobs)
     print(f"[jobs] {total} training runs\n")
 
+    # Write meta.json eagerly so mid-run aggregators (e.g.
+    # aggregate_report.py) can read the authoritative expected count
+    # before the sweep finishes. Updated again at end with elapsed_sec.
+    meta_json.write_text(json.dumps({
+        "plan": plan.to_dict(),
+        "seeds": list(seeds),
+        "device": str(device),
+        "config": cfg,
+        "num_runs": total,
+        "elapsed_sec": 0.0,
+        "status": "running",
+    }, indent=2, default=str))
+
     iterable = jobs
     pbar = None
     if not no_tqdm:
@@ -243,6 +256,7 @@ def run_sweep(plan: dg.SweepPlan, seeds: Sequence[int],
         "config": cfg,
         "num_runs": total,
         "elapsed_sec": elapsed,
+        "status": "complete",
     }, indent=2, default=str))
 
     print(f"\n[done] {total} runs in {elapsed/60:.1f} min")

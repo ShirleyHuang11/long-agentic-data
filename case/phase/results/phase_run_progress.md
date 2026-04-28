@@ -164,3 +164,51 @@ commits for iteration-N:
   (committed by `aggregate_report.py`, not git-committed).
 * No new sbatch submissions.
 * No git commits (per user rule).
+
+## 7. Iteration-3..5 updates
+
+* **3a655f5** (iteration 3): de-duped `aggregate_report.classify_phase` →
+  `utils.classify_fixed`. Added `section_top_nonchaos`. Surfaced 4
+  emergent cells previously hidden by the unusual-cell filter logic.
+* **a7652df** (iteration 4): parameterized `_FACTORIES["standard"]` to
+  honor `plan.n_beta`/`plan.n_gamma`/`plan.beta_range`/`plan.gamma_range`
+  overrides. Submitted `phase-standard_complement` (job 9008462) covering
+  the upper β half {0.8, 1.6, 3.2, 6.4} that the running standard (8493171)
+  won't reach. Cost ~24 GPU-h; combined with running standard, this
+  recovers the full 7×7 grid (3 seeds on low-β + 1 seed on high-β).
+* **(this commit, iteration 5)**: aggregate_report now (a) discovers
+  variants from `runs/` filesystem (no longer limited to the static
+  EXPECTED_PAIRS table — `standard_complement` will appear automatically),
+  and (b) reads `sweep_meta.json` for authoritative expected-row count
+  with the static table as fallback. phase_sweep writes `sweep_meta.json`
+  eagerly at run start (mid-run aggregators no longer have to guess).
+
+### Iteration-5 confirmation: 3-seed emergent cells
+
+`corners` reached 9 rows = 3 cells × 3 seeds. The hot corner
+`(β=8, γ=0.02)` now has the full 3-seed reading:
+
+| (β, γ)        | n_seeds | train_acc | long_acc | gap   | retention | phase    |
+|---------------|--------:|----------:|---------:|------:|----------:|----------|
+| (8.0, 0.02)   | 3       | 0.359     | 0.141    | 0.218 | 0.394     | emergent |
+| (1.4, 0.21)   | 3       | 0.230     | 0.089    | 0.142 | 0.385     | emergent |
+| (1.4, 0.255)  | 3       | 0.223     | 0.084    | 0.139 | 0.378     | emergent |
+| (1.4, 0.30)   | 3       | 0.212     | 0.084    | 0.129 | 0.394     | emergent |
+
+`mean(long_acc) = 0.100` across these 4 cells with `std = 0.029`
+(intra-cell, across 3 seeds). The emergent strip is **not a single-seed
+fluke** — it is repeatable across seeds.
+
+### Predictions to verify in iteration 6+
+
+* `alpha_iso_0p1` traces γ = 0.2β; at β ≈ 1.4, γ ≈ 0.28 — within the
+  emergent strip identified by `refine_b2p0_g0p3`. The α=0.1 line should
+  show a phase transition around its 7th–8th cell (β crossing ~1.0).
+  Iteration 6 (~hour 9) won't see it yet; iteration ~12 (hour ~16)
+  should. Iteration ~22 (hour ~32) should have it complete.
+* `beta_axis_g0p3` traces β at fixed γ=0.3; refine_b2p0 confirms emergent
+  at (β=1.4, γ=0.3). beta_axis should also see emergent in its high-β
+  cells, expected around iteration ~16 (hour ~22).
+* `gamma_axis_b0p4` traces γ at β=0.4 — too low-β to enter the emergent
+  strip. Predict all chaos. If it shows non-chaos, our boundary
+  hypothesis is wrong.
