@@ -550,6 +550,31 @@ instead of 0.212. When that cell lands (~ row 25 of complement, in
 ~13 hours), we'll have a 3rd cross-validation of the fit's
 extrapolation.
 
+### Iteration-34 validation: 6-cell fit wins again at β=0.8
+
+Second complement row landed: `(β=0.8, γ=0.208, N=1)` train_acc=0.180 → chaos.
+
+| fit | predicted train_acc(0.8, 0.208) | implied phase | error |
+|---|---:|---|---:|
+| 5-cell (iter-19) | 0.201 | **emergent** | +0.021 (WRONG class) |
+| 6-cell (iter-33) | 0.189 | **chaos** ✓ | +0.009 |
+
+This is the second β=0.8 cell where the 6-cell fit out-predicts the
+5-cell fit. Combined:
+
+```
+γ*(β=0.8) brackets:
+  observed         (0.05 emergent, 0.208 chaos)        width 0.16
+  5-cell predicted  γ* = 0.215   ← too high (above bracket)
+  6-cell predicted  γ* = 0.113   ← within bracket ✓
+  iter-13 (wrong)  γ* = 0.302   ← far too high
+```
+
+So at β=0.8 — the lowest β touched by any sweep — only the 6-cell
+fit gives the right classification on both observed cells. **The
+5-cell fit's near-perfect R²=0.9999 was masking a real extrapolation
+error**. Honest reporting: the 6-cell fit is now the operative model.
+
 ## Result 10 — emergent cells are still actively learning at 5000 steps
 
 (Added in iteration 23 from re-analysis of `aulc_train_to_final_norm`
