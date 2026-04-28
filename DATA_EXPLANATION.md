@@ -1,5 +1,21 @@
 # Holographic Pointer Chasing 数据的特别之处
 
+> **Scope note.** This document describes the **holographic-pointer-chasing**
+> task implemented in `data/pointer.py` — a permutation-based jump-table
+> task with a fixed 33-token input and variable logical depth (path_length).
+>
+> The phase-diagram experiments under `case/phase/` use a **different**
+> task: key-value retrieval implemented in
+> `case/phase/phase_core.py::AlgorithmicKVGenerator`. There β controls
+> the power-law decay of retrieval distance and γ controls the noise-token
+> rate; sequence length is variable (default 512, eval at 2048). See
+> `case/phase/README.md` and `case/phase/results/main_findings.md` for
+> the phase-diagram task spec and findings.
+>
+> The two tasks both use the symbols β and γ but parametrize different
+> things — don't confuse them.
+
+
 展开物理序列 (Expand Context Length)：不要把映射表挤在开头。构建一个长达几千 Token 的序列，把逻辑节点分散埋伏在整个序列中。引入 $\gamma$ (控制噪声)：$\gamma$ 代表序列中插入的无关 Token（废话）的比例。
 
 $\gamma \to 1$：序列里大部分是乱码，偶尔出现几个逻辑节点。$\gamma \to 0$：全是紧凑的逻辑跳跃。引入 $\beta$ (控制跳跃距离分布)：

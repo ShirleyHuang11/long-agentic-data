@@ -330,6 +330,24 @@ def render_markdown(results: List[Dict]) -> str:
     return "\n".join(lines)
 
 
+def render_terminal_summary(results: List[Dict]) -> str:
+    """One-screen status — easier to skim than the full markdown table."""
+    counts: Dict[str, int] = {}
+    for r in results:
+        counts[r["status"]] = counts.get(r["status"], 0) + 1
+    lines = [f"verify_predictions  ({sum(counts.values())} total)"]
+    parts = [f"{k}={v}" for k, v in sorted(counts.items())]
+    lines.append("  " + ", ".join(parts))
+    by_status: Dict[str, List[Dict]] = {}
+    for r in results:
+        by_status.setdefault(r["status"], []).append(r)
+    for status in ("refuted", "mixed", "confirmed", "observed", "pending"):
+        for r in by_status.get(status, []):
+            tag = f"[{status.upper():>9}]"
+            lines.append(f"  {tag} {r['id']}: {r['desc']}")
+    return "\n".join(lines)
+
+
 def main() -> None:
     runs_dir = Path(__file__).resolve().parent / "runs"
     out_path = Path(__file__).resolve().parent / "results" / "predictions_verification.md"
@@ -341,7 +359,11 @@ def main() -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(md)
 
-    print(md)
+    # Print compact terminal summary by default; full markdown is on disk.
+    if "--full" in sys.argv:
+        print(md)
+    else:
+        print(render_terminal_summary(results))
     print(f"\n[wrote {out_path}]")
 
 
