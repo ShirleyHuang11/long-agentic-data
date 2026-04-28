@@ -207,6 +207,33 @@ PREDICTIONS: List[Dict] = [
         "expected": "emergent",
         "min_seeds": 1,
     },
+    {
+        # 2D linear fit predicts train_acc(4.0, 0.6) = 0.262 + 0.031 − 0.111 = 0.182
+        # 0.182 < 0.20 ⇒ chaos. Job 9033655 (single, 1 seed, 2h wall).
+        # If the (β=8, γ=0.02) corner-anomaly is a general high-β bonus
+        # (interaction term hypothesis), this cell would come out
+        # emergent (refuting P18). If linear fit holds at moderate-β /
+        # moderate-γ, it stays chaos (confirming P18).
+        "id": "P18",
+        "desc": "(β=4.0, γ=0.6) chaos — 2D linear fit predicts train_acc≈0.182, just below threshold",
+        "variants": ["pilot_b4p0_g0p6"],
+        "where": lambda r: True,
+        "expected": "chaos",
+        "min_seeds": 1,
+    },
+    {
+        # 2D linear fit predicts train_acc(6.4, 0.7) = 0.262 + 0.042 − 0.130 = 0.174
+        # 0.174 < 0.20 ⇒ chaos. Job 9033656 (single, 1 seed, 2h wall).
+        # Tests the same interaction-vs-linear question at a higher β
+        # closer to the (β=8, γ=0.02) anomalous corner. If interaction
+        # term is needed, P19 refutes; if linear fit holds, P19 confirms.
+        "id": "P19",
+        "desc": "(β=6.4, γ=0.7) chaos — 2D linear fit predicts train_acc≈0.174",
+        "variants": ["pilot_b6p4_g0p7"],
+        "where": lambda r: True,
+        "expected": "chaos",
+        "min_seeds": 1,
+    },
 ]
 
 
