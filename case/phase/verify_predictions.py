@@ -190,6 +190,23 @@ PREDICTIONS: List[Dict] = [
         "expected": "chaos",
         "min_seeds": 1,
     },
+    {
+        # 2D linear fit train_acc(β, γ) = 0.262 + 0.0224·log(β) − 0.185·γ
+        # predicts train_acc(4.0, 0.2) = 0.262 + 0.031 − 0.037 = 0.256.
+        # 0.256 > 0.20 chaos threshold ⇒ emergent.
+        # Job 9030513 (single-cell probe at this point, 3 seeds, 4h wall)
+        # tests the 2D linear extrapolation at a (β, γ) point not covered
+        # by any other variant. Distinguishes:
+        #   - linear separable fit holds out-of-strip   ⇒ ta ∈ [0.24, 0.27]
+        #   - interaction term needed (high-β favoured) ⇒ ta > 0.27
+        #   - linear fit fails at extrapolation         ⇒ ta < 0.24
+        "id": "P17",
+        "desc": "(β=4.0, γ=0.2) emergent — 2D linear fit predicts train_acc≈0.256",
+        "variants": ["pilot_b4p0_g0p2"],
+        "where": lambda r: True,
+        "expected": "emergent",
+        "min_seeds": 1,
+    },
 ]
 
 

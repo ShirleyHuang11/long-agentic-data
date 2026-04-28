@@ -347,6 +347,16 @@ def _standard_from_cfg(c) -> SweepPlan:
     return standard_grid(**kwargs)
 
 
+def _single_from_cfg(c) -> SweepPlan:
+    """One-cell plan at (plan.beta, plan.gamma) — used for pilots."""
+    b, g = float(c.beta), float(c.gamma)
+    return SweepPlan(
+        name=f"single_b{b:g}_g{g:g}",
+        description=f"Single point (β={b}, γ={g}) — pilot / sanity-check.",
+        pairs=((round(b, 5), round(g, 5)),),
+    )
+
+
 _FACTORIES = {
     "standard": _standard_from_cfg,
     "corners": lambda c: boundary_corners(),
@@ -355,6 +365,7 @@ _FACTORIES = {
     "gamma_axis": lambda c: gamma_axis(c.beta, n=c.n),
     "fast_beta": lambda c: fast_beta_limit(p=c.p, n=c.n),
     "refine": lambda c: refine_around(c.beta, c.gamma),
+    "single": _single_from_cfg,
 }
 
 
