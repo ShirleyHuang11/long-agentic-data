@@ -294,6 +294,30 @@ PREDICTIONS: List[Dict] = [
         "expected": "emergent",
         "min_seeds": 1,
     },
+    {
+        # standard_complement (job 9008462, RUNNING since iter-31) covers
+        # β ∈ {0.8, 1.6, 3.2, 6.4} × γ ∈ {0.05, 0.208, 0.367, 0.525,
+        # 0.683, 0.842, 1.0}. The corrected 2D fit predicts:
+        #   train_acc(3.2, 0.525) = 0.254 + 0.0523·log(3.2) − 0.197·0.525
+        #                         = 0.254 + 0.0608 − 0.1034
+        #                         = 0.212
+        # This is the most discriminating cell in the complement —
+        # only 0.012 above the chaos threshold of 0.20. If the corrected
+        # fit's β-extrapolation holds beyond the original β=1.4 strip
+        # data, this cell is JUST emergent. If the fit overestimates
+        # train_acc at higher β (e.g. due to a saturating effect), this
+        # cell flips to chaos.
+        # Also tests the iter-19 vs iter-13 fit comparison: iter-13 fit
+        # gives 0.262 + 0.0224·log(3.2) − 0.185·0.525 = 0.262 + 0.0260 −
+        # 0.0971 = 0.191 (chaos). So this cell is exactly where the two
+        # fits disagree at the chaos boundary — a clean discriminator.
+        "id": "P25",
+        "desc": "(β=3.2, γ=0.525) emergent — corrected fit predicts train_acc=0.212; iter-13 fit said 0.191 chaos; cleanest discriminator on standard_complement",
+        "variants": ["standard_complement"],
+        "where": lambda r: abs(r.beta - 3.2) < 1e-3 and abs(r.gamma - 0.525) < 1e-3,
+        "expected": "emergent",
+        "min_seeds": 1,
+    },
 ]
 
 
