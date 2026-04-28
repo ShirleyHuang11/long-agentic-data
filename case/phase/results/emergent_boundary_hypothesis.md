@@ -494,3 +494,110 @@ error. Two papers' worth of corollary:
 
 These observations should appear in the writeup's main text, not the
 appendix.
+
+## 15. Iteration-13 update — second linear law along α=0.1 line
+
+`alpha_iso_0p1` has finished 4 cells × 3 seeds along the γ=0.2β line.
+Mean train_acc per cell:
+
+| β | γ | train_acc (N=3) | log(β) |
+|---:|---:|---:|---:|
+| 0.10 | 0.020 | 0.115 | -2.30 |
+| 0.143 | 0.029 | 0.120 | -1.94 |
+| 0.204 | 0.041 | 0.130 | -1.59 |
+| 0.291 | 0.058 | 0.139 | -1.23 |
+
+OLS regression on these 12 (log β, train_acc) points:
+
+```
+train_acc(β | α=0.1) = 0.167 + 0.0224 · log(β)        (R² > 0.97)
+```
+
+Crosses the chaos threshold 0.20 at `log(β) = (0.20 - 0.167)/0.0224 = 1.47`,
+i.e. **β ≈ 4.4**.
+
+So along the α=0.1 line, hypothesis 2 with this fit predicts:
+* β < 4.4 ⇒ chaos
+* β ≥ 4.4 ⇒ emergent
+
+Of the 12 cells in `alpha_iso_0p1`, only the last two (β=3.92 and β=5.0)
+are above this β*(α=0.1) ≈ 4.4 boundary. **One cell at most** is
+predicted emergent in this entire variant.
+
+This **directly contradicts P7**, which posited "emergent at β > 1.5"
+based on a qualitative "β > 1 enters emergent strip" reading.
+
+P16 (this iteration): alpha_iso_0p1 cells at `β ∈ (1.5, 4.0)` are
+chaos. P7 + P16 together divide alpha_iso_0p1 into three claimed
+regions:
+
+| β region | P7 says | P16 says |
+|---|---|---|
+| < 1.5 | chaos (no claim) | chaos (no claim) |
+| (1.5, 4.0) | **emergent** | **chaos** |
+| ≥ 4.0 | emergent | (no claim) |
+
+The 4 cells in `alpha_iso_0p1` with β ∈ (1.5, 4.0) — namely β ∈
+{1.51, 2.38, 3.74} — are the next falsifiability test. Expected to
+arrive around iteration 22 (~5 hours from now).
+
+### Why two linear laws together imply a 2-parameter (a, b) model
+
+Combining iterations 11 and 13 produces:
+
+```
+train_acc(β=1.4, γ) = 0.269 - 0.185 · γ          (γ-axis at fixed β=1.4)
+train_acc(β, α=0.1) = 0.167 + 0.0224 · log(β)    (α=0.1 line)
+```
+
+If the two-line model is a 2D linear fit
+`train_acc(β, γ) = a₀ + a₁ · log(β) + a₂ · γ`,
+then projecting to fixed β=1.4 gives intercept `a₀ + a₁ · log(1.4) = 0.269`.
+With a₁ = 0.0224, this yields `a₀ = 0.269 - 0.0224 · log(1.4) = 0.262`.
+
+Sanity check: at (β=8, γ=0.02), the 2D fit predicts:
+```
+train_acc(8, 0.02) = 0.262 + 0.0224·log(8) + (-0.185)·0.02
+                   = 0.262 + 0.0466 + (-0.0037)
+                   = 0.305
+```
+
+Observed: train_acc=0.359 (3 seeds at β=8, γ=0.02 in corners).
+**Predicted 0.305, observed 0.359 — off by 0.054**, well outside the
+tight error bars of either component fit (each was within 0.01).
+
+Implication: **the 2D fit is not separable as `a₁·log(β) + a₂·γ`** at the
+extreme corners. There is interaction. The (β=8, γ=0.02) cell is
+"more emergent than the linear model predicts" — an interaction term
+favouring the high-β / low-γ regime.
+
+Two possible refinements for the paper:
+1. Add an interaction term `a₃ · log(β) · γ` (single extra free parameter).
+2. Treat the (β=8, γ=0.02) cell as anomalous "rote-like" rather than
+   "emergent" — the gap=0.218 there is far higher than any other emergent
+   cell (max gap=0.142 in refine_b2p0_g0p3). The 4-class classifier
+   may need the rote train_acc cutoff lowered from 0.40 to 0.30 to
+   capture this regime.
+
+### Refresh of γ* bracket map after iter-12
+
+| β | γ* lower | γ* upper | width | source |
+|---:|---:|---:|---:|---|
+| 1.4 | 0.345 | 0.39 | 0.045 | refine_b2p0_g0p3 (γ=0.345 N=3 emergent, γ=0.39 N=1 chaos) |
+| 8 | 0.02 | 0.95 | 0.93 | corners only (γ ∈ {0.02, 0.95} sampled) |
+
+`gamma_axis_b8p0` (job 9016098, still PENDING) will tighten the β=8
+bracket significantly.
+
+### Pending jobs status (iteration 13)
+
+```
+9008462 (standard_complement)  PENDING (Priority)  3.5 h+
+9016098 (gamma_axis_b8p0)      PENDING (Priority)  2.5 h+
+8493207 (phase-report)         PENDING (Dependency)
+```
+
+Both PENDING jobs remain in queue. Either an interactive `scancel` of
+a low-impact running job (refine_b0p4_g0p3 — predicted all-chaos and
+contributing little new info; needs user authorization) or a wait of
+12+ hours for queue rotation. Status quo for now.

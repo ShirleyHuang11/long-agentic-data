@@ -173,6 +173,23 @@ PREDICTIONS: List[Dict] = [
         "expected": "chaos",
         "min_seeds": 1,
     },
+    {
+        # Linear-in-log-β regression on the 4 N=3 alpha_iso_0p1 cells:
+        #   train_acc(β | α=0.1) ≈ 0.167 + 0.0224 · log(β)   (R² > 0.97)
+        # crosses train_acc=0.20 at log(β) = (0.20 - 0.167)/0.0224 = 1.47,
+        # i.e. β ≈ 4.4. So along α=0.1, only the highest-β cell (β=5.0)
+        # is predicted emergent — *not* "all β > 1.5".
+        # P16 supersedes P7's qualitative "β > 1.5 emergent at α=0.1" by
+        # claiming β ∈ (1.5, 4.0) are still chaos. Both P7 and P16 cover
+        # the β ∈ (1.5, 4.0) range; both pending until alpha_iso_0p1
+        # progresses to those cells.
+        "id": "P16",
+        "desc": "alpha_iso_0p1 cells at β ∈ (1.5, 4.0) are CHAOS — linear-in-log-β fit gives β*(α=0.1) ≈ 4.4; supersedes P7 partially",
+        "variants": ["alpha_iso_0p1"],
+        "where": lambda r: 1.5 < r.beta < 4.0,
+        "expected": "chaos",
+        "min_seeds": 1,
+    },
 ]
 
 
