@@ -212,3 +212,44 @@ fluke** — it is repeatable across seeds.
 * `gamma_axis_b0p4` traces γ at β=0.4 — too low-β to enter the emergent
   strip. Predict all chaos. If it shows non-chaos, our boundary
   hypothesis is wrong.
+
+## 8. Iteration-30 update (2026-04-28 10:51 EDT) — concrete ETAs at last
+
+After ~16 hours of all 6 phase jobs at `START_TIME=N/A`, Slurm's
+backfill scheduler now reports estimated starts for the two long-wall
+jobs:
+
+| job | partition | est. start (EDT) | wait remaining |
+|---|---|---|---:|
+| 9008462 (`standard_complement`, 24 h wall) | seas_gpu | 2026-04-28T16:33:24 | ~5h40m |
+| 9016098 (`gamma_axis_b8p0`, 24 h wall)    | seas_gpu | 2026-04-28T22:20:00 | ~11h30m |
+
+The 4 short-wall pilots (P17, P18-P21, P19-P22, P24, all PENDING with
+2-h or 4-h walls) still show `START_TIME=N/A` — too short or too
+low-priority for the scheduler's planning horizon to lock in, but
+these are the most likely to backfill into earlier slots if any of
+the user's earlier-priority `seas_gpu` jobs (`100m-linattn` at
+13:55, `100m-ilf-rank2` at 14:47, etc.) leave gaps.
+
+Fairshare for `barak_lab/hanlinzhang`:
+* iter-22 (~7 h ago): 0.000757
+* iter-30 (now):       0.000951
+
+slowly recovering as the user's earlier RUNNING jobs accrue more usage
+and rotate. The recovery is real but does not move the needle on
+START_TIME estimates that are mostly determined by other-user priority
+in the partition.
+
+### Loop posture from here
+
+* Iteration 31 onward: nothing actionable until 16:33 (or earlier
+  backfill of the small pilots). The infrastructure is ready —
+  `aggregate_report.py`, `cross_variant_scatter.py`,
+  `verify_predictions.py`, and `linear_law_plot.py` will all
+  auto-discover new `runs/<name>/` data when it lands.
+* Loop heartbeat continues every 30 minutes per the user's `/loop
+  30min` schedule. Iterations without new data may produce no
+  commits, by design — committing only when there's substance is
+  per the user's own atomic-commit rule.
+* The cluster_strategy_options.md menu is still on the table if the
+  16:33 slot is preempted or the small pilots don't backfill.
