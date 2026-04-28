@@ -47,6 +47,21 @@ Phase classifier (fixed thresholds, see `utils.classify_fixed`):
 | 2 | super-gen | `long_acc ≥ 0.50` AND `retention ≥ 0.85` |
 | 3 | rote | `train_acc ≥ 0.40` AND `gap ≥ 0.10` |
 
+## Results at a glance
+
+| # | Result | One-line headline |
+|---:|---|---|
+| 1 | emergent strip | 5 cells emergent, all N=3 seeds, std ≤ 0.005 |
+| 2 | refute single α-threshold | (β=0.4, γ=0.02) chaos at α=0.025 — α_theory enclosure means no α* exists |
+| 3 | two linear laws | train_acc(γ\|β=1.4) and train_acc(β\|α=0.1) both linear with R² > 0.97 |
+| 4 | (CORRECTED) 2D fit had no breakdown | apparent corner anomaly was a fitting artifact |
+| 5 | soft boundary, not phase transition | final_loss(γ) is also linear; "transition" = hard 0.20 cutoff on smooth quantity |
+| 6 | falsifiability | 23 written-down predictions, programmatic check, 10 confirmed / 1 refuted (P11) / 12 pending |
+| 7 | length-gen ratio separates mechanism | r=acc(2048)/acc(512): emergent 0.39, weak-chaos 0.47, no-retrieval 0.77 |
+| 8 | Rényi D separates phase from data side | D_q=1: emergent 0.625, chaos 0.659; 3.4σ separation |
+| 9 | corrected 2D fit unifies all emergent cells | R²=0.9999, max\|resid\|<0.001; γ*(β)≈0.274 + 0.265 log(β) |
+| 10 | AULC says emergent still learning at 5k steps | emergent AULC 0.040, chaos 0.029; 4× tighter std on emergent |
+
 ## Headline claim
 
 **The chaos→emergent boundary in the (β, γ) plane is a soft, smoothly
@@ -482,6 +497,93 @@ P24 logged in verifier with this prediction. Refutation would mean
 either (a) 5k steps was massively under-trained (changes the entire
 boundary location story), or (b) more compute lets the model escape
 to a fundamentally different basin. Both are interesting outcomes.
+
+## Limitations / threats to validity
+
+A NeurIPS submission needs an explicit accounting of what these results
+do not establish. The honest list:
+
+### Single architecture, single size
+
+All cells use `TinyCausalTransformer` at the 100M-non-embedding-param
+preset (d_model=1024, 8 layers, 16 heads, ff_mult=4). We **cannot**
+claim any of the linear laws or boundary locations transfer to:
+
+* larger Transformers (e.g. 1B params),
+* smaller Transformers (the codebase enforces a 100M floor that wasn't
+  experimentally crossed),
+* non-Transformer architectures (Mamba / RWKV / RetNet / etc.),
+* different attention variants (RoPE, ALiBi, sliding-window).
+
+The (β=8, γ=0.02) corner's accuracy at this size is 0.359; we don't
+know whether scaling fixes the still-substantial generalization gap
+(0.218) or whether it persists. **If a referee asks "is this a property
+of Transformers or of this 100M Transformer?", the honest answer is
+the latter, until the alternative is run.**
+
+### Single training schedule
+
+`lr=3e-4`, cosine decay to `lr_min_ratio=0.1`, `warmup_steps=100`,
+`grad_clip=1.0`, `train_steps=5000`. Result 10 (AULC) suggests the
+model is still descending at 5000 steps in emergent cells. The
+user-submitted 30k-step pilot at (β=1.4, γ=0.345) (job 9029967, still
+PENDING) is the ONE direct test of this; if it gives train_acc
+substantially higher than 0.205, **the boundary location γ*(β) we
+report is specifically the boundary at 5000 training steps**, not an
+intrinsic property.
+
+### Single seed range
+
+Seeds {1, 2, 3} for everything claimed N=3. We do not have variance
+estimates from 5 or 10 seeds. The reported std ≤ 0.005 on emergent
+cells could be an underestimate.
+
+### γ*(β) formula was fit on 5 cells
+
+The corrected 2D linear law (Result 9) fits 5 emergent points
+exactly (R²=0.9999) but that's **5 points × 3 free parameters** — the
+fit is barely overdetermined. Out-of-sample tests are P17, P21, P22, P23
+(the 4 PENDING pilots and the gamma_axis_b8p0 sweep). Until at least
+one of these confirms or refutes, the formula's generalization is
+speculative.
+
+### Cells covered are unbalanced in the (β, γ) plane
+
+The 5 emergent cells cluster heavily at β=1.4 (4 of 5 at this β value)
+plus one outlier at β=8. We have no emergent points at β ∈ (1.4, 8).
+The linear law's β-slope (0.052 per log β) is mostly determined by
+extrapolating from β=1.4 to β=8 — a 1.74-unit gap in log space with
+no interior data. `standard_complement` would close this gap.
+
+### Phase classifier thresholds chosen by the original authors
+
+The fixed thresholds (0.20 train, 0.10 long, 0.40 train for rote, etc.)
+predate this loop's analysis. Lowering rote_train to 0.30 was raised
+in Result 4 (now corrected) as a possibility. We did NOT systematically
+sensitivity-analyze the boundary's location vs threshold choice. The
+existence of the linear laws is threshold-independent; only the
+specific γ*(β) numbers depend on the train_acc=0.20 cutoff.
+
+### Single task family
+
+`AlgorithmicKVGenerator` is one specific task. We deliberately do not
+claim Transformers exhibit a γ*(β) phase boundary on natural language,
+copy tasks, induction heads, or any task other than this one. The
+results say something about *this synthetic retrieval task with this
+parameterization*; generalization to natural data is a research
+direction, not a claim.
+
+### Falsifiability scoreboard caveat
+
+The 23 predictions in `verify_predictions.py` were written down before
+the data they test arrived (with the exception of P11, which existed
+when γ=0.39 data did, and got refuted). However, predictions P21–P24
+were all written *after* the underlying linear-fit data was observed
+— they extrapolate that fit, but the fit itself was estimated from
+the same data we then test against. This is normal for derived
+predictions but worth flagging: the **strongest** claim is that the
+linear fit predicts P17/P21/P22/P23/P24 cells correctly, which is
+out-of-sample only insofar as those cells' data hasn't arrived yet.
 
 ## Reproducibility
 
