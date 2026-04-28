@@ -227,3 +227,57 @@ When 9016098 finishes, γ*(β=8) is bracketed to within one γ step of
 | `beta_axis_g0p3` emergent at β > 1.0 | not yet — running has β ∈ [0.05, 0.121] |
 
 Two predictions confirmed; five still pending. None refuted.
+
+## 10. Iteration-8 update (2026-04-27 23:51 EDT)
+
+### 10a. New non-chaos cell: (β=1.4, γ=0.345)
+
+`refine_b2p0_g0p3` finished its β=1.4 row at γ ∈ {0.21, 0.255, 0.30, 0.345}.
+The cell at γ=0.345 (seed 1, n_seeds=1):
+
+| (β, γ) | seed | α_theory | train_acc | long_acc | gap | retention | phase |
+|---|---:|---:|---:|---:|---:|---:|---|
+| (1.4, 0.345) | 1 | 0.1232 | 0.204 | 0.081 | 0.123 | 0.398 | **emergent** |
+
+This **further refutes hypothesis 1 (single α-threshold)**: α_theory=0.123
+exceeds every prior emergent cell's α_theory (max was 0.107). With this
+new cell, the α_theory range of emergent cells widens to [0.001, 0.123],
+overlapping more deeply with the chaos cells' range [0.025, 192].
+
+### 10b. γ*(β=1.4) bound refinement
+
+```
+γ*(β=1.4) ≥ 0.30      (iter 6)
+γ*(β=1.4) ≥ 0.345     (iter 8)
+```
+
+The next refine cell (γ=0.39) is the last one in this row at β=1.4. If
+also emergent, then γ*(β=1.4) ≥ 0.39. If chaos, γ*(β=1.4) ∈ (0.345, 0.39).
+Iteration 9 should resolve this.
+
+### 10c. Infrastructure — cross-variant scatter
+
+Added `case/phase/cross_variant_scatter.py`:
+* Reads every `runs/*/run_summary.csv`, aggregates per (β, γ), then
+  re-aggregates across variants (n_seeds-weighted means).
+* Plots one scatter on log-β / linear-γ axes coloured by the same
+  4-phase classifier used by `aggregate_report` and `plot_phase_diagram`
+  (re-uses `utils.classify_fixed` and `plot_phase_diagram.aggregate` —
+  no third source-of-truth for thresholds).
+* Output: `case/phase/figures/cross_variant_scatter.png` +
+  `cross_variant_summary.csv`.
+
+This is the union view that `plot_phase_diagram.py` cannot produce
+because the union of corners + alpha_iso + refine + … is not a regular
+β×γ grid. Expected to become Figure 1 of the writeup once
+standard_complement (9008462) and gamma_axis_b8p0 (9016098) lands.
+
+Currently shows: 43 unique (β, γ) cells, 5 emergent + 38 chaos.
+
+### 10d. Pending jobs status
+
+| job | state | wait | action if next iter still pending |
+|---|---|---:|---|
+| 9008462 (`standard_complement`) | PENDING (Priority) | 2 h+ | continue waiting; this is the most informative pending job |
+| 9016098 (`gamma_axis_b8p0`) | PENDING (Priority) | 0.5 h | continue waiting; small enough to backfill |
+| 8493207 (`phase-report`) | PENDING (Dependency) | n/a | unchanged — fires when all 11 sweeps end |
