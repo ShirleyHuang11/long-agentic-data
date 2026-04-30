@@ -241,15 +241,27 @@ def train_one_model(
     max_len = max([train_len] + eval_lengths)
 
     gen = AlgorithmicKVGenerator(vocab_size=int(config["vocab_size"]))
-    model = TinyCausalTransformer(
-        vocab_size=int(config["vocab_size"]),
-        d_model=int(config["d_model"]),
-        nhead=int(config["nhead"]),
-        ff_mult=int(config["ff_mult"]),
-        num_layers=int(config["num_layers"]),
-        max_ctx_tokens=max_len,
-        dropout=float(config["dropout"]),
-    ).to(device)
+    arch = str(config.get("architecture", "transformer"))
+    if arch == "mamba":
+        from model_mamba import MambaCausal
+        model = MambaCausal(
+            vocab_size=int(config["vocab_size"]),
+            d_model=int(config["d_model"]),
+            num_layers=int(config["num_layers"]),
+            d_state=int(config.get("d_state", 16)),
+            d_conv=int(config.get("d_conv", 3)),
+            dropout=float(config["dropout"]),
+        ).to(device)
+    else:
+        model = TinyCausalTransformer(
+            vocab_size=int(config["vocab_size"]),
+            d_model=int(config["d_model"]),
+            nhead=int(config["nhead"]),
+            ff_mult=int(config["ff_mult"]),
+            num_layers=int(config["num_layers"]),
+            max_ctx_tokens=max_len,
+            dropout=float(config["dropout"]),
+        ).to(device)
 
     lr = float(config["lr"])
     train_steps = int(config["train_steps"])

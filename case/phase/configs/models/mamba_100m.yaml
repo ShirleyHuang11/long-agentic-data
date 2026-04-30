@@ -1,0 +1,38 @@
+# 100M-scale MambaCausal preset.
+# Pure-pytorch selective SSM with sequential scan; same forward signature
+# as TinyCausalTransformer so the rest of phase_core / phase_sweep is
+# unchanged. Sized at ~102.69M non-embed params at:
+#   d_model=1024, num_layers=32, d_state=16, d_conv=3.
+# Loaded by utils.load_config when default.yaml has `model_preset: mamba_100m`.
+
+# ---- Architecture ----
+architecture: mamba         # dispatched by phase_sweep.build_config and phase_core.train_one_model
+vocab_size: 60
+d_model: 1024
+num_layers: 32
+d_state: 16
+d_conv: 3
+# Transformer-only fields kept for build_config back-compat (Mamba ignores):
+nhead: 16
+ff_mult: 4
+dropout: 0.0
+
+# ---- Training ----
+# Mamba sequential scan is ~10× slower per step than attention. Reduce
+# batch and steps proportionally for first-pass parity.
+train_len: 512
+eval_lengths: [512, 1024, 2048]
+train_steps: 5000
+train_batch_size: 16        # halved vs Transformer to stay under wall-time
+eval_batch_size: 4
+eval_batches: 8
+lr: 3e-4
+warmup_steps: 100
+lr_min_ratio: 0.1
+grad_clip: 1.0
+deterministic: false
+
+# ---- Rényi diagnostics on raw token sequences ----
+renyi_seq_len: 12000
+renyi_qs: [0.5, 1.0, 2.0]
+renyi_orders: [1, 2, 3]

@@ -99,13 +99,24 @@ def build_config(model_cfg, long_len) -> Dict[str, object]:
         base_evals = [int(x) for x in cfg["eval_lengths"]]
         cfg["eval_lengths"] = sorted({train_len, *base_evals})
 
-    n_non_embed = count_non_embedding_params(
-        d_model=int(cfg["d_model"]),
-        nhead=int(cfg["nhead"]),
-        ff_mult=int(cfg["ff_mult"]),
-        num_layers=int(cfg["num_layers"]),
-        vocab_size=int(cfg["vocab_size"]),
-    )
+    arch = str(cfg.get("architecture", "transformer"))
+    if arch == "mamba":
+        from model_mamba import count_mamba_params
+        n_non_embed = count_mamba_params(
+            d_model=int(cfg["d_model"]),
+            num_layers=int(cfg["num_layers"]),
+            vocab_size=int(cfg["vocab_size"]),
+            d_state=int(cfg.get("d_state", 16)),
+            d_conv=int(cfg.get("d_conv", 3)),
+        )
+    else:
+        n_non_embed = count_non_embedding_params(
+            d_model=int(cfg["d_model"]),
+            nhead=int(cfg["nhead"]),
+            ff_mult=int(cfg["ff_mult"]),
+            num_layers=int(cfg["num_layers"]),
+            vocab_size=int(cfg["vocab_size"]),
+        )
     if n_non_embed < MIN_NON_EMBED_PARAMS:
         raise ValueError(
             f"non-embedding params = {n_non_embed:,} (~{n_non_embed/1e6:.2f}M) "
