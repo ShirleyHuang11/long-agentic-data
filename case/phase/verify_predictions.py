@@ -273,6 +273,55 @@ PREDICTIONS: List[Dict] = [
         "min_seeds": 1,
     },
     {
+        # iter-46 anchor pilot (Natural, β=2.0, γ=0.8) — proposal's
+        # Region I "learnable / Wikipedia-like" anchor.
+        # 18-cell weighted OLS predicts:
+        #   train_acc(2.0, 0.8) = 0.270 + 0.0475·log(2) − 0.254·0.8
+        #                       = 0.270 + 0.033 − 0.203 = 0.100
+        # Below 0.20 chaos threshold ⇒ predicted chaos.
+        # Mechanistic reading: γ=0.8 means 80% of tokens are noise, the
+        # model's locality (β=2) has nothing to retrieve from.
+        "id": "P26",
+        "desc": "(β=2.0, γ=0.8) chaos — Natural anchor; weighted 18-cell fit predicts train_acc≈0.100",
+        "variants": ["anchor_natural_b2p0_g0p8"],
+        "where": lambda r: True,
+        "expected": "chaos",
+        "min_seeds": 1,
+    },
+    {
+        # iter-46 anchor pilot (Edge-of-Chaos, β=0.05, γ=0.05) —
+        # proposal's "sweet spot" anchor for strong reasoning. 18-cell
+        # weighted fit predicts:
+        #   train_acc(0.05, 0.05) = 0.270 + 0.0475·log(0.05) − 0.254·0.05
+        #                         = 0.270 − 0.142 − 0.013 = 0.115
+        # Below 0.20 chaos threshold ⇒ predicted chaos.
+        # If confirmed: Transformer's locality bias is useless when
+        # retrieval distance is uniform; this is the regime where
+        # Mamba should escape chaos (the proposal's central claim).
+        "id": "P27",
+        "desc": "(β=0.05, γ=0.05) chaos — Edge-of-Chaos anchor; weighted 18-cell fit predicts train_acc≈0.115",
+        "variants": ["anchor_edge_b0p05_g0p05"],
+        "where": lambda r: True,
+        "expected": "chaos",
+        "min_seeds": 1,
+    },
+    {
+        # iter-47 anchor pilot (CoT, β=0.5, γ=0.4) — proposal's
+        # transition anchor (Region II / yellow). Weighted fit predicts:
+        #   train_acc(0.5, 0.4) = 0.270 + 0.0475·log(0.5) − 0.254·0.4
+        #                      = 0.270 − 0.033 − 0.102 = 0.135
+        # Below 0.20 chaos threshold ⇒ predicted chaos.
+        # CoT is the third anchor and the boundary discriminator: if
+        # this one lands emergent (which would surprise the fit by
+        # 0.07), the 18-cell fit's γ-slope is wrong and we revisit.
+        "id": "P28",
+        "desc": "(β=0.5, γ=0.4) chaos — CoT anchor; weighted 18-cell fit predicts train_acc≈0.135",
+        "variants": ["anchor_cot_b0p5_g0p4"],
+        "where": lambda r: True,
+        "expected": "chaos",
+        "min_seeds": 1,
+    },
+    {
         # User-submitted pilot (job 9029967) trains the same (β=1.4, γ=0.345)
         # cell but for 30000 steps (6× the 5000-step default). Tests
         # whether 5000 steps already captures the model's capacity at
