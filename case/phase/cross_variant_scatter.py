@@ -59,6 +59,11 @@ def collect_all_cells(runs_dir: Path) -> pd.DataFrame:
     """
     parts: List[pd.DataFrame] = []
     for vdir in sorted(runs_dir.iterdir()):
+        # Skip non-Transformer architectures — mixing them into the
+        # phase scatter would average across heterogeneous models.
+        # (Mamba runs live under mamba_* dirs; analyzed separately.)
+        if vdir.name.startswith("mamba_"):
+            continue
         csv = vdir / "run_summary.csv"
         if not csv.exists() or not vdir.is_dir():
             continue
