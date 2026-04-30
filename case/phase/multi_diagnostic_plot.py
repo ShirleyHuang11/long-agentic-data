@@ -30,6 +30,9 @@ from utils import classify_fixed, PHASE_COLORS, PHASE_NAMES
 def collect_cells(runs_dir: Path) -> pd.DataFrame:
     rows = []
     for vdir in sorted(runs_dir.iterdir()):
+        # Skip non-Transformer architectures (analyzed separately).
+        if vdir.name.startswith("mamba_"):
+            continue
         sumcsv = vdir / "run_summary.csv"
         rawcsv = vdir / "raw_metrics.csv"
         if not sumcsv.exists() or not rawcsv.exists() or not vdir.is_dir():
