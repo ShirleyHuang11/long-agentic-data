@@ -104,3 +104,64 @@ strongest test yet of the boundary's extrapolation behavior.
   confirmed
 * If Mamba 9411019 not yet started → wait
 * If Mamba started → estimate completion time
+
+---
+
+## 2026-04-30 17:17 EDT (cron iter-4)
+
+### N=3 anchor confirmation (P26 + P27 fully observed)
+
+| anchor | (β, γ) | N | train_acc mean | seed-std | predicted | classifier |
+|---|---|---:|---:|---:|---:|---|
+| Natural | (2.0, 0.8) | **3** | 0.0849 | 0.003 | 0.100 | **chaos** ✓ |
+| Edge-of-Chaos | (0.05, 0.05) | **3** | 0.1050 | 0.002 | 0.115 | **chaos** ✓ |
+| CoT | (0.5, 0.4) | 2 | 0.1269 | 0.001 | 0.135 | chaos ✓ (N≥1) |
+
+**Inter-seed std 0.002–0.003 across all 3 anchors** — paper-grade
+reproducibility. All 3 anchor cells confirmed chaos for the
+Transformer; Transformer baseline established.
+
+### Systematic under-prediction at anchors
+
+The 18-cell weighted fit over-predicts train_acc at all 3 anchors by
+0.008–0.015 (always positive error). This is consistent with the
+iter-39 Result 9c finding that the linear-in-log(β) fit is **concave
+in log(β)** — both directions of extrapolation over-predict.
+
+The deepest under-prediction is at Natural (β=2.0, γ=0.8, off 0.015).
+Even though the cell is CLASSIFIED correctly, the magnitude error
+suggests the linear law's intercept is too high, or the γ-axis slope
+is too gentle at large γ.
+
+### New submission: boundary probe
+
+Submitted `phase-probe-b0p2-g0p05` (job 9417079) at (β=0.2, γ=0.05),
+3 seeds, seas_gpu, 4 h wall. Fills the missing low-β region between
+the 5 N=3 strip cells (β=1.4) and the 1 N=3 corner (β=0.05). With
+this point at N=3 in the fit, the log(β) concavity should become
+quantifiable.
+
+Picked seas_gpu (queue depth 18) over kempner (queue depth 52);
+Natural+Edge just freed 2 seas_gpu slots so this should backfill
+quickly.
+
+### Queue snapshot
+
+| job | name | partition | state | notes |
+|---|---|---|---|---|
+| 9393854 | phase-anchor-cot-b0p5-g0p4 | seas_gpu | RUNNING 1:43 | seed 3 ~17 min away |
+| 9411019 | phase-mamba-edge-full | kempner | PENDING | kempner depth 52 |
+| 9417079 | phase-probe-b0p2-g0p05 | seas_gpu | PENDING | just submitted |
+
+### Plan.md priorities
+
+* P1 Mamba: code done; smoke verified; full-size submitted (PENDING)
+* P2 Logical Folding: not started
+* P3 boundary probes: **first probe submitted (9417079)**
+
+### Predictions scoreboard (27 total, unchanged)
+
+confirmed=16, observed=2, pending=3, refuted=6
+
+P26 + P27 still classified as confirmed (already were at seed 1, the
+N=3 confirmation is just a stronger version).
