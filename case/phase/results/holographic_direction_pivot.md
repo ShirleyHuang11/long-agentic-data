@@ -107,6 +107,45 @@ Current 18-cell linear fit predicts:
 * **Natural (β=2.0, γ=0.8)**: train_acc = `0.269 + 0.049·log(2) − 0.263·0.8 = 0.093` → **chaos**
 * **Edge-of-Chaos (β=0.05, γ=0.05)**: train_acc = `0.269 + 0.049·log(0.05) − 0.263·0.05 = 0.109` → **chaos**
 
+### Iter-48 update — seed 1 of both anchors landed at 15:17 EDT
+
+| anchor | predicted | observed (seed 1) | error | predicted phase | observed |
+|---|---:|---:|---:|---|---|
+| Natural (2.0, 0.8) | 0.093 | **0.082** | 0.011 | chaos | **chaos** ✓ |
+| Edge-of-Chaos (0.05, 0.05) | 0.109 | **0.106** | 0.003 | chaos | **chaos** ✓ |
+
+Both predictions confirmed at sub-1.5 % error in train_acc. The linear
+fit's **extrapolation works correctly at the directional level** (correct
+phase classification) at both anchors — including Edge-of-Chaos which
+sits two decades below any β cell used to fit. Long-acc and gap:
+
+| anchor | long_acc | gap | retention |
+|---|---:|---:|---:|
+| Natural | 0.0516 | 0.030 | 0.629 |
+| Edge-of-Chaos | 0.0554 | 0.051 | 0.523 |
+
+Both ~5 % long_acc — close to chaos-floor random baseline (1/19 ≈
+0.053). The model is essentially unable to extract retrieval signal
+in either regime.
+
+**Mechanistic difference**:
+* Natural is "signal washed out by 80 % noise" — the model's locality
+  bias (β=2) is well-matched but there's nothing to retrieve from.
+* Edge-of-Chaos is "signal present but inaccessible" — γ=0.05 means
+  almost every token is information, but β=0.05 means retrieval
+  distance is uniformly distributed and the Transformer's local
+  attention can't localize the relevant past KV pair.
+
+This **establishes the Transformer baseline** for the paper's
+architecture-dependent boundary claim. Future Mamba experiments would
+need to show:
+* Mamba at Natural (2.0, 0.8) → still chaos (signal genuinely absent)
+* Mamba at Edge-of-Chaos (0.05, 0.05) → escapes chaos (selective state
+  space exploits long-range correlations the Transformer misses)
+
+Pending: seeds 2, 3 of both pilots (~1.7 h more) for N=3 confirmation.
+Plus CoT (β=0.5, γ=0.4) anchor (job 9393854, currently PENDING).
+
 So **a Transformer is predicted to be CHAOS at both proposal anchors**,
 but for opposite reasons:
 
