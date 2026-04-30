@@ -130,6 +130,35 @@ direction is to implement Mamba and re-run.
   * 9388698: `phase-anchor-edge-b0p05-g0p05` (β=0.05, γ=0.05, 3 seeds, 4 h wall)
 * Document direction pivot (this file).
 
+### Iter 46.5 (user redirected to seas_gpu)
+* User explicitly asked to move kempner jobs back to seas_gpu (the
+  proposal's "prefer kempner" was overridden for this run).
+* Cancelled 9388697 + 9388698 (had been RUNNING 6 min, no data
+  produced yet — clean cancel).
+* Resubmitted to `seas_gpu / barak_lab` with same parameters:
+  * 9390238: `phase-anchor-natural-b2p0-g0p8`
+  * 9390239: `phase-anchor-edge-b0p05-g0p05`
+* Both backfilled to RUNNING within 2.5 minutes (queue much less
+  congested than during iter 14-46 marathon).
+
+### Iter 47 (now, this loop fire)
+* The 2 RUNNING anchor pilots are 27 min into ~51 min/cell ×
+  3 seeds = ~2.5 h jobs. First row each ~14:25+51m=15:16 EDT.
+* Submit 3rd anchor (CoT) per proposal: `(β=0.5, γ=0.4)` with
+  3 seeds, 4 h wall, also seas_gpu/barak_lab.
+  * 9393854: `phase-anchor-cot-b0p5-g0p4`
+* Coverage status of proposal's 4 anchors:
+
+  | anchor | (β, γ) | coverage |
+  |---|---|---|
+  | Natural | (2.0, 0.8) | running (9390238) |
+  | CoT | (0.5, 0.4) | submitted (9393854) |
+  | Edge-of-Chaos | (0.05, 0.05) | running (9390239) |
+  | Abyss | (0.0, 0.0) | covered by corners (0.01, 0.02), N=3 chaos |
+
+  All 4 anchor regions will be sampled by the time these 3 pilots
+  complete (~3 h from now if no preemption).
+
 ### Iter 47–50 (next 3–4 hours, anchor pilots returning)
 * When anchors land, refit the linear law with 20 cells (vs 18).
 * Verify the chaos-at-both-anchors prediction.
