@@ -224,3 +224,56 @@ live in main_findings.md not the verifier scoreboard.
 * P2 Logical Folding: not started
 * P3 boundary probes: 1 of expected ~3 done (seed 1 at β=0.2; 2 more
   seeds + possible β=0.3, β=0.4 probes pending)
+
+---
+
+## 2026-04-30 19:17 EDT (cron iter-12)
+
+### Mamba 9411019 FAILED (OOM on 40GB A100, 30 sec elapsed)
+
+```
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 2.00 MiB.
+GPU 0 has a total capacity of 39.49 GiB of which 1.25 MiB is free.
+```
+
+The sequential-scan implementation accumulates per-timestep activations
+across all 32 layers × T=512 × batch=16. Memory blows up:
+~512 MB per layer × 32 layers ≈ 16 GB of dA/dB tensors alone, plus
+hidden-state sequence + standard activations → exceeds 40 GB.
+
+### Resubmitted as 9436718 with batch_size 16 → 4
+
+`model.train_batch_size=4 model.eval_batch_size=2` override. 4× less
+memory in the inner scan tensors. Same kempner partition, 18h wall.
+
+If batch=4 also OOMs, escalation options:
+1. `--partition=kempner_h100` (80 GB H100, 2× headroom)
+2. Reduce d_model or num_layers (changes 100M target)
+3. Add `torch.utils.checkpoint` to MambaBlock.forward (more compute,
+   less memory)
+
+### Probe (β=0.2, γ=0.05) seed 2 landed
+
+| seed | ta | la |
+|---:|---:|---:|
+| 1 | 0.1257 | 0.0597 |
+| 2 | 0.1244 | 0.0612 |
+
+N=2 mean = 0.1250, std = 0.0007. Inter-seed variance trivial.
+
+**Result 9c quantitative confirmation at N=2**: linear fit predicted
+0.181 here, observed 0.125 — gap 0.056. Same magnitude as seed-1
+finding; not a fluke.
+
+### Queue snapshot
+
+| job | partition | state | elapsed |
+|---|---|---|---:|
+| 9417079 | seas_gpu | RUNNING 1:55 | probe seed 3 in ~17 min |
+| 9436718 | kempner | PENDING | new mamba (bs=4) |
+
+### Plan.md status
+
+* P1 Mamba: smoke OK, full-size **OOMed**, **resubmitted with batch=4**
+* P2 Logical Folding: not started
+* P3 boundary probes: (β=0.2, γ=0.05) at N=2 confirms iter-8 finding
