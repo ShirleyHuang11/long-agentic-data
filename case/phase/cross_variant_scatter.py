@@ -118,34 +118,46 @@ def overlay_alpha_lines(ax, betas, gammas, alphas=(0.1, 0.4, 1.0)) -> None:
 
 
 def fit_emergent_boundary(cells: pd.DataFrame, threshold: float = 0.20):
-    """Re-fit the corrected 2D linear law on current emergent cells.
+    """Re-fit the 2D linear law on all emergent cells (weighted by √n_seeds).
+
+    Uses every (β, γ) cell classified as emergent regardless of seed
+    count. Per-cell weights w_i = √n_seeds_i give 3-seed cells √3× the
+    influence of 1-seed cells in the OLS objective — proper handling of
+    heteroscedastic sample sizes without discarding evidence.
 
     Returns (intercept_a, log_beta_coef_b, gamma_coef_c, n_used, R2)
-    or (None, None, None, 0, None) if fewer than 3 emergent cells with
-    n_seeds_total ≥ 3 are available.
+    or (None, None, None, 0, None) if fewer than 3 emergent cells.
 
     Boundary line: train_acc = threshold ⇒
        γ*(β) = (a + b·log(β) − threshold) / (−c)
     """
-    em = cells[(cells["phase_code"] == 1) & (cells["n_seeds_total"] >= 3)]
+    em = cells[cells["phase_code"] == 1]
     if len(em) < 3:
         return None, None, None, 0, None
     log_b = np.log(em["beta"].to_numpy())
     g = em["gamma"].to_numpy()
     y = em["train_acc_mean"].to_numpy()
+    w = np.sqrt(em["n_seeds_total"].to_numpy(dtype=float))
     X = np.column_stack([np.ones(len(em)), log_b, g])
-    coef, *_ = np.linalg.lstsq(X, y, rcond=None)
+    # weighted least squares: sqrt(w) scaling
+    Xw = X * w[:, None]
+    yw = y * w
+    coef, *_ = np.linalg.lstsq(Xw, yw, rcond=None)
     pred = X @ coef
-    r2 = 1 - ((y - pred) ** 2).sum() / max(((y - y.mean()) ** 2).sum(), 1e-12)
+    # weighted R² (accounting for sample sizes)
+    ss_res = ((w * (y - pred)) ** 2).sum()
+    y_wmean = (w * y).sum() / w.sum()
+    ss_tot = ((w * (y - y_wmean)) ** 2).sum()
+    r2 = 1 - ss_res / max(ss_tot, 1e-12)
     return float(coef[0]), float(coef[1]), float(coef[2]), int(len(em)), float(r2)
 
 
 def overlay_boundary(ax, cells: pd.DataFrame, threshold: float = 0.20):
     """Overlay the predicted chaos→emergent boundary γ*(β) on the scatter.
 
-    Only draws when ≥3 emergent cells with N=3 seeds are available to
-    fit the 2D linear law. Returns (a, b, c, n) used so the plotter can
-    annotate.
+    Only draws when ≥3 emergent cells are available to fit the 2D
+    linear law (weighted by √n_seeds). Returns (a, b, c, n) used so
+    the plotter can annotate.
     """
     a, b, c, n, r2 = fit_emergent_boundary(cells, threshold)
     if a is None:
