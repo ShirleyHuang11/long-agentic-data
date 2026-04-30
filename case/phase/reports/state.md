@@ -165,3 +165,62 @@ confirmed=16, observed=2, pending=3, refuted=6
 
 P26 + P27 still classified as confirmed (already were at seed 1, the
 N=3 confirmation is just a stronger version).
+
+---
+
+## 2026-04-30 18:17 EDT (cron iter-8)
+
+### CoT anchor done at N=3
+
+| (β, γ) | N | ta_mean | seed-std | predicted (P28) |
+|---|---:|---:|---:|---:|
+| (0.5, 0.4) | **3** | 0.1262 | 0.0015 | 0.135 (off −0.009) |
+
+3 anchors all complete at N=3, all chaos as predicted, all
+under-predicted by linear fit by 0.008–0.015. Job 9393854 done.
+
+### Boundary probe — first row at (β=0.2, γ=0.05)
+
+| (β, γ) | seed | ta | la | predicted | error |
+|---|---:|---:|---:|---:|---:|
+| (0.2, 0.05) | 1 | **0.126** | 0.060 | **0.181** | **+0.055** |
+
+The 18-cell weighted fit massively over-predicts at this low-β cell.
+Observed ta=0.126, predicted 0.181 — **off by 0.055**, far worse
+than the 0.008–0.015 anchor errors.
+
+This **strongly validates Result 9c quantitatively**: the
+linear-in-log(β) fit extrapolates too aggressively into low β.
+Concrete numbers:
+
+* fit's β-slope: +0.0475 per log(β)
+* implied γ=0 intercept at β=0.2: 0.270 + 0.0475·log(0.2) = 0.194
+* observed γ=0 implied intercept (using local fit slope -0.184):
+  0.126 + 0.184·0.05 = 0.135
+* gap of 0.06 in γ=0 intercept
+
+The fit needs either:
+* a 1/β saturation term, or
+* a piecewise-linear-in-log(β) form with knee around β≈0.5
+
+### Queue snapshot (iter-8)
+
+| job | name | partition | state | elapsed |
+|---|---|---|---|---:|
+| 9411019 | phase-mamba-edge-full | kempner | PENDING | — |
+| 9417079 | phase-probe-b0p2-g0p05 | seas_gpu | RUNNING 55 min | seed 2 in progress |
+
+### Predictions scoreboard (27, unchanged)
+
+confirmed=16, observed=2, pending=3, refuted=6
+
+The probe wasn't pre-registered as a prediction (it's a follow-up
+data probe rather than a hypothesis test). Result 9c implications
+live in main_findings.md not the verifier scoreboard.
+
+### Plan.md status
+
+* P1 Mamba: full-size still PENDING on kempner (queue depth 52)
+* P2 Logical Folding: not started
+* P3 boundary probes: 1 of expected ~3 done (seed 1 at β=0.2; 2 more
+  seeds + possible β=0.3, β=0.4 probes pending)
