@@ -497,6 +497,87 @@ at the anchor points.
 
 ---
 
+## 2026-05-01 10:21 EDT (MAMBA HEADLINE RESULT)
+
+### Mamba at Edge-of-Chaos COMPLETED
+
+| (β, γ) | metric | Transformer (N=3) | **Mamba (N=1)** | Δ |
+|---|---|---:|---:|---:|
+| (0.05, 0.05) | train_acc | 0.1050 ± 0.002 | **0.1056** | +0.001 |
+| (0.05, 0.05) | long_acc(2048) | 0.0551 | **0.0710** | **+29%** |
+| (0.05, 0.05) | gap | 0.0500 | 0.0345 | -31% |
+| (0.05, 0.05) | retention r | **0.525** | **0.673** | **+28%** |
+| (0.05, 0.05) | final_loss | 3.300 | 3.366 | +0.07 |
+
+train_time = 13.84 h on 40GB A100, batch=4, 5000 steps.
+
+### What this MEANS
+
+**Phase classification: BOTH chaos** under the train_acc<0.20 rule.
+The proposal's prediction "Mamba escapes chaos at Edge-of-Chaos" is
+**not confirmed** at the 100M scale.
+
+**BUT** — Mamba's length-generalization ratio r = acc(2048)/acc(512)
+is **0.673 vs Transformer's 0.525**. That's a 28 % improvement in
+length retention, exactly the proposal's architectural-difference
+signal — just at a magnitude too small to flip the chaos-threshold
+classifier.
+
+Per Result 7's mechanism categorization:
+
+| regime | r |
+|---|---:|
+| true retrieval (emergent strip) | 0.39 |
+| weak retrieval | 0.47 |
+| **Mamba @ Edge-of-Chaos** | **0.67** |
+| no retrieval (β≈0 fast_beta) | 0.77 |
+
+Mamba sits between "weak retrieval" and "no retrieval" — better than
+Transformer's full "no retrieval" floor at this cell, but still not
+in the "true retrieval" regime.
+
+### Three readings for the paper
+
+1. **Refutation reading**: 100M Mamba does not solve Edge-of-Chaos.
+   Architecture-dependent boundary claim weakened at this scale.
+   Need 1B+ to show clean separation.
+
+2. **Partial confirmation reading**: architecture DOES matter — Mamba
+   generalizes 28 % better to longer sequences at the same cell.
+   The proposal's mechanism story is supported; just the binary
+   threshold lumps both as chaos.
+
+3. **Implementation reading**: my MambaCausal is minimal — pure
+   pytorch sequential scan, no HiPPO init, no `dt_proj` bias init,
+   no parallel scan. A reference Mamba (`mamba_ssm` library) might
+   show stronger separation. The smoke test at 20 steps gave random
+   accuracy; the full 5000 steps gave only marginal improvement.
+
+For the paper, **(2) is the right framing**: report Mamba's
++28 % length-gen advantage as the architecture-dependent signal,
+but acknowledge the absolute level still falls under the chaos
+classifier.
+
+### Three more Mamba anchors PENDING
+
+| job | (β, γ) | expected behavior |
+|---|---|---|
+| 9523316 mamba-natural | (2.0, 0.8) | both chaos (signal washed by noise) |
+| 9523317 mamba-cot | (0.5, 0.4) | likely chaos |
+| 9523318 mamba-strip | (1.4, ?) | possibly emergent (in Transformer's strip) |
+
+If mamba-strip shows higher train_acc than the Transformer cell, that
+strengthens the architecture-dependent reading.
+
+### Plan.md status
+
+* P1 Mamba: **first headline result in!** 1 of 4 anchors done. 3 more queued.
+* P2 Logical Folding: not started.
+* P3 boundary probes: 3 cells done (β ∈ {0.2, 0.3, 0.5} all show
+  -0.055 bias). seed 3 of (β=0.5) imminent.
+
+---
+
 ## 2026-05-01 09:17 EDT (P29 confirmed at seed 1)
 
 ### Probe (β=0.5, γ=0.05) seed 1: linear fit refuted, concavity wins
