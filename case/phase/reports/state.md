@@ -375,3 +375,69 @@ Will validate when β=0.3 N=3 lands (~2 hours).
 |---|---|---|---:|
 | 9436718 | kempner | RUNNING | 1:50 (~13% of ~14h) |
 | 9458760 | seas_gpu | RUNNING | 59 min (seed 2 incoming) |
+
+---
+
+## 2026-04-30 23:51 EDT (probe N=3 — concavity, not step)
+
+### (β=0.3, γ=0.05) N=3 complete
+
+| seed | ta | la |
+|---:|---:|---:|
+| 1 | 0.1417 | 0.0641 |
+| 2 | 0.1371 | 0.0606 |
+| 3 | 0.1447 | 0.0599 |
+
+N=3 mean = 0.1412 ± 0.0038, predicted 0.200, **error -0.059**.
+
+### Bias pattern across all N=3 cells at γ=0.05:
+
+| β | observed intercept_at_γ=0 | fit intercept_at_γ=0 | bias |
+|---:|---:|---:|---:|
+| 0.05 (corner) | 0.118 | 0.128 | **-0.010** |
+| 0.2 | 0.139 | 0.194 | **-0.055** |
+| 0.3 | 0.154 | 0.213 | **-0.059** |
+| 1.4 (strip) | 0.272 | 0.286 | **-0.014** |
+
+**The bias is U-shaped, not a constant offset.** It vanishes at the
+fit's anchor cells (β=0.05 corner, β=1.4 strip) and is maximal in the
+interior. This **CORRECTS** the iter-24 piecewise-step hypothesis —
+the right description is **concavity in log(β)**:
+
+* The fit anchors at the two endpoints (β=0.05 and β=1.4) and
+  linearly interpolates across the gap
+* The true intercept(log β) is concave (rises rapidly out of the
+  corner, levels at the strip)
+* Linear interpolation **overshoots** the concave true curve in the
+  middle — by ~0.06 at β∈[0.2, 0.3], near 0 at the anchors
+
+Better model: a quadratic in log(β):
+
+```
+train_acc(β, γ) ≈ a + b·log(β) + c·log(β)² − 0.254·γ
+```
+
+or a saturating form like `1 - α·exp(-β/β_0)`. Either captures the
+"diminishing returns at high β + slow build-up at low β" structure.
+
+### Implication for paper
+
+Result 9 (linear 2D fit, R²=0.9999 on 5 cells) was an over-fit
+artifact — confirmed by these probes.
+
+Result 9c (concavity in log(β)) is now QUANTIFIED with 4 N=3 cells
+spanning β ∈ [0.05, 1.4]. The peak interior bias is 0.06 in train_acc
+units, ~30 % of the fit's predicted value at those cells.
+
+Honest paper framing:
+
+* **Linear fit is good for classification** (chaos vs emergent
+  prediction is correct at all 4 cells)
+* **Linear fit is wrong for magnitude prediction by up to 30 %**
+* **The true relation is concave in log(β)** — quadratic or
+  saturating form needed for quantitative use
+
+### Mamba 9436718 progress
+
+3:27 elapsed (~25 % of ~14h). Still RUNNING. Will write its single
+row at the very end after eval.
