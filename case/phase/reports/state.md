@@ -494,3 +494,50 @@ at the anchor points.
 | 9436718 | kempner | RUNNING | 12:52 (~92%) |
 | 9515313 | seas_gpu | RUNNING | 1:13 (seed 2 ~37 min) |
 | 9523316/7/8 | kempner | PENDING | (waiting on edge to free slot) |
+
+---
+
+## 2026-05-01 09:17 EDT (P29 confirmed at seed 1)
+
+### Probe (β=0.5, γ=0.05) seed 1: linear fit refuted, concavity wins
+
+| seed | ta | la | phase |
+|---:|---:|---:|---|
+| 1 | 0.1688 | 0.0715 | **chaos** |
+
+Linear fit predicted 0.224 (emergent); concavity-corrected predicted
+~0.18 (chaos). Observed 0.169 → **chaos**. P29 confirmed.
+
+### Full bias picture across all 5 N≥1 cells at γ=0.05
+
+| β | observed ta | predicted (linear) | bias | regime |
+|---:|---:|---:|---:|---|
+| 0.05 | 0.105 | 0.115 | -0.010 | corner anchor |
+| 0.2 | 0.126 | 0.181 | **-0.055** | interior (N=3) |
+| 0.3 | 0.141 | 0.200 | **-0.059** | interior (N=3) |
+| **0.5** | **0.169** | 0.224 | **-0.055** | interior (N=1) |
+| 1.4 | 0.230 | 0.244 | -0.014 | strip anchor (γ=0.21 closest) |
+
+**The bias is flat ~-0.055 across the entire interior** [0.2, 0.5] and
+drops to ~-0.01 at the two anchor points. This is exactly the
+signature of linear interpolation across a concave function.
+
+### Implication: paper-grade scaling-law form
+
+```
+True: train_acc(β, γ) = a₀ + a₁·log(β) + a₂·log(β)² − 0.254·γ
+                        ↑ quadratic term captures concavity
+```
+
+A 1-extra-parameter quadratic fit on the 5 cells at γ=0.05 should
+reduce max residual from ~0.06 (linear) to <0.01.
+
+### Active jobs
+
+```
+9436718 mamba-edge   RUNNING 12:52  ~92% (eval phase soon)
+9515313 probe-b0p5   RUNNING  1:13  seed 2 in progress
+9523316 mamba-natural PENDING       kempner
+9523317 mamba-cot    PENDING        kempner
+9523318 mamba-strip  PENDING        kempner
+```
