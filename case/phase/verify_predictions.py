@@ -306,6 +306,24 @@ PREDICTIONS: List[Dict] = [
         "min_seeds": 1,
     },
     {
+        # iter-33 boundary probe (β=0.5, γ=0.05) — discriminator between
+        # the linear 18-cell fit and the concavity-corrected model.
+        #   linear fit:   train_acc(0.5, 0.05) = 0.270 + 0.0475·log(0.5)
+        #                                       − 0.254·0.05 = 0.224  → emergent
+        #   concavity:    expected ~0.18 (interior bias ~-0.04 at β=0.5)
+        #                                                         → chaos
+        # If chaos: linear fit's interior over-prediction (-0.055 at β=0.2,
+        # -0.059 at β=0.3) extends to β=0.5; concavity-in-log(β) confirmed.
+        # If emergent (ta ≥ 0.20): linear fit valid here; concavity only
+        # in β ∈ [0.05, 0.3].
+        "id": "P29",
+        "desc": "(β=0.5, γ=0.05) chaos — concavity hypothesis predicts ta≈0.18 < 0.20 (linear fit said 0.224 emergent)",
+        "variants": ["probe_b0p5_g0p05"],
+        "where": lambda r: True,
+        "expected": "chaos",
+        "min_seeds": 1,
+    },
+    {
         # iter-47 anchor pilot (CoT, β=0.5, γ=0.4) — proposal's
         # transition anchor (Region II / yellow). Weighted fit predicts:
         #   train_acc(0.5, 0.4) = 0.270 + 0.0475·log(0.5) − 0.254·0.4
