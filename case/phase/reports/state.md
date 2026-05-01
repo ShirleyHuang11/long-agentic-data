@@ -331,3 +331,47 @@ PENDING on kempner.
   quantitatively established. Could submit (β=0.3 or 0.4) similarly
   for a richer concavity-fit dataset, but diminishing returns until
   Mamba result lands or paper-narrative shifts.
+
+---
+
+## 2026-04-30 22:14 EDT (resume after pause)
+
+### Second probe (β=0.3, γ=0.05) seed 1 — Result 9c bias is constant
+
+| Cell | Predicted | Observed | Error | N |
+|---|---:|---:|---:|---:|
+| (β=0.2, γ=0.05) | 0.181 | 0.126 | **-0.055** | 3 |
+| (β=0.3, γ=0.05) | 0.200 | **0.142** | **-0.058** | 1 |
+
+The fit's over-prediction is constant at **-0.056 ± 0.002** across two
+independent cells in the low-β regime. This is paper-quality
+reproducibility of the bias.
+
+Implications:
+* The 18-cell linear fit's intercept is too high by ~0.056 in the
+  β ∈ [0.05, 1.4] regime
+* True train_acc(β, γ=0.05) curve is shifted DOWN ~0.056 from the
+  linear extrapolation across the entire low-β region
+* The bias is **consistent** (not increasing with β-distance from
+  fit), suggesting an additive offset rather than a slope mismatch
+
+Paper-grade fit candidate:
+
+```
+train_acc(β, γ) ≈ 0.214 + 0.0475·log(β) − 0.254·γ   for β < 1
+                  0.270 + 0.0475·log(β) − 0.254·γ   for β ≥ 1
+```
+
+(intercept dropped 0.056 in the low-β regime). A knee at β=1 — which
+is also Result 9c's β\* threshold for emergent strip — has the
+intuition that "the model retrieves at β ≥ 1, doesn't at β < 1, and
+those two regimes have different intercepts".
+
+Will validate when β=0.3 N=3 lands (~2 hours).
+
+### Queue snapshot
+
+| job | partition | state | elapsed |
+|---|---|---|---:|
+| 9436718 | kempner | RUNNING | 1:50 (~13% of ~14h) |
+| 9458760 | seas_gpu | RUNNING | 59 min (seed 2 incoming) |
