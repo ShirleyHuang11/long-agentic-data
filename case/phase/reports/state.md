@@ -277,3 +277,57 @@ finding; not a fluke.
 * P1 Mamba: smoke OK, full-size **OOMed**, **resubmitted with batch=4**
 * P2 Logical Folding: not started
 * P3 boundary probes: (β=0.2, γ=0.05) at N=2 confirms iter-8 finding
+
+---
+
+## 2026-04-30 20:17 EDT (cron iter-16)
+
+### Probe (β=0.2, γ=0.05) N=3 complete
+
+| seed | ta | la |
+|---:|---:|---:|
+| 1 | 0.1257 | 0.0597 |
+| 2 | 0.1244 | 0.0612 |
+| 3 | 0.1287 | 0.0596 |
+
+**N=3 mean = 0.1263 ± 0.0022, predicted = 0.1809, error = −0.0546**
+
+The fit's error at this cell is **~5× larger** than at the 3 anchors:
+
+| cell | (β, γ) | error |
+|---|---|---:|
+| Natural | (2.0, 0.8) | −0.015 |
+| Edge-of-Chaos | (0.05, 0.05) | −0.010 |
+| CoT | (0.5, 0.4) | −0.008 |
+| **Probe** | **(0.2, 0.05)** | **−0.055** |
+
+(β=0.2, γ=0.05) sits **between** the β=1.4 strip cells (where slope was
+fit) and the β=0.05 corner cell (the only N=3 anchor at low β). The
+linear-in-log(β) fit interpolates linearly across this region, but the
+true curve is concave — the linear interpolant over-shoots in the
+middle. This is exactly the iter-39 Result 9c finding, now **quantified
+at N=3 with an interior witness cell**.
+
+For the paper: the boundary detection (γ\*(β) sign) is unaffected
+because both fit and observed are firmly in chaos. But the magnitude
+calibration is off by 30 % at this cell. A 1/β-saturating intercept
+or a piecewise-linear-in-log(β) form would fix this; the existing fit
+is honest about its R²=0.947 residuals.
+
+### Queue snapshot
+
+| job | partition | state | elapsed |
+|---|---|---|---:|
+| 9436718 | kempner | PENDING | (waiting on kempner queue depth ~49) |
+
+Probe 9417079 done. seas_gpu now free for backfill. Mamba still
+PENDING on kempner.
+
+### Plan.md status
+
+* P1 Mamba: bs=4 retry submitted (9436718), still queued
+* P2 Logical Folding: not started
+* P3 boundary probes: **(β=0.2, γ=0.05) N=3 done**, Result 9c
+  quantitatively established. Could submit (β=0.3 or 0.4) similarly
+  for a richer concavity-fit dataset, but diminishing returns until
+  Mamba result lands or paper-narrative shifts.
