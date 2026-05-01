@@ -306,6 +306,34 @@ PREDICTIONS: List[Dict] = [
         "min_seeds": 1,
     },
     {
+        # iter-39 Mamba at Natural anchor (β=2.0, γ=0.8). Transformer is
+        # chaos here (P26 confirmed N=3 ta=0.085) because γ=0.8 means 80%
+        # noise — no architecture should save the model. Mechanism failure
+        # is at the data side, not the model side. Predicting chaos for
+        # Mamba too as a control: if it's emergent, the proposal's
+        # "no signal genuinely" claim about high-γ chaos is wrong.
+        "id": "P30",
+        "desc": "(β=2.0, γ=0.8) chaos for Mamba — high-γ chaos is data-limited, not architecture-limited",
+        "variants": ["mamba_natural_b2p0_g0p8"],
+        "where": lambda r: True,
+        "expected": "chaos",
+        "min_seeds": 1,
+    },
+    {
+        # iter-39 Mamba at strip cell (β=1.4, γ=0.21). Transformer is
+        # firmly emergent here (P10 confirmed N=3 ta=0.230, lengthgen
+        # ratio 0.385 = real retrieval). Mamba should also retrieve here
+        # (signal is present, β=1.4 is not extreme low). Whether Mamba
+        # achieves higher ta than Transformer or just matches is the
+        # interesting question; either way the cell should be emergent.
+        "id": "P32",
+        "desc": "(β=1.4, γ=0.21) emergent for Mamba — strip cell where Transformer already retrieves; signal present",
+        "variants": ["mamba_strip_b1p4_g0p21"],
+        "where": lambda r: True,
+        "expected": "emergent",
+        "min_seeds": 1,
+    },
+    {
         # iter-33 boundary probe (β=0.5, γ=0.05) — discriminator between
         # the linear 18-cell fit and the concavity-corrected model.
         #   linear fit:   train_acc(0.5, 0.05) = 0.270 + 0.0475·log(0.5)
