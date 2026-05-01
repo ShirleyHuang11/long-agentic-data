@@ -30,8 +30,8 @@ from utils import classify_fixed, PHASE_COLORS, PHASE_NAMES
 def collect_cells(runs_dir: Path) -> pd.DataFrame:
     rows = []
     for vdir in sorted(runs_dir.iterdir()):
-        # Skip non-Transformer architectures (analyzed separately).
-        if vdir.name.startswith("mamba_"):
+        # Skip non-default training regimes (Mamba + 30k-step pilots).
+        if vdir.name.startswith("mamba_") or vdir.name.startswith("pilot_30k_"):
             continue
         sumcsv = vdir / "run_summary.csv"
         rawcsv = vdir / "raw_metrics.csv"
