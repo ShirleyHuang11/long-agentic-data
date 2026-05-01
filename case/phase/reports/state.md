@@ -622,3 +622,69 @@ reduce max residual from ~0.06 (linear) to <0.01.
 9523317 mamba-cot    PENDING        kempner
 9523318 mamba-strip  PENDING        kempner
 ```
+
+---
+
+## 2026-05-01 10:47 EDT (MAMBA EDGE COMPLETE — central claim REFUTED)
+
+### Headline experiment 9436718 done
+
+| arch | (β, γ) | N | train_acc | long_acc | gap |
+|---|---|---:|---:|---:|---:|
+| **Transformer** | (0.05, 0.05) | 3 | **0.105** | 0.055 | 0.050 |
+| **Mamba** | (0.05, 0.05) | 1 | **0.106** | 0.071 | 0.035 |
+| Δ | | | **+0.001** | +0.016 | -0.015 |
+
+The central proposal claim — that Mamba's selective state-space would
+escape chaos at the Edge-of-Chaos anchor where Transformer fails —
+is **REFUTED** at N=1. Mamba's train_acc at this cell is within the
+Transformer's seed std (0.002).
+
+Mechanistic implication: the (β=0.05, γ=0.05) cell is **data-side
+hard**, not architecture-side. With β=0.05 the retrieval-distance
+distribution is essentially uniform from 1 to ~1000 — there is no
+"selective state to maintain" because the relevant past KV pair is
+uniformly random in distance, and **no architecture (within 100M /
+5000 steps) can localize it**.
+
+### What this means for the paper
+
+The architecture-dependent boundary claim needs revision. Two readings:
+
+1. **Strong reading (claim refuted)**: at this scale (100M params,
+   5000 steps), the boundary is **architecture-INVARIANT**. Mamba and
+   Transformer fail in the same regime for the same reason
+   (signal-localization). The β-γ phase diagram is universal.
+
+2. **Weak reading (claim holds at scale)**: maybe Mamba needs more
+   compute / depth / d_state to differentiate from Transformer. The
+   proposal mentioned "16 layers Mamba with d_state and weight_decay
+   tuning" — our 32-layer d_state=16 implementation may not be
+   optimal.
+
+Either reading is interesting and publishable. The N=3 anchor data
+on Transformer + this N=1 Mamba data form the most informative
+single comparison this loop has produced.
+
+### Probe (β=0.5, γ=0.05) N=3 also done
+
+| seed | ta | la |
+|---:|---:|---:|
+| 1 | 0.1688 | 0.0715 |
+| 2 | 0.1660 | 0.0640 |
+| 3 | 0.1670 | 0.0673 |
+
+N=3 mean = 0.1673 ± 0.0014, predicted 0.224 (linear fit), bias -0.057.
+**Concavity model confirmed at N=3** — the bias is flat ~-0.055 across
+the entire interior β ∈ [0.2, 0.5].
+
+### Active jobs
+
+| job | partition | state | notes |
+|---|---|---|---|
+| 9523316 | kempner | PENDING | Mamba Natural |
+| 9523317 | kempner | PENDING | Mamba CoT |
+| 9523318 | kempner | PENDING | Mamba Strip |
+
+Mamba Edge result released its kempner slot. The 3 other Mamba pilots
+should now backfill faster.
