@@ -441,3 +441,56 @@ Honest paper framing:
 
 3:27 elapsed (~25 % of ~14h). Still RUNNING. Will write its single
 row at the very end after eval.
+
+---
+
+## 2026-05-01 09:17 EDT (P29 confirmed at seed 1)
+
+### (β=0.5, γ=0.05) seed 1 — concavity wins
+
+| seed | ta | la | phase |
+|---:|---:|---:|---|
+| 1 | **0.1688** | 0.0715 | **chaos** |
+
+Linear fit predicted 0.224 (would be emergent). Concavity-corrected
+predicted ~0.18 (chaos). **Observed 0.169 → CHAOS. P29 CONFIRMED.**
+
+### Three interior cells, identical bias
+
+| Cell | predicted | observed | error |
+|---|---:|---:|---:|
+| (β=0.2, γ=0.05) N=3 | 0.181 | 0.126 | **−0.055** |
+| (β=0.3, γ=0.05) N=3 | 0.200 | 0.141 | **−0.059** |
+| (β=0.5, γ=0.05) N=1 | 0.224 | 0.169 | **−0.055** |
+
+The bias is ~−0.055 ± 0.002 across all three interior cells. Combined
+with anchors:
+
+| β | bias |
+|---:|---:|
+| 0.05 (corner) | −0.010 |
+| 0.2 | −0.055 |
+| 0.3 | −0.059 |
+| 0.5 | −0.055 |
+| 1.4 (strip) | −0.014 |
+
+Either way to read it (concave continuous curve OR step function with
+0.055 offset across the interior), the practical paper finding is
+**linear fit over-predicts by ~0.055 in β ∈ (0.05, 1.4)**, accurately
+at the anchor points.
+
+### Plan.md status
+
+* P1 Mamba: 9436718 RUNNING 12:52 (~92% done — first results in
+  ~1.5h). 3 more (Natural, CoT, Strip) PENDING.
+* P2 Logical Folding: not started.
+* P3 boundary probes: **3 cells done, concavity quantified**:
+  β ∈ {0.2, 0.3, 0.5} all show ~−0.055 bias.
+
+### Queue
+
+| job | partition | state | elapsed |
+|---|---|---|---:|
+| 9436718 | kempner | RUNNING | 12:52 (~92%) |
+| 9515313 | seas_gpu | RUNNING | 1:13 (seed 2 ~37 min) |
+| 9523316/7/8 | kempner | PENDING | (waiting on edge to free slot) |
