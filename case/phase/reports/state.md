@@ -914,3 +914,25 @@ Refines the paper's central claim:
 * Length-generalization at L=8k, 16k, 100k — proposal's strongest
   claim is L=100k retention; need extended evaluator
 * Logical-folding task (P2) — test universality across tasks
+
+---
+
+## 2026-05-02 07:17 EDT (post-headline: submit Mamba seeds 2+3 for Strip and CoT)
+
+Submitted 4 jobs to kempner for paper-grade N=3 error bars on the
+two most informative anchors:
+
+  9667778: phase-mamba-strip-s2 (β=1.4, γ=0.21, seed 2)
+  9667780: phase-mamba-strip-s3 (β=1.4, γ=0.21, seed 3)
+  9667792: phase-mamba-cot-s2   (β=0.5, γ=0.4,  seed 2)
+  9667797: phase-mamba-cot-s3   (β=0.5, γ=0.4,  seed 3)
+
+All 4 PENDING (kempner queue depth 51). Each ~14h projected.
+
+Strip (Δla=+0.141 at N=1) and CoT (chaos→emergent flip at N=1) are
+the highest-impact anchor data points. N=3 will tighten the headline
+finding.
+
+Natural and Edge anchors deferred for now — Δla=+0.035 (Natural) and
+Δla=+0.016 (Edge) are smaller signals, less paper-critical, can add
+later if needed.
