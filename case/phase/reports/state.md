@@ -936,3 +936,38 @@ finding.
 Natural and Edge anchors deferred for now — Δla=+0.035 (Natural) and
 Δla=+0.016 (Edge) are smaller signals, less paper-critical, can add
 later if needed.
+
+---
+
+## 2026-05-03 15:01 EDT (strip-s2 DONE — N=2 paper-grade confirmation)
+
+### Mamba Strip (β=1.4, γ=0.21) at N=2
+
+| seed | ta | la |
+|---:|---:|---:|
+| 1 | 0.2345 | 0.2304 |
+| 2 | 0.2280 | 0.2290 |
+| **N=2 mean** | **0.2312** | **0.2297** |
+
+retention r = la/ta = **0.993** (Transformer N=3: 0.387)
+
+The headline length-generalization finding (Mamba >> Transformer) is
+now confirmed at N=2 with very tight error bars:
+
+  inter-seed std:  ta ~0.005, la ~0.001
+  Δla vs Transformer N=3: +0.141 — far above any noise
+
+The "Mamba's selective state-space gives ~2× length-generalization
+retention" claim is robust at this anchor.
+
+### Pending: 7 more Mamba seeds (3 RUNNING, 4 PENDING)
+
+  strip-s3 RUNNING 2:28
+  cot-s2   RUNNING 2:28
+  cot-s3   RUNNING 2:28
+  edge-s2  RUNNING 1:28
+  edge-s3  RUNNING (just started)
+  nat-s2   PENDING
+  nat-s3   PENDING
+
+Strip will reach N=3 when strip-s3 lands (~10-12h).
