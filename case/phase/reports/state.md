@@ -971,3 +971,83 @@ retention" claim is robust at this anchor.
   nat-s3   PENDING
 
 Strip will reach N=3 when strip-s3 lands (~10-12h).
+
+---
+
+## 2026-05-04 16:48 EDT (FULL N=3 ARCHITECTURE GRID COMPLETE)
+
+All 7 remaining Mamba seed-2/3 jobs landed between 2026-05-04 01:57 and
+2026-05-04 16:21. Combined with seed-1 cells from 2026-04-30 → 2026-05-02
+(`mamba_edge_bs4` for Edge seed 1, the others under their canonical names),
+the full **4-anchor × 2-architecture × N=3 retention grid** is now in.
+
+### Headline: architecture-dependent length-generalization
+
+| anchor | (β, γ) | Transformer r (N=3) | Mamba r (N=3) | Δ | ratio |
+|---|---|---:|---:|---:|---:|
+| Strip       | (1.4, 0.21)   | 0.385 ± 0.046 | **1.001 ± 0.017** | +0.616 | **2.60×** |
+| CoT         | (0.5, 0.4)    | 0.440 ± 0.037 | **0.952 ± 0.024** | +0.512 | **2.16×** |
+| Natural     | (2.0, 0.8)    | 0.587 ± 0.064 | **0.992 ± 0.059** | +0.405 | 1.69× |
+| Edge-of-Chaos | (0.05, 0.05) | 0.525 ± 0.005 | 0.653 ± 0.235 | +0.128 | 1.24× |
+
+r = retention_ratio = acc(L=2048) / acc(L=512).
+
+**Mamba > Transformer at every anchor in length-generalization.** Gap is
+largest at Strip + CoT (anchors with structured long-range dependence
+in the data), smallest at Edge-of-Chaos.
+
+### Inter-seed stability
+
+Strip / CoT / Natural have small Mamba std (0.017-0.059) — the
+architectural advantage is robust across seeds. Edge has Mamba std =
+0.235 across {0.673, 0.408, 0.878} → unstable, presumably because at
+β=γ=0.05 the data has neither long-range structure nor enough noise
+tokens to anchor the model on a fixed strategy. Useful as a control:
+the chaos region is where Mamba *also* fails.
+
+### Refines the headline (was: 2× retention everywhere)
+
+The "2× length-gen retention everywhere" claim from 2026-05-02 was
+based on N=1. With N=3 the claim sharpens to:
+
+* **Strip and CoT**: 2.0-2.6× ratio, very robust (std < 0.04 on both
+  sides). These are the paper headline cells.
+* **Natural**: 1.7× ratio, noisier on Mamba side (rote regime — both
+  architectures memorize, Mamba memorizes "more length-stably").
+* **Edge**: 1.2× ratio, dominated by seed noise. The proposal's
+  "Mamba escapes Edge-of-Chaos" prediction does NOT hold — both
+  architectures are stuck at chaos here, Mamba is just noisier.
+
+### What's new vs the 2026-05-03 (N=2 strip-only) snapshot
+
+* Mamba × {strip-s3, cot-s2, cot-s3, edge-s2, edge-s3, nat-s2, nat-s3}
+  all landed — 7 new seeds since the previous N=2-strip snapshot.
+* CoT confirmed at N=3: chaos→emergent flip is real (la=0.117 ± 0.002,
+  > 0.10 chaos threshold).
+* Edge confirmed at N=3: high seed variance is intrinsic, not a
+  one-off. **Refutes the proposal's strongest specific prediction.**
+
+### Plan.md status
+
+* Priority 1 (Mamba): **complete** — full N=3 grid landed. No more Mamba
+  seeds queued.
+* Priority 2 (Logical Folding): unchanged, requires substantive new code.
+* Priority 3 (low-β boundary probes): no longer blocked by anchor pilots
+  (anchors all done). Could be submitted now if needed.
+
+### What to do next
+
+The N=3 architectural finding is paper-grade as-is. Possible next steps
+in priority order:
+
+1. **Re-render `phase_continuous.png` and the multi-diagnostic figure**
+   to include Mamba seeds. Already filtered via the `mamba_*` skip in
+   the cross-variant scripts, so they won't contaminate the
+   Transformer-only baseline fit. Need a *separate* Mamba-vs-Transformer
+   panel.
+2. **Write the architectural-comparison results section** as
+   `results/architecture_comparison.md`, citing the Δ + ratio table
+   above. (Atomic-commit candidate this iteration.)
+3. P3 boundary probes — concavity refinement at low β. Now unblocked.
+4. P2 Logical Folding — universality across tasks. Substantive new code,
+   not minimum-change.
