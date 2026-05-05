@@ -253,3 +253,50 @@ in the partition.
   per the user's own atomic-commit rule.
 * The cluster_strategy_options.md menu is still on the table if the
   16:33 slot is preempted or the small pilots don't backfill.
+
+## 9. 2026-05-04 17:55 EDT — boundary 4×3 grid filled, Logical Folding launched
+
+### Boundary refinement: 7 missing cells submitted to seas_gpu
+
+Original 3 kempner probes (b0p1_g0p05, b0p2_g0p10, b0p4_g0p05) all completed
+single-seed runs. Aggregated table over γ=0.05 column:
+
+| β | train_acc | long_acc | gap | retention |
+|---|---|---|---|---|
+| 0.1 | 0.115 | 0.056 | 0.059 | 0.49 |
+| 0.2 (N=3) | 0.126 | 0.060 | 0.066 | 0.48 |
+| 0.3 (N=3) | 0.141 | 0.062 | 0.079 | 0.45 |
+| 0.4 | 0.154 | 0.069 | 0.085 | 0.45 |
+| 0.5 (N=3) | 0.168 | 0.069 | 0.099 | 0.41 |
+
+All chaos (train_acc < 0.20), but monotone in β with smooth slope — consistent
+with Result 9c's concavity finding. The 7 still-missing cells (β∈{0.1,0.3,0.4}
+× γ∈{0.10,0.15} plus β=0.1/0.2 × γ=0.15) submitted to seas_gpu, est. start
+2026-05-05T00:34 → 05:38 EDT (1-seed each, ~51 min wall).
+
+### Logical Folding task (Priority 2 from plan.md): code + 4 anchors
+
+`data_logical_folding.py` adds a sibling generator parametrized by the same
+(β, γ): a fold-stack state machine where β controls Zipfian recall depth and
+γ controls noise frac. Vocab=60 stays fixed so the 100M-param model budget is
+preserved. `phase_core.make_generator(config)` dispatches on `task` ∈
+{kv, logical_folding}. CLI: `task=logical_folding`.
+
+Submitted 4 anchor jobs at the Mamba-comparison anchors so KV ↔ LF cells line
+up 1:1 for universality:
+
+| anchor | β | γ |
+|---|---|---|
+| edge | 0.05 | 0.05 |
+| strip | 1.4 | 0.21 |
+| cot | 0.5 | 0.4 |
+| natural | 2.0 | 0.8 |
+
+Est. start 2026-05-05T05:43 → ~12:30 EDT.
+
+### Universality test (will run once LF anchors land)
+
+For each of the 4 anchors, compare KV vs LF on (train_acc, long_acc, gap,
+retention). If γ*(β) phase boundary is task-invariant, both tasks classify
+into the same regime per anchor. Mismatch at any anchor would falsify the
+"task-universal boundary" claim and demote the result to "KV-specific".

@@ -85,12 +85,13 @@ def resolve_plan(plan_cfg) -> dg.SweepPlan:
     return dg._FACTORIES[name](plan_cfg)
 
 
-def build_config(model_cfg, long_len) -> Dict[str, object]:
+def build_config(model_cfg, long_len, task: str = "kv") -> Dict[str, object]:
     """Convert the (now fully-populated) cfg.model OmegaConf node into the
     plain dict that train_one_model expects, then enforce the 100M floor."""
     from omegaconf import OmegaConf
 
     cfg = dict(OmegaConf.to_container(model_cfg, resolve=True))
+    cfg["task"] = str(task)
 
     train_len = int(cfg["train_len"])
     if long_len is not None:
@@ -297,7 +298,8 @@ def main() -> None:
 
     plan = resolve_plan(cfg.plan)
     seeds = [int(s) for s in cfg.sweep.seeds]
-    train_cfg = build_config(cfg.model, cfg.sweep.long_len)
+    train_cfg = build_config(cfg.model, cfg.sweep.long_len,
+                             task=str(cfg.get("task", "kv")))
     device = choose_device(str(cfg.sweep.device))
 
     out_dir = Path(str(cfg.sweep.out_dir))

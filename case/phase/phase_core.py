@@ -104,6 +104,23 @@ def estimate_renyi_dimensions_from_tokens(
     return out
 
 
+def make_generator(config: Dict[str, object]):
+    """Build the (β, γ)-parametrized data generator selected by ``config['task']``.
+
+    Supported tasks:
+      ``kv`` (default) — ``AlgorithmicKVGenerator``
+      ``logical_folding`` — ``LogicalFoldingGenerator``
+    """
+    task = str(config.get("task", "kv"))
+    vocab_size = int(config.get("vocab_size", 60))
+    if task == "kv":
+        return AlgorithmicKVGenerator(vocab_size=vocab_size)
+    if task == "logical_folding":
+        from data_logical_folding import LogicalFoldingGenerator
+        return LogicalFoldingGenerator(vocab_size=vocab_size)
+    raise ValueError(f"unknown task={task!r} (expected 'kv' or 'logical_folding')")
+
+
 def compute_dataset_renyi_dimensions(
     beta: float,
     gamma: float,
@@ -118,7 +135,7 @@ def compute_dataset_renyi_dimensions(
 
     # Use a deterministic offset so diagnostic stats are stable and separated from training RNG path.
     set_all_seeds(seed + 100_000, deterministic=bool(config.get("deterministic", False)))
-    gen = AlgorithmicKVGenerator(vocab_size=vocab_size)
+    gen = make_generator(config)
     x, _, _ = gen.generate_batch(batch_size=1, seq_len=seq_len, beta=beta, gamma=gamma)
     tokens = x[0].cpu().numpy().astype(np.int64)
     return estimate_renyi_dimensions_from_tokens(tokens, vocab_size=vocab_size, orders=orders, qs=qs)
@@ -187,7 +204,7 @@ def next_token_loss_and_acc(logits: torch.Tensor, targets: torch.Tensor) -> Tupl
 
 def evaluate_at_length(
     model: nn.Module,
-    gen: AlgorithmicKVGenerator,
+    gen,
     beta: float,
     gamma: float,
     seq_len: int,
@@ -240,7 +257,7 @@ def train_one_model(
     eval_lengths = [int(x) for x in config["eval_lengths"]]
     max_len = max([train_len] + eval_lengths)
 
-    gen = AlgorithmicKVGenerator(vocab_size=int(config["vocab_size"]))
+    gen = make_generator(config)
     arch = str(config.get("architecture", "transformer"))
     if arch == "mamba":
         from model_mamba import MambaCausal
