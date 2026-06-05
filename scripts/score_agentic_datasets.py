@@ -85,6 +85,15 @@ def ser_agentnet(row):
     return "\n\n".join(parts), len(row["traj"])
 
 
+def ser_agentnet_actions(row):
+    # AgentNet compact action view: instruction + pyautogui code per step only
+    # (VLM-generated observation/thought/reflection stripped) — within-dataset
+    # ablation against ser_agentnet, mirroring the mind2web/weblinx pair.
+    parts = [f"[instruction]\n{row.get('instruction') or ''}"]
+    parts += [(s.get("value") or {}).get("code") or "" for s in row["traj"]]
+    return "\n\n".join(parts), len(row["traj"])
+
+
 def ser_rebel_steps(row):
     # ReBel ALFWorld: `steps` is a JSON-encoded list of step dicts (idx + obs/
     # action/... fields); render each non-idx field as its own labelled line.
@@ -442,6 +451,8 @@ REGISTRY = [
      ser_nemotron_inj, "nemotron-rl-injection-v1"),
     # --- loop iter 32: first desktop computer-use entry (text side) ---
     ("xlangai/AgentNet", None, ["train"], ser_agentnet, "agentnet-text"),
+    # --- loop iter 33: annotation-stripped action view (within-dataset ablation) ---
+    ("xlangai/AgentNet", None, ["train"], ser_agentnet_actions, "agentnet-actions"),
 ]
 
 

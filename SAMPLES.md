@@ -44,6 +44,7 @@
 | Mind2Web (action 视图) | Web 轨迹 | 2,350 任务 / 137 站点 | 7.7 / 423 | **compact action 视图**（task + action_reprs），非全观测 | 0.420 | 1.70 | [`osunlp/Mind2Web`](https://huggingface.co/datasets/osunlp/Mind2Web) |
 | Mind2Web (全观测切片) | Web 轨迹（full-obs） | 同上，129 eps 采样 | 7.9 / 65,038 | 每步 `cleaned_html`（37–240KB/步）截断至 8KB；**与 action 视图对照：H∞ 1.70→0.30** —— HTML 观测样板主导长程冗余 | 0.427 | 0.30 | 同上 |
 | AgentNet (文本侧) | 桌面 computer-use 轨迹 | 大规模（采样 160） | 16.7 / 52,850 | **registry 首个桌面 GUI 条目**（OSWorld 家族；步级 observation/thought/action/reflection + pyautogui code 全文本，截图仅文件名可排除）；H∞=0 —— VLM 生成的标注层呈蒸馏签名 + 相邻步屏幕描述近重复（发现 3/8 双重机制，不可分） | 0.136 | 0.00 | [`xlangai/AgentNet`](https://huggingface.co/datasets/xlangai/AgentNet) |
+| AgentNet (action 视图) | 桌面 computer-use 轨迹 | 同上（采样 1500） | 16.6 / 906 | 同 episode 剥离 VLM 标注层（仅 instruction + pyautogui code）；**H∞ 0.00→1.43 —— 退化在标注层不在人类演示本体（发现 15）**；与 Mind2Web/WebLINX action 视图同在高密度带 | 0.423 | 1.43 | 同上 |
 | WebLINX (全观测切片) | Web 轨迹（full-obs） | 同 WebLINX，116 eps 采样 | 29.1 / 72,353 | pruned DOM（~1.6–4.3KB/turn）全量 + action；**与 action 视图对照：H∞ 1.95→0.00** —— 相邻 turn 页面几乎不变，观测近乎纯冗余 | 0.203 | 0.00 | 同上 |
 
 ## III. 多环境 / 工具使用轨迹
@@ -96,7 +97,7 @@
 
 ---
 
-## V. 总览速查（α × H∞ × horizon，迭代 32 时点，n=66 有效 / CSV 70 行含 4 项已剔除）
+## V. 总览速查（α × H∞ × horizon，迭代 33 时点，n=67 有效 / CSV 71 行含 4 项已剔除）
 
 ### Horizon 排行（bytes·ep⁻¹ 前五，仅 H∞>0.3 的健康轨迹；H∞≈0 的"空转膨胀"纪录（aider-polyglot 7B 322KB / R2EGym-32B 149.8 turns）见发现 12）
 
@@ -120,7 +121,7 @@
 | **蒸馏 SFT 模板退化** | α 0.05–0.26, **H∞=0** | AgentInstruct、AgentTraj-L、Agent-FLAN、CodeAct、ToolLLaMA-DFS、APIGen-MT、Lumos、ScienceWorld、tau-bench traces、nebius-SWE-agent、Ko-Agent（韩语）、APP1、ReBel-ALFWorld、factory-agent（韩语）、deep-research-sft、Fractal | 环境观测/系统提示/persona 模板主导；跨语言、跨域成立 —— 结构性重复照杀 H∞（发现 4/8） |
 | **中型生成器失败空转** | α 0.19–0.26, H∞ 0–0.08，episode 反而最长 | aider-polyglot 家族（7B/30B/32B、ntc-1k/100k）、R2E-Gym SWE-agent-LM-32B、Kwai-Klear-66k（0.26 边缘） | **失败重试循环膨胀 horizon**：turns/bytes 双纪录全在此集群；SFT 剂量 ×100 救不回（发现 12/13） |
 | **compact 高密度** | α 0.40–0.49, H∞ 1.7–1.95 | WebLINX/Mind2Web action 视图、FireAct | 人写/多样内容、observation 已剥离；短 episode 但语义密度全场最高 |
-| **观测坍缩对照** | 同源 H∞ 1.7→0.3 / 1.95→0.0 | mind2web/weblinx full-obs vs action 视图 | **观测并入即 H∞ 坍缩** —— web 观测在长程上近乎纯模板冗余 |
+| **观测/标注坍缩对照** | 同源 H∞ 1.7→0.3 / 1.95→0.0 / 1.43→0.0 | mind2web/weblinx full-obs vs action 视图；AgentNet 标注 vs action 视图（iter 33） | **观测或机器标注并入即 H∞ 坍缩** —— web HTML 观测与 VLM 标注层在长程上均近乎纯模板冗余；人类动作流本身高密度 |
 | **拟合 artifact（已剔除）** | α<0 或 H∞>8 | Nemotron-v1、rlenv-appworld、Aguvis 文本侧 | 近恒等文档集上 3-point 拟合失效；CSV 保留原始分，registry 不收 |
 
 ### 累积发现
@@ -139,6 +140,7 @@
 12. **长 horizon ≠ 高信息密度**（iter 23）：aider-polyglot 同任务受控对照下，7B/30B/32B 中型生成器全落 H∞ 0–0.08 模板带，且 episode 反而最长（94–150 turns / 160–322KB·ep⁻¹，全 registry turns 与 bytes 双纪录）—— **失败重试循环膨胀 horizon**；bytes/turns 排行必须配 H∞ 解读，与发现 6/11 合并成完整生成器谱系：frontier 0.7–1.6 ≫ 中型 ≈0。
 13. **SFT 剂量不改变签名带**（iter 25）：同任务同架构下，Qwen3-32B 经 1k vs 100k agentic SFT 后的轨迹均 H∞=0（α 0.22→0.21），×100 数据量只拉长 episode（23.6→46.1 turns）—— **决定 H∞ 带的是生成器能力档位，不是 agentic SFT 剂量**（此对照限单一 32B 架构 + polyglot 任务，外推需谨慎）。
 14. **seed-σ 量化：跨集群结论稳健，带内排名不可做**（iter 30）：5 个不相交切片重复评分（4 个代表集 ×5 seed，`data/seed_sigma.csv`）：同质管线 H∞ 极稳（Toucan-Kimi 1.346±0.041、glaive 1.034±0.034）；**异质 repo-scale 集 σ 大一个量级**（SWE-ZERO-12M 0.820±0.244 —— 切片组成主导，单切片 H∞ 0.60–1.23）；模板带在 0 处精确钉死（APP1 五 seed 全 0.000）；α 普遍比 H∞ 稳（σ 0.003–0.022）。**推论：集群级发现（0 vs 0.6–1.6）≫ σ 全部站得住；异质集内 <0.3 的 H∞ 差异不可解读 —— 发现 11 的"frontier 内部不可分"获定量背书**；offset-0 复跑与 registry 数字逐位一致（确定性验证 ✓）。
+15. **退化在标注层，不在演示本体**（iter 33）：AgentNet 同 episode 两视图对照 —— 含 VLM 生成 observation/thought/reflection 的全文本视图 H∞=0.00，剥离后仅留人类演示动作流（instruction + pyautogui code）H∞=1.43。**机器生成的标注文本即使"内容丰富"也呈模板签名；人类行为流本身高密度** —— 发现 3（观测坍缩）与发现 6（机器生成探针）在同一数据集内同时成立，且可分离。对 GUI 数据的训练含义：标注层提供监督信号但稀释长程密度，配比需权衡。
 
 ## 候选队列（按预期 horizon 长度排序，每轮从顶部取 2–3 个）
 
@@ -209,3 +211,4 @@
 | 30 | 2026-06-05 | **5-seed σ 升级轮（遗留清单兑现）**：新增 `scripts/seed_sigma.py` + `data/seed_sigma.csv`（4 代表集 ×5 不相交切片 = 20 评分）；**发现 14 落档：同质管线 H∞ σ≈0.03–0.04，异质 repo-scale σ≈0.24，模板带精确 0，α 比 H∞ 稳一档；集群级结论全部 ≫ σ，带内 <0.3 差异不可解读**；offset-0 复跑逐位复现 registry 数字（确定性 ✓） |
 | 31 | 2026-06-05 | +1 集：Nemotron-RL-Injection-v1 → §IV（注入攻击任务语料，**载荷在 environment 字段 —— prompt-only 视图 α 虚高 0.40 vs 全文档 0.04**，新增 `ser_nemotron_inj`；近纯模板，对照 DTap 真实对抗 rollout 0.71–0.81）；DTap 框架普查确认仅 3 切片（无第 4 frontier）；3 候选剔除：valoomba（SWE-ZERO 派生）、poolside-laguna（单轮）、aec-bench rollouts（纯元数据） |
 | 32 | 2026-06-05 | **桌面 computer-use 破冰轮**：+1 集 AgentNet 文本侧 → §II（**registry 首个桌面 GUI 条目**，步级 obs/thought/action/reflection 全文本无需图像解码，新增 `ser_agentnet`；H∞=0 —— VLM 标注蒸馏 + 屏幕描述重复双机制）；ming9999-recovery（JSONL 损坏）、laion gym-v2（tar.gz 二进制行）、cua-dev 系（需图像解码）均不可评分 |
+| 33 | 2026-06-05 | **标注剥离 ablation 轮**：+1 集 AgentNet action 视图 → §II（同 episode 剥离 VLM 标注：**H∞ 0.00→1.43，发现 15 落档 —— 退化在机器标注层，人类演示动作流本身高密度**；iter-32 的"双机制不可分"就此分离）；观测坍缩集群更名"观测/标注坍缩"并扩员 |
