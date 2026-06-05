@@ -102,7 +102,7 @@
 
 ---
 
-## V. 总览速查（α × H∞ × horizon，迭代 36 时点，n=72 有效 / CSV 76 行含 4 项已剔除）
+## V. 总览速查（α × H∞ × horizon，迭代 38 收尾时点，n=72 有效（含 6 个同源再序列化视图条目）/ CSV 76 行含 4 项已剔除 / seed-σ 23 行）
 
 ### Horizon 排行（bytes·ep⁻¹ 前五，仅 H∞>0.3 的健康轨迹；H∞≈0 的"空转膨胀"纪录（aider-polyglot 7B 322KB / R2EGym-32B 149.8 turns）见发现 12）
 
@@ -225,3 +225,4 @@
 | 35 | 2026-06-05 | **frontier agent 文本切片轮**：+2 视图 → §I（JetBrains assistant-only **H∞ 1.63→0.72**、swe-rebench-OH 0.67→0.66 持平）；**发现 16 落档：观测的密度角色随域反转 —— SWE 观测是真实代码内容承载密度，web/GUI 观测是渲染样板稀释密度；数据清洗必须分域** |
 | 36 | 2026-06-05 | **任务来源对照 + GDPval 轮**：JetBrains × SWE-smith → §I（同 harness 合成 issue H∞=1.25 vs 真实 1.63，与发现 7 同向但 Δ≈1.5σ 谨慎表述）；**GDPval → §IV（220 题人写专业任务，H∞=1.67 任务语料新高：人写专业 > 人写 issue > 合成 issue）**；kaggle-notebooks（非轨迹）、swe-lancer（空壳）剔除 |
 | 37 | 2026-06-05 | **DTap 第 2 seed 校验轮（诚实修正）**：`score_dtap_direct.py` 增 `--offset` σ 模式；深位样本三家齐跌（Opus 0.25 / Sonnet **0.08** / Gemini 0.44）—— 重复场景族主导的深尾切片把 frontier rollout 也钉进模板带；**发现 17 落档：健康 H∞ = frontier 生成器 × 场景多样性，缺一不可**；集群表"充分条件"措辞改为"必要非充分" |
+| 38 | 2026-06-05 | **终轮收尾（iters 29–38：+9 条目 / 7 候选剔除 / 发现 14–17 / σ 协议落地）**：n=72 有效（含 6 个同源视图条目）/ CSV 76 行 / provenance·samples 76·76 三方一致 / seed-σ 23 行；本批主线 = **视图分解方法学**（标注剥离、assistant-only、action-only、深位 seed）把"什么承载/杀死长程密度"拆到了机制层；遗留：gated ×4、多模态协议（OSWorld 截图侧 / GUI-Odyssey）、DTap 均衡组合 σ（分组配额采样器）、Claude Code 会话类别待真正释出。**循环结束** |
