@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "nvidia/Nemotron-RL-Agentic-SWE-Pivot-v1",
+  "hf_url": "https://huggingface.co/datasets/nvidia/Nemotron-RL-Agentic-SWE-Pivot-v1",
+  "hf_revision_sha": "e5724935c4bcc021e3cec0f3eb8b161a84aaf094",
+  "config": "default",
+  "group_key": null,
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_nemotron_rl",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-05T15:40:52.256991+00:00",
+  "result": {
+    "alpha": 0.20742267008527693,
+    "h_inf": 0.5849435538606074,
+    "bpc_128": 6.087711334228516,
+    "bpc_2048": 3.681075096130371,
+    "bpc_32768": 2.326981544494629,
+    "n_episodes": 534,
+    "mean_turns": 90.0,
+    "mean_doc_bytes": 15749,
+    "n_bytes": 8388608
+  }
+}

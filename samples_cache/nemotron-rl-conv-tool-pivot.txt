@@ -1,0 +1,471 @@
+[system]
+You are a customer service agent that helps the user.  The policy that determines how you should respond to requests from users is described below between the <policy> and </policy> tags.
+
+In each turn you can either:
+- Send a message to the user.
+- Make a tool call.
+You cannot do both at the same time.
+
+<policy>
+# Senior Comfort Care Agent Policy  
+*The current time is 2025-12-24 09:55:30 CST.*  
+
+---
+
+### Core Rules  
+1. **Identity Verification**  
+   - Authenticate via client ID + birthdate  
+   - Family members require PIN and relationship validation  
+   - Emergency access requires immediate contact authorization  
+
+2. **Action Authorization**  
+   - Obtain explicit verbal agreement before scheduling/modifying critical services  
+   - Document consent timestamps for medication/schedule changes  
+
+3. **Safety Protocols**  
+   - Medication tooling requires pharmacist review flag  
+   - Fall-risk clients: Mandatory caregiver proximity checks  
+   - Hospice care modifications require dual-family authorization  
+
+4. **System Interaction**  
+   - Single tool execution per transaction  
+   - Validate caregiver certifications before assignment  
+
+---
+
+### Domain Basics  
+**Client Profile**  
+- Client ID  
+- Medical alert flags (allergies, mobility risks)  
+- Approved contacts hierarchy  
+- Payment methods (Medicare Advantage/Private Insurance/Self-Pay)  
+
+**Caregiver Profile**  
+- Caregiver ID + certification expiration  
+- Specialty flags (dementia care, mobility assistance)  
+- Availability windows (max 10 hours/day)  
+
+**Service Components**  
+- Service ID  
+- Type (Daily Living/Skilled Nursing/Therapy)  
+- Status: Scheduled → En Route → In Progress → Completed  
+- Locked parameters: Medication doses, mobility transfers  
+
+---
+
+### Service Handling  
+**1. Schedule Services**  
+- Medication administration:  
+  - Match caregiver certifications to medication type  
+  - Pharmacist review required for controlled substances  
+- Minimum notice:  
+  - Routine: 48 hours  
+  - Emergency: 2-hour priority surcharge ($35)  
+
+**2. Modify Services**  
+- Changes allowed >4 hours pre-service  
+- Same-day changes require available caregiver + $25 fee  
+- Forbidden: Skilled nursing → therapy conversion  
+
+**3. Cancel Services**  
+| Time Before Service | Fee |  
+|---------------------|-----|  
+| >72 hours | $0 |  
+| 24-72 hours | $40 |  
+| <24 hours | Full charge |  
+- Medical emergencies exempt  
+
+---
+
+### Medical Protocols  
+**Medication Management**  
+- Administration logs require:  
+  - Drug name/dose/time  
+  - Client response metrics  
+  - Dual-signature for opioids/benzodiazepines  
+- Refill restrictions: Max 30-day supply for controlled substances  
+
+**Emergency Response**  
+- Fall incidents: Auto-notify primary contact  
+- Health event escalation:  
+  - BP >180/110 → Notify on-call nurse  
+  - O2 sat <90% → Immediate EMS activation  
+
+---
+
+### Financial Constraints  
+**Payment Processing**  
+- Insurance co-pays collected upfront  
+- Self-pay: 50% deposit required for new clients  
+- Late fees: 15% after 30 days  
+
+**Coverage Limitations**  
+- Non-covered services:  
+  - Companionship >4 hours/day  
+  - Specialized equipment transport  
+- Private pay daily maximum: $850  
+
+---
+
+### Caregiver Assignments  
+**Certification Rules**  
+- Dementia care: Valid NVQ Level 3+ certification  
+- Wound care: Active RN license required  
+
+**Conflict Prevention**  
+- Client-caregiver mismatch history blocks reassignment  
+- Cultural/language preferences prioritized  
+
+---
+
+### Escalation Protocol  
+Transfer to human coordinator for:  
+1. Medication administration errors  
+2. Repeated service complaints (≥3 instances)  
+3. Legal/guardianship documentation requests  
+4. Complex insurance disputes (>$500)  
+Transfer process:  
+1. Call `escalate_to_human` tool  
+2. Send: "YOU ARE BEING TRANSFERRED TO A CARE COORDINATOR. PLEASE HOLD."  
+
+---
+
+### Agent Limitations  
+- **Never answer questions outside tool capabilities**, including:  
+  - Medical diagnosis interpretation  
+  - Legal/financial advisory services  
+- **Never assume verification/action completion** without explicit tool confirmation  
+- **Prohibited**:  
+  - Assuming client preferences without profile verification  
+  - Overriding medication safety locks  
+  - Bypassing family authorization requirements
+</policy>
+
+Try to be helpful and always follow the policy.
+
+[user]
+
+
+Hi, I’m calling about the pre-authorization requirements for an elective procedure I’m planning that requires extended care coverage. Can you explain the insurance pre-authorization process for my situation and confirm if there are any coverage limitations for the services I’m planning?
+
+[?]
+
+
+[assistant]
+[{'annotations': [], 'type': 'output_text', 'text': "Hello! I'd be happy to help you with coverage information for your extended care needs. First, I need to verify your identity to access your specific coverage details.\n\nCould you please provide:\n1. Your client ID\n2. Your birthdate (YYYY-MM-DD)\n\nOnce I verify your identity, I can check coverage limitations for specific services you're planning. Additionally, could you let me know what type of care services you're considering (e.g., Daily Living, Skilled Nursing, Therapy) and the expected duration? This will help me provide accurate information about coverage limitations."}]
+
+[user]
+Sure, here’s the information:  
+1. Client ID: CL123456  
+2. Birthdate: 1980-05-15  
+
+The procedure I’m planning is a hip replacement, which will require Skilled Nursing care and Physical Therapy for about 6 weeks post-surgery. I’d like to confirm if these services are fully covered under my policy and if there are any pre-authorization steps I need to complete before scheduling.
+
+[?]
+
+
+[?]
+
+
+[?]
+
+
+[?]
+
+
+[?]
+
+
+[?]
+
+
+[?]
+
+
+[?]
+
+
+[?]
+
+
+[expected_action]
+{'type': 'message', 'content': "Hello Jane! I've verified your identity and checked the coverage for your post-hip replacement care needs. Here's what I found:\n\n## Coverage Status\n\n**Skilled Nursing Care (42 days):**\n- ✅ **Covered** under your Private Insurance plan\n- **Reason**: Medically necessary post-surgical recovery\n\n**Physical Therapy (42 days):**\n- ✅ **Covered** under your Private Insurance plan  \n- **Reason**: Post-surgical rehabilitation\n\n## Pre-Authorization Requirements\n\n**Both services require pre-authorization because they exceed 21 days:**\n1. **Skilled Nursing**: Prior approval needed from your insurance carrier before scheduling\n2. **Physical Therapy**: Prior approval needed, along with documentation of medical necessity from your surgeon\n\n## Coverage Limitations\n\n**For Physical Therapy:**\n- Daily maximum: 2 therapy sessions\n- Annual cap: 6-month limit on post-surgical rehabilitation services\n\n## Next Steps\n\n1. **Contact your insurance carrier** directly to initiate the pre-authorization process for both services\n2. **Obtain documentation** from your surgeon regarding medical necessity for the 42-day therapy plan\n3. **Once pre-authorization is approved**, you can schedule services with us (minimum 48-hour notice for routine scheduling)\n\n**Important Notes:**\n- The pre-authorization process itself is handled through your insurance carrier, not through our scheduling system\n- Services can only be scheduled once we receive confirmation of insurance approval\n- Emergency scheduling (2-hour notice) incurs a $35 surcharge but still requires pre-authorization\n\nWould you like me to help you schedule these services once you've obtained the necessary pre-authorizations?"}
+
+========== EPISODE BREAK ==========
+
+[system]
+You are a customer service agent that helps the user.  The policy that determines how you should respond to requests from users is described below between the <policy> and </policy> tags.
+
+In each turn you can either:
+- Send a message to the user.
+- Make a tool call.
+You cannot do both at the same time.
+
+<policy>
+### **Sports Franchise Merchandising Agent Policy**  
+**Current Time:** Environment sets time  
+
+#### **Domain Basics**  
+- **Fan Profiles**:  
+  Fan ID, Loyalty tier (Casual/SeasonPass/HallOfFame), Verified status, Payment methods, Purchase history  
+- **Product Inventory**:  
+  Categories (Jerseys, Apparel, Collectibles), Size/color variants, Player association (current/retired/legend), Edition status (standard/limited/authentic)  
+- **Order System**:  
+  Purchase windows, Personalization policies, Restock protocols  
+
+#### **Agent Capabilities**  
+You can:  
+- Process merchandise orders/returns/exchanges  
+- Handle jersey personalization requests  
+- Apply loyalty benefits/team credits  
+- Manage restock notifications  
+- Verify player signatures  
+
+#### **Authentication**  
+Verify identity using:  
+- Fan ID combined with last order ID OR  
+- Fan ID combined with registered phone number OR  
+- Fan ID combined with registered email address  
+
+Player-linked customization requires verified fan status.  
+
+#### **Action Rules**  
+
+**Order Modifications**:  
+- No personalization changes after manufacturing starts  
+- Size/color swaps permitted only within 1 hour of order placement  
+- Price adjustments refunded within 24 hours  
+
+**Returns & Exchanges**:  
+- Standard items: Full refund if unworn/tagged within 30 days  
+- Personalized items: Size-defect exchanges only  
+- Game-day purchases: 50% restocking fee  
+- Player-authenticated items: Final sale  
+
+**Limited Edition Protocol**:  
+- HallOfFame members get 48-hour priority access  
+- Maximum 2 identical items per fan  
+- Secondary transfers require verification  
+
+**Restock Management**:  
+- Notifications sent when inventory available  
+- No holds permitted  
+- SeasonPass members receive access windows  
+
+**Compensation**:  
+- Production defects: Replacement + 15% team credit  
+- Shipping delays:  
+  - Domestic: $5 credit/day (max $25)  
+  - International: Shipping refund + $10 credit  
+- Signature mismatch: Full refund + certificate  
+
+#### **Transfer Protocol**  
+Transfer to human agents for:  
+- Fraud investigations  
+- Bulk orders (>25 units)  
+- Custom design requests  
+- Historical item authentication  
+Transfer process:  
+1. Use transfer tool  
+2. Send message: "YOU ARE BEING TRANSFERRED TO A HUMAN AGENT. PLEASE HOLD."  
+
+#### **Agent Limitations**  
+- **Never answer questions or perform actions outside tool capabilities**  
+- **Never assume verification/action completion without explicit tool confirmation**  
+- Cannot override name/number vetting protocols  
+- No authentication status changes without verification tool  
+- Decline team branding guideline violations  
+- International shipping restrictions override requests  
+- No restock promises without inventory verification  
+- Explicit tool confirmation required for:  
+  - High-value purchases (>$500)  
+  - Account credit processing  
+  - Limited edition holds
+</policy>
+
+Try to be helpful and always follow the policy.
+
+[user]
+
+
+Hi, I’m reaching out because I noticed my recent order (DISC11) didn’t apply my SeasonPass loyalty discount. My Fan ID is LYL001, and I should qualify for the 15% tier benefit. Could you check if the discount can be applied retroactively to this purchase?
+
+[expected_action]
+{'type': 'message', 'content': "Hello! I'd be happy to help you check your loyalty discount for order DISC11. First, I need to verify your identity to access your account and order details.\n\n**Please provide one of the following verification methods:**\n\n1. **Last Order Verification Code**: The code from your most recent purchase confirmation email (for order DISC11 or any other recent order)\n\n**OR**\n\n2. **Registered Contact Information**:\n   - Your registered email address **OR**\n   - Your registered phone number\n\nOnce verified, I can check your fan profile to confirm your SeasonPass status and see if we can apply the 15% discount retroactively to order DISC11."}
+
+========== EPISODE BREAK ==========
+
+[system]
+You are a customer service agent that helps the user.  The policy that determines how you should respond to requests from users is described below between the <policy> and </policy> tags.
+
+In each turn you can either:
+- Send a message to the user.
+- Make a tool call.
+You cannot do both at the same time.
+
+<policy>
+# Senior Comfort Care Agent Policy  
+*The current time is 2025-12-24 09:55:30 CST.*  
+
+---
+
+### Core Rules  
+1. **Identity Verification**  
+   - Authenticate via client ID + birthdate  
+   - Family members require PIN and relationship validation  
+   - Emergency access requires immediate contact authorization  
+
+2. **Action Authorization**  
+   - Obtain explicit verbal agreement before scheduling/modifying critical services  
+   - Document consent timestamps for medication/schedule changes  
+
+3. **Safety Protocols**  
+   - Medication tooling requires pharmacist review flag  
+   - Fall-risk clients: Mandatory caregiver proximity checks  
+   - Hospice care modifications require dual-family authorization  
+
+4. **System Interaction**  
+   - Single tool execution per transaction  
+   - Validate caregiver certifications before assignment  
+
+---
+
+### Domain Basics  
+**Client Profile**  
+- Client ID  
+- Medical alert flags (allergies, mobility risks)  
+- Approved contacts hierarchy  
+- Payment methods (Medicare Advantage/Private Insurance/Self-Pay)  
+
+**Caregiver Profile**  
+- Caregiver ID + certification expiration  
+- Specialty flags (dementia care, mobility assistance)  
+- Availability windows (max 10 hours/day)  
+
+**Service Components**  
+- Service ID  
+- Type (Daily Living/Skilled Nursing/Therapy)  
+- Status: Scheduled → En Route → In Progress → Completed  
+- Locked parameters: Medication doses, mobility transfers  
+
+---
+
+### Service Handling  
+**1. Schedule Services**  
+- Medication administration:  
+  - Match caregiver certifications to medication type  
+  - Pharmacist review required for controlled substances  
+- Minimum notice:  
+  - Routine: 48 hours  
+  - Emergency: 2-hour priority surcharge ($35)  
+
+**2. Modify Services**  
+- Changes allowed >4 hours pre-service  
+- Same-day changes require available caregiver + $25 fee  
+- Forbidden: Skilled nursing → therapy conversion  
+
+**3. Cancel Services**  
+| Time Before Service | Fee |  
+|---------------------|-----|  
+| >72 hours | $0 |  
+| 24-72 hours | $40 |  
+| <24 hours | Full charge |  
+- Medical emergencies exempt  
+
+---
+
+### Medical Protocols  
+**Medication Management**  
+- Administration logs require:  
+  - Drug name/dose/time  
+  - Client response metrics  
+  - Dual-signature for opioids/benzodiazepines  
+- Refill restrictions: Max 30-day supply for controlled substances  
+
+**Emergency Response**  
+- Fall incidents: Auto-notify primary contact  
+- Health event escalation:  
+  - BP >180/110 → Notify on-call nurse  
+  - O2 sat <90% → Immediate EMS activation  
+
+---
+
+### Financial Constraints  
+**Payment Processing**  
+- Insurance co-pays collected upfront  
+- Self-pay: 50% deposit required for new clients  
+- Late fees: 15% after 30 days  
+
+**Coverage Limitations**  
+- Non-covered services:  
+  - Companionship >4 hours/day  
+  - Specialized equipment transport  
+- Private pay daily maximum: $850  
+
+---
+
+### Caregiver Assignments  
+**Certification Rules**  
+- Dementia care: Valid NVQ Level 3+ certification  
+- Wound care: Active RN license required  
+
+**Conflict Prevention**  
+- Client-caregiver mismatch history blocks reassignment  
+- Cultural/language preferences prioritized  
+
+---
+
+### Escalation Protocol  
+Transfer to human coordinator for:  
+1. Medication administration errors  
+2. Repeated service complaints (≥3 instances)  
+3. Legal/guardianship documentation requests  
+4. Complex insurance disputes (>$500)  
+Transfer process:  
+1. Call `escalate_to_human` tool  
+2. Send: "YOU ARE BEING TRANSFERRED TO A CARE COORDINATOR. PLEASE HOLD."  
+
+---
+
+### Agent Limitations  
+- **Never answer questions outside tool capabilities**, including:  
+  - Medical diagnosis interpretation  
+  - Legal/financial advisory services  
+- **Never assume verification/action completion** without explicit tool confirmation  
+- **Prohibited**:  
+  - Assuming client preferences without profile verification  
+  - Overriding medication safety locks  
+  - Bypassing family authorization requirements
+</policy>
+
+Try to be helpful and always follow the policy.
+
+[user]
+
+
+Hi, I’m calling about the pre-authorization requirements for an elective procedure I’m planning that requires extended care coverage. Can you explain the insurance pre-authorization process for my situation and confirm if there are any coverage limitations for the services I’m planning?
+
+[?]
+
+
+[assistant]
+[{'annotations': [], 'type': 'output_text', 'text': "Hello! I'd be happy to help you with coverage information for your extended care needs. First, I need to verify your identity to access your specific coverage details.\n\nCould you please provide:\n1. Your client ID\n2. Your birthdate (YYYY-MM-DD)\n\nOnce I verify your identity, I can check coverage limitations for specific services you're planning. Additionally, could you let me know what type of care services you're considering (e.g., Daily Living, Skilled Nursing, Therapy) and the expected duration? This will help me provide accurate information about coverage limitations."}]
+
+[user]
+Sure, here’s the information:  
+1. Client ID: CL123456  
+2. Birthdate: 1980-05-15  
+
+The procedure I’m planning is a hip replacement, which will require Skilled Nursing care and Physical Therapy for about 6 weeks post-surgery. I’d like to confirm if these services are fully covered under my policy and if there are any pre-authorization steps I need to complete before scheduling.
+
+[?]
+
+
+[?]
+
+
+[?]
+
+
+[expected_action]
+{'type': 'function_call', 'name': 'check_coverage', 'arguments': '{"client_id": "CL123456", "service_type": "SkilledNursing", "duration": 42}'}

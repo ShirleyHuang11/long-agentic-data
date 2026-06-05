@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "FractalAIResearch/DeepResearch-SFT",
+  "hf_url": "https://huggingface.co/datasets/FractalAIResearch/DeepResearch-SFT",
+  "hf_revision_sha": "4c22754e75dc6f7343a4e74eb67245a4dd3e667b",
+  "config": "default",
+  "group_key": null,
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_fractal_dr",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-05T17:15:34.757419+00:00",
+  "result": {
+    "alpha": 0.17960631194945711,
+    "h_inf": 0.0,
+    "bpc_128": 6.3087158203125,
+    "bpc_2048": 3.810929298400879,
+    "bpc_32768": 2.2928733825683594,
+    "n_episodes": 72,
+    "mean_turns": 1,
+    "mean_doc_bytes": 118099,
+    "n_bytes": 8388608
+  }
+}

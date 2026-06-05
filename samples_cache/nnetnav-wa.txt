@@ -1,0 +1,1385 @@
+[system]
+You are an autonomous intelligent agent tasked with navigating a web browser. You will be given web-based tasks. These tasks will be accomplished through the use of specific actions you can issue.
+
+Here's the information you'll have:
+The user's objective: This is the task you're trying to complete.
+The current web page's accessibility tree: This is a simplified representation of the webpage, providing key information.
+The current web page's URL: This is the page you're currently navigating.
+The open tabs: These are the tabs you have open.
+The previous actions: These are all the action you have performed. It may be helpful to track your progress.
+
+The actions you can perform fall into several categories:
+
+Page Operation Actions:
+`click [id]`: This action clicks on an element with a specific id on the webpage.
+`type [id] [content] [press_enter_after=0|1]`: Use this to type the content into the field with id. By default, the "Enter" key is pressed after typing unless press_enter_after is set to 0.
+`hover [id]`: Hover over an element with id.
+`press [key_comb]`:  Simulates the pressing of a key combination on the keyboard (e.g., Ctrl+v).
+`scroll [down|up]`: Scroll the page up or down.
+
+Tab Management Actions:
+`new_tab`: Open a new, empty browser tab.
+`tab_focus [tab_index]`: Switch the browser's focus to a specific tab using its index.
+`close_tab`: Close the currently active tab.
+
+URL Navigation Actions:
+`goto [url]`: Navigate to a specific URL.
+`go_back`: Navigate to the previously viewed page.
+`go_forward`: Navigate to the next page (if a previous 'go_back' action was performed).
+
+Completion Action:
+`stop [answer]`: Issue this action when you believe the task is complete. If the objective is to find a text-based answer, provide the answer in the bracket. If you believe the task is impossible to complete, provide the answer as "N/A" in the bracket.
+
+Homepage:
+If you want to visit other websites, check out the homepage at http://homepage.com. It has a list of websites you can visit.
+
+To be successful, it is very important to follow the following rules:
+1. You should only issue an action that is valid given the current observation
+2. You should only issue one action at a time.
+3. You should follow the examples to reason step by step and then issue the next action.
+4. You are strictly forbidden from issuing a goto action to a URL that is not on the homepage.
+5. Generate the action in the correct format. Start by reasoning about the current situation. End with "In summary, the next action I will perform is" phrase, followed by action inside ``````. For example, "Let's think step-by-step. Given the current state, I need to click on the like button which has id 1234. In summary, the next action I will perform is ```click [1234]```".
+6. Issue stop action when you think you have achieved the objective. Don't generate anything after stop. 
+
+Here are some example outputs for some random tasks:
+1. Let's think step-by-step. This page list the information of HP Inkjet Fax Machine, which is the product identified in the objective. Its price is $279.49. I think I have achieved the objective. I will issue the stop action with the answer. In summary, the next action I will perform is ```stop [$279.49]```
+2. Let's think step-by-step. This page has a search box whose ID is [164]. According to the nominatim rule of openstreetmap, I can search for the restaurants near a location by "restaurants near". I can submit my typing by pressing the Enter afterwards. In summary, the next action I will perform is ```type [164] [restaurants near CMU] [1]```
+
+[user]
+OBSERVATION:
+RootWebArea 'Dashboard / Magento Admin', focused, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/'
+	[148] link 'Magento Admin Panel', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/'
+		[149] image 'Magento Admin Panel', visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/static/version1735520705/adminhtml/Magento/backend/en_US/images/magento-icon.svg'
+	[150] navigation '', visible
+		[151] menubar '', visible, orientation='horizontal'
+			[153] link '\ue604 DASHBOARD', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/'
+				StaticText '\ue604'
+				StaticText 'DASHBOARD'
+			[156] link '\ue60b SALES', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/#'
+				StaticText '\ue60b'
+				StaticText 'SALES'
+			[189] link '\ue608 CATALOG', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/#'
+				StaticText '\ue608'
+				StaticText 'CATALOG'
+			[207] link '\ue603 CUSTOMERS', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/#'
+				StaticText '\ue603'
+				StaticText 'CUSTOMERS'
+			[226] link '\ue609 MARKETING', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/#'
+				StaticText '\ue609'
+				StaticText 'MARKETING'
+			[293] link '\ue602 CONTENT', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/#'
+				StaticText '\ue602'
+				StaticText 'CONTENT'
+			[339] link '\ue60a REPORTS', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/#'
+				StaticText '\ue60a'
+				StaticText 'REPORTS'
+			[464] link '\ue60d STORES', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/#'
+				StaticText '\ue60d'
+				StaticText 'STORES'
+			[540] link '\ue610 SYSTEM', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/#'
+				StaticText '\ue610'
+				StaticText 'SYSTEM'
+			[623] link '\ue612 FIND PARTNERS & EXTENSIONS', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/marketplace/index/'
+				StaticText '\ue612'
+				StaticText 'FIND PARTNERS & EXTENSIONS'
+	[645] button 'System Messages: 2', clickable, visible
+		StaticText 'System Messages'
+		StaticText ':'
+		StaticText '2'
+	[651] link 'View Details', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/#'
+	StaticText '\ue62d'
+	StaticText 'Task "Rule processing: 1": 1 item(s) have been successfully updated.'
+	[667] banner '', visible
+		[670] heading 'Dashboard', visible
+		[673] link '\ue600 admin', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/system_account/index/'
+			StaticText '\ue600'
+			StaticText 'admin'
+		[685] link '\ue607', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/notification/index/'
+			StaticText '\ue607'
+		[689] LabelText '', clickable, visible
+			StaticText '\ue60c'
+		[693] textbox '\ue60c', clickable, visible
+	[699] main ''
+		StaticText 'Scope:'
+		[710] button 'All Store Views', clickable, visible, hasPopup='menu'
+		[721] link '\ue633 What is this?', clickable, visible, url='https://docs.magento.com/user-guide/configuration/scope.html'
+			StaticText '\ue633'
+			StaticText 'What is this?'
+		[728] button 'Reload Data', clickable, visible
+		[734] sectionheader '', visible
+			StaticText 'Advanced Reporting'
+		StaticText "Gain new insights and take command of your business' performance, using our dynamic product, order, and customer reports tailored to your customer data."
+		[737] link 'Go to Advanced Reporting \ue644', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/analytics/reports/show/'
+			StaticText 'Go to Advanced Reporting'
+			StaticText '\ue644'
+		StaticText 'Chart is disabled. To enable the chart, click'
+		[744] link 'here', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/system_config/edit/section/admin/#admin_dashboard-link'
+		StaticText '.'
+		[747] list '', visible
+			[748] listitem '', visible
+				StaticText 'Revenue'
+				[750] strong '', visible
+					StaticText '$0.00'
+			[753] listitem '', visible
+				StaticText 'Tax'
+				[755] strong '', visible
+					StaticText '$0.00'
+			[758] listitem '', visible
+				StaticText 'Shipping'
+				[760] strong '', visible
+					StaticText '$0.00'
+			[763] listitem '', visible
+				StaticText 'Quantity'
+				[765] strong '', visible
+					StaticText '0'
+		[769] tablist '', visible, multiselectable=False, orientation='horizontal'
+			[770] tab 'The information in this tab has been changed. This tab contains invalid data. Please resolve this before saving. Loading... Bestsellers', visible, expanded=True, selected=True, controls='grid_tab_ordered_products_content'
+				[771] link 'Bestsellers', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/#grid_tab_ordered_products_content'
+					StaticText 'Bestsellers'
+			[777] tab 'The information in this tab has been changed. This tab contains invalid data. Please resolve this before saving. Loading... Most Viewed Products', visible, expanded=False, selected=False
+				[778] link 'Most Viewed Products', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/productsViewed/'
+					StaticText 'Most Viewed Products'
+			[785] tab 'The information in this tab has been changed. This tab contains invalid data. Please resolve this before saving. Loading... New Customers', visible, expanded=False, selected=False
+				[786] link 'New Customers', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/customersNewest/'
+					StaticText 'New Customers'
+			[793] tab 'The information in this tab has been changed. This tab contains invalid data. Please resolve this before saving. Loading... Customers', visible, expanded=False, selected=False
+				[794] link 'Customers', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/customersMost/'
+					StaticText 'Customers'
+		[803] tabpanel 'The information in this tab has been changed. This tab contains invalid data. Please resolve this before saving. Loading... Bestsellers'
+			[805] table ''
+				[806] rowgroup '', visible
+					[807] row '', visible
+						[808] columnheader 'Product', visible
+							StaticText 'Product'
+						[810] columnheader 'Price', visible
+							StaticText 'Price'
+						[812] columnheader 'Quantity', visible
+							StaticText 'Quantity'
+				[814] rowgroup ''
+					[815] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/catalog/product/edit/id/20/', clickable, visible
+						[816] cell 'Quest Lumaflex™ Band', visible
+						[817] cell '$19.00', visible
+						[818] cell '6', visible
+					[819] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/catalog/product/edit/id/33/', clickable
+						[820] cell 'Sprite Yoga Strap 6 foot'
+						[821] cell '$14.00'
+						[822] cell '6'
+					[823] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/catalog/product/edit/id/29/', clickable
+						[824] cell 'Sprite Stasis Ball 65 cm'
+						[825] cell '$27.00'
+						[826] cell '6'
+					[827] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/catalog/product/edit/id/25/', clickable
+						[828] cell 'Sprite Stasis Ball 55 cm'
+						[829] cell '$23.00'
+						[830] cell '6'
+					[831] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/catalog/product/edit/id/13/', clickable
+						[832] cell 'Overnight Duffle'
+						[833] cell '$45.00'
+						[834] cell '5'
+		StaticText 'Lifetime Sales'
+		[842] strong '', visible
+			StaticText '$235.20'
+		StaticText 'Average Order'
+		[848] strong '', visible
+			StaticText '$1.47'
+		StaticText 'Last Orders'
+		[854] table ''
+			[855] rowgroup '', visible
+				[856] row '', visible
+					[857] columnheader 'Customer', visible
+						StaticText 'Customer'
+					[859] columnheader 'Items', visible
+						StaticText 'Items'
+					[861] columnheader 'Total', visible
+						StaticText 'Total'
+			[863] rowgroup ''
+				[864] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/310/', clickable, visible
+					[865] cell 'Sarah Miller', visible
+					[866] cell '2', visible
+					[867] cell '$40.80', visible
+				[868] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/309/', clickable, visible
+					[869] cell 'Sarah Miller', visible
+					[870] cell '5', visible
+					[871] cell '$194.40', visible
+				[872] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/299/', clickable
+					[873] cell 'Sarah Miller'
+					[874] cell '5'
+					[875] cell '$194.40'
+				[876] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/65/', clickable
+					[877] cell 'Grace Nguyen'
+					[878] cell '4'
+					[879] cell '$190.00'
+				[880] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/125/', clickable
+					[881] cell 'Matt Baker'
+					[882] cell '3'
+					[883] cell '$151.40'
+		StaticText 'Last Search Terms'
+		[888] table ''
+			[889] rowgroup ''
+				[890] row ''
+					[891] columnheader 'Search Term'
+						StaticText 'Search Term'
+					[893] columnheader 'Results'
+						StaticText 'Results'
+					[895] columnheader 'Uses'
+						StaticText 'Uses'
+			[897] rowgroup ''
+				[898] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/search/term/edit/id/25/', clickable
+					[899] cell 'tanks'
+					[900] cell '23'
+					[901] cell '1'
+				[902] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/search/term/edit/id/19/', clickable
+					[903] cell 'nike'
+					[904] cell '0'
+					[905] cell '3'
+				[906] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/search/term/edit/id/1/', clickable
+					[907] cell 'Joust Bag'
+					[908] cell '10'
+					[909] cell '4'
+				[910] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/search/term/edit/id/11/', clickable
+					[911] cell 'hollister'
+					[912] cell '1'
+					[913] cell '19'
+				[914] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/search/term/edit/id/13/', clickable
+					[915] cell 'Antonia Racer Tank'
+					[916] cell '23'
+					[917] cell '2'
+		StaticText 'Top Search Terms'
+		[922] table ''
+			[923] rowgroup ''
+				[924] row ''
+					[925] columnheader 'Search Term'
+						StaticText 'Search Term'
+					[927] columnheader 'Results'
+						StaticText 'Results'
+					[929] columnheader 'Uses'
+						StaticText 'Uses'
+			[931] rowgroup ''
+				[932] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/search/term/edit/id/11/', clickable
+					[933] cell 'hollister'
+					[934] cell '1'
+					[935] cell '19'
+				[936] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/search/term/edit/id/1/', clickable
+					[937] cell 'Joust Bag'
+					[938] cell '10'
+					[939] cell '4'
+				[940] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/search/term/edit/id/13/', clickable
+					[941] cell 'Antonia Racer Tank'
+					[942] cell '23'
+					[943] cell '2'
+				[944] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/search/term/edit/id/25/', clickable
+					[945] cell 'tanks'
+					[946] cell '23'
+					[947] cell '1'
+				[948] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/search/term/edit/id/9/', clickable
+					[949] cell 'WP10'
+					[950] cell '1'
+					[951] cell '1'
+	[953] contentinfo ''
+		[956] paragraph ''
+			[957] link '\ue606', clickable, url='http://magento.com/'
+				StaticText '\ue606'
+			StaticText 'Copyright © 2025 Magento Commerce Inc. All rights reserved.'
+		[959] paragraph ''
+			[960] strong ''
+				StaticText 'Magento'
+			StaticText'ver. 2.4.6'
+		[961] link 'Privacy Policy', clickable, url='https://www.adobe.com/privacy/policy.html'
+		StaticText '|'
+		[962] link 'Account Activity', clickable, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/security/session/activity/'
+		StaticText '|'
+		[963] link 'Report an Issue', clickable, url='https://github.com/magento/magento2/issues'
+URL: http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/
+OBJECTIVE: Find the details of order #000000299.
+PREVIOUS ACTIONS:
+1: None
+
+[assistant]
+Let's think step-by-step. The objective is to find the details of order #000000299. From the current observation, we are at the 'Dashboard / Magento Admin' page. In order to find the details of order #000000299, we need to navigate to the page where the order information is displayed. 
+
+Since none of the links on this page has the order number #000000299, we can start by looking at the top menu bar of this page. Among the options available, 'SALES' seems most likely to provide an interface to view order details. In summary, the next action I will perform is ```click [156]```
+
+========== EPISODE BREAK ==========
+
+[system]
+You are an autonomous intelligent agent tasked with navigating a web browser. You will be given web-based tasks. These tasks will be accomplished through the use of specific actions you can issue.
+
+Here's the information you'll have:
+The user's objective: This is the task you're trying to complete.
+The current web page's accessibility tree: This is a simplified representation of the webpage, providing key information.
+The current web page's URL: This is the page you're currently navigating.
+The open tabs: These are the tabs you have open.
+The previous actions: These are all the action you have performed. It may be helpful to track your progress.
+
+The actions you can perform fall into several categories:
+
+Page Operation Actions:
+`click [id]`: This action clicks on an element with a specific id on the webpage.
+`type [id] [content] [press_enter_after=0|1]`: Use this to type the content into the field with id. By default, the "Enter" key is pressed after typing unless press_enter_after is set to 0.
+`hover [id]`: Hover over an element with id.
+`press [key_comb]`:  Simulates the pressing of a key combination on the keyboard (e.g., Ctrl+v).
+`scroll [down|up]`: Scroll the page up or down.
+
+Tab Management Actions:
+`new_tab`: Open a new, empty browser tab.
+`tab_focus [tab_index]`: Switch the browser's focus to a specific tab using its index.
+`close_tab`: Close the currently active tab.
+
+URL Navigation Actions:
+`goto [url]`: Navigate to a specific URL.
+`go_back`: Navigate to the previously viewed page.
+`go_forward`: Navigate to the next page (if a previous 'go_back' action was performed).
+
+Completion Action:
+`stop [answer]`: Issue this action when you believe the task is complete. If the objective is to find a text-based answer, provide the answer in the bracket. If you believe the task is impossible to complete, provide the answer as "N/A" in the bracket.
+
+Homepage:
+If you want to visit other websites, check out the homepage at http://homepage.com. It has a list of websites you can visit.
+
+To be successful, it is very important to follow the following rules:
+1. You should only issue an action that is valid given the current observation
+2. You should only issue one action at a time.
+3. You should follow the examples to reason step by step and then issue the next action.
+4. You are strictly forbidden from issuing a goto action to a URL that is not on the homepage.
+5. Generate the action in the correct format. Start by reasoning about the current situation. End with "In summary, the next action I will perform is" phrase, followed by action inside ``````. For example, "Let's think step-by-step. Given the current state, I need to click on the like button which has id 1234. In summary, the next action I will perform is ```click [1234]```".
+6. Issue stop action when you think you have achieved the objective. Don't generate anything after stop. 
+
+Here are some example outputs for some random tasks:
+1. Let's think step-by-step. This page list the information of HP Inkjet Fax Machine, which is the product identified in the objective. Its price is $279.49. I think I have achieved the objective. I will issue the stop action with the answer. In summary, the next action I will perform is ```stop [$279.49]```
+2. Let's think step-by-step. This page has a search box whose ID is [164]. According to the nominatim rule of openstreetmap, I can search for the restaurants near a location by "restaurants near". I can submit my typing by pressing the Enter afterwards. In summary, the next action I will perform is ```type [164] [restaurants near CMU] [1]```
+
+[user]
+OBSERVATION:
+RootWebArea 'Dashboard / Magento Admin', focused, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/'
+	[148] link 'Magento Admin Panel', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/'
+		[149] image 'Magento Admin Panel', visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/static/version1735520705/adminhtml/Magento/backend/en_US/images/magento-icon.svg'
+	[150] navigation '', visible
+		[151] menubar '', visible, orientation='horizontal'
+			[153] link '\ue604 DASHBOARD', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/'
+				StaticText '\ue604'
+				StaticText 'DASHBOARD'
+			[156] link '\ue60b SALES', clickable, visible, focused, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/#'
+				StaticText '\ue60b'
+				StaticText 'SALES'
+			[159] strong '', visible
+				StaticText 'Sales'
+			[160] link '\ue62f', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/#'
+				StaticText '\ue62f'
+			[161] menu '', visible, orientation='vertical'
+				[166] menu '', visible, orientation='vertical'
+					[168] link 'Orders', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/'
+						StaticText 'Orders'
+					[171] link 'Invoices', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/invoice/'
+						StaticText 'Invoices'
+					[174] link 'Shipments', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/shipment/'
+						StaticText 'Shipments'
+					[177] link 'Credit Memos', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/creditmemo/'
+						StaticText 'Credit Memos'
+					[180] link 'Billing Agreements', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/paypal/billing_agreement/'
+						StaticText 'Billing Agreements'
+					[183] link 'Transactions', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/transactions/'
+						StaticText 'Transactions'
+					[186] link 'Braintree Virtual Terminal', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/braintree/virtual/'
+						StaticText 'Braintree Virtual Terminal'
+			[189] link '\ue608 CATALOG', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/#'
+				StaticText '\ue608'
+				StaticText 'CATALOG'
+			[207] link '\ue603 CUSTOMERS', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/#'
+				StaticText '\ue603'
+				StaticText 'CUSTOMERS'
+			[226] link '\ue609 MARKETING', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/#'
+				StaticText '\ue609'
+				StaticText 'MARKETING'
+			[293] link '\ue602 CONTENT', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/#'
+				StaticText '\ue602'
+				StaticText 'CONTENT'
+			[339] link '\ue60a REPORTS', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/#'
+				StaticText '\ue60a'
+				StaticText 'REPORTS'
+			[464] link '\ue60d STORES', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/#'
+				StaticText '\ue60d'
+				StaticText 'STORES'
+			[540] link '\ue610 SYSTEM', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/#'
+				StaticText '\ue610'
+				StaticText 'SYSTEM'
+			[623] link '\ue612 FIND PARTNERS & EXTENSIONS', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/marketplace/index/'
+				StaticText '\ue612'
+				StaticText 'FIND PARTNERS & EXTENSIONS'
+	[645] button 'System Messages: 2', clickable, visible
+		StaticText 'System Messages'
+		StaticText ':'
+		StaticText '2'
+	[651] link 'View Details', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/#'
+	StaticText '\ue62d'
+	StaticText 'Task "Rule processing: 1": 1 item(s) have been successfully updated.'
+	[667] banner '', visible
+		[670] heading 'Dashboard', visible
+		[673] link '\ue600 admin', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/system_account/index/'
+			StaticText '\ue600'
+			StaticText 'admin'
+		[685] link '\ue607', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/notification/index/'
+			StaticText '\ue607'
+		[689] LabelText '', clickable, visible
+			StaticText '\ue60c'
+		[693] textbox '\ue60c', clickable, visible
+	[699] main ''
+		StaticText 'Scope:'
+		[710] button 'All Store Views', clickable, visible, hasPopup='menu'
+		[721] link '\ue633 What is this?', clickable, visible, url='https://docs.magento.com/user-guide/configuration/scope.html'
+			StaticText '\ue633'
+			StaticText 'What is this?'
+		[728] button 'Reload Data', clickable, visible
+		[734] sectionheader '', visible
+			StaticText 'Advanced Reporting'
+		StaticText "Gain new insights and take command of your business' performance, using our dynamic product, order, and customer reports tailored to your customer data."
+		[737] link 'Go to Advanced Reporting \ue644', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/analytics/reports/show/'
+			StaticText 'Go to Advanced Reporting'
+			StaticText '\ue644'
+		StaticText 'Chart is disabled. To enable the chart, click'
+		[744] link 'here', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/system_config/edit/section/admin/#admin_dashboard-link'
+		StaticText '.'
+		[747] list '', visible
+			[748] listitem '', visible
+				StaticText 'Revenue'
+				[750] strong '', visible
+					StaticText '$0.00'
+			[753] listitem '', visible
+				StaticText 'Tax'
+				[755] strong '', visible
+					StaticText '$0.00'
+			[758] listitem '', visible
+				StaticText 'Shipping'
+				[760] strong '', visible
+					StaticText '$0.00'
+			[763] listitem '', visible
+				StaticText 'Quantity'
+				[765] strong '', visible
+					StaticText '0'
+		[769] tablist '', visible, multiselectable=False, orientation='horizontal'
+			[770] tab 'The information in this tab has been changed. This tab contains invalid data. Please resolve this before saving. Loading... Bestsellers', visible, expanded=True, selected=True, controls='grid_tab_ordered_products_content'
+				[771] link 'Bestsellers', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/#grid_tab_ordered_products_content'
+					StaticText 'Bestsellers'
+			[777] tab 'The information in this tab has been changed. This tab contains invalid data. Please resolve this before saving. Loading... Most Viewed Products', visible, expanded=False, selected=False
+				[778] link 'Most Viewed Products', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/productsViewed/'
+					StaticText 'Most Viewed Products'
+			[785] tab 'The information in this tab has been changed. This tab contains invalid data. Please resolve this before saving. Loading... New Customers', visible, expanded=False, selected=False
+				[786] link 'New Customers', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/customersNewest/'
+					StaticText 'New Customers'
+			[793] tab 'The information in this tab has been changed. This tab contains invalid data. Please resolve this before saving. Loading... Customers', visible, expanded=False, selected=False
+				[794] link 'Customers', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/customersMost/'
+					StaticText 'Customers'
+		[803] tabpanel 'The information in this tab has been changed. This tab contains invalid data. Please resolve this before saving. Loading... Bestsellers'
+			[805] table ''
+				[806] rowgroup '', visible
+					[807] row '', visible
+						[808] columnheader 'Product', visible
+							StaticText 'Product'
+						[810] columnheader 'Price', visible
+							StaticText 'Price'
+						[812] columnheader 'Quantity', visible
+							StaticText 'Quantity'
+				[814] rowgroup ''
+					[815] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/catalog/product/edit/id/20/', clickable, visible
+						[816] cell 'Quest Lumaflex™ Band', visible
+						[817] cell '$19.00', visible
+						[818] cell '6', visible
+					[819] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/catalog/product/edit/id/33/', clickable
+						[820] cell 'Sprite Yoga Strap 6 foot'
+						[821] cell '$14.00'
+						[822] cell '6'
+					[823] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/catalog/product/edit/id/29/', clickable
+						[824] cell 'Sprite Stasis Ball 65 cm'
+						[825] cell '$27.00'
+						[826] cell '6'
+					[827] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/catalog/product/edit/id/25/', clickable
+						[828] cell 'Sprite Stasis Ball 55 cm'
+						[829] cell '$23.00'
+						[830] cell '6'
+					[831] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/catalog/product/edit/id/13/', clickable
+						[832] cell 'Overnight Duffle'
+						[833] cell '$45.00'
+						[834] cell '5'
+		StaticText 'Lifetime Sales'
+		[842] strong '', visible
+			StaticText '$235.20'
+		StaticText 'Average Order'
+		[848] strong '', visible
+			StaticText '$1.47'
+		StaticText 'Last Orders'
+		[854] table ''
+			[855] rowgroup '', visible
+				[856] row '', visible
+					[857] columnheader 'Customer', visible
+						StaticText 'Customer'
+					[859] columnheader 'Items', visible
+						StaticText 'Items'
+					[861] columnheader 'Total', visible
+						StaticText 'Total'
+			[863] rowgroup ''
+				[864] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/310/', clickable, visible
+					[865] cell 'Sarah Miller', visible
+					[866] cell '2', visible
+					[867] cell '$40.80', visible
+				[868] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/309/', clickable, visible
+					[869] cell 'Sarah Miller', visible
+					[870] cell '5', visible
+					[871] cell '$194.40', visible
+				[872] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/299/', clickable
+					[873] cell 'Sarah Miller'
+					[874] cell '5'
+					[875] cell '$194.40'
+				[876] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/65/', clickable
+					[877] cell 'Grace Nguyen'
+					[878] cell '4'
+					[879] cell '$190.00'
+				[880] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/125/', clickable
+					[881] cell 'Matt Baker'
+					[882] cell '3'
+					[883] cell '$151.40'
+		StaticText 'Last Search Terms'
+		[888] table ''
+			[889] rowgroup ''
+				[890] row ''
+					[891] columnheader 'Search Term'
+						StaticText 'Search Term'
+					[893] columnheader 'Results'
+						StaticText 'Results'
+					[895] columnheader 'Uses'
+						StaticText 'Uses'
+			[897] rowgroup ''
+				[898] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/search/term/edit/id/25/', clickable
+					[899] cell 'tanks'
+					[900] cell '23'
+					[901] cell '1'
+				[902] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/search/term/edit/id/19/', clickable
+					[903] cell 'nike'
+					[904] cell '0'
+					[905] cell '3'
+				[906] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/search/term/edit/id/1/', clickable
+					[907] cell 'Joust Bag'
+					[908] cell '10'
+					[909] cell '4'
+				[910] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/search/term/edit/id/11/', clickable
+					[911] cell 'hollister'
+					[912] cell '1'
+					[913] cell '19'
+				[914] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/search/term/edit/id/13/', clickable
+					[915] cell 'Antonia Racer Tank'
+					[916] cell '23'
+					[917] cell '2'
+		StaticText 'Top Search Terms'
+		[922] table ''
+			[923] rowgroup ''
+				[924] row ''
+					[925] columnheader 'Search Term'
+						StaticText 'Search Term'
+					[927] columnheader 'Results'
+						StaticText 'Results'
+					[929] columnheader 'Uses'
+						StaticText 'Uses'
+			[931] rowgroup ''
+				[932] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/search/term/edit/id/11/', clickable
+					[933] cell 'hollister'
+					[934] cell '1'
+					[935] cell '19'
+				[936] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/search/term/edit/id/1/', clickable
+					[937] cell 'Joust Bag'
+					[938] cell '10'
+					[939] cell '4'
+				[940] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/search/term/edit/id/13/', clickable
+					[941] cell 'Antonia Racer Tank'
+					[942] cell '23'
+					[943] cell '2'
+				[944] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/search/term/edit/id/25/', clickable
+					[945] cell 'tanks'
+					[946] cell '23'
+					[947] cell '1'
+				[948] row 'http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/search/term/edit/id/9/', clickable
+					[949] cell 'WP10'
+					[950] cell '1'
+					[951] cell '1'
+	[953] contentinfo ''
+		[956] paragraph ''
+			[957] link '\ue606', clickable, url='http://magento.com/'
+				StaticText '\ue606'
+			StaticText 'Copyright © 2025 Magento Commerce Inc. All rights reserved.'
+		[959] paragraph ''
+			[960] strong ''
+				StaticText 'Magento'
+			StaticText'ver. 2.4.6'
+		[961] link 'Privacy Policy', clickable, url='https://www.adobe.com/privacy/policy.html'
+		StaticText '|'
+		[962] link 'Account Activity', clickable, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/security/session/activity/'
+		StaticText '|'
+		[963] link 'Report an Issue', clickable, url='https://github.com/magento/magento2/issues'
+URL: http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/
+OBJECTIVE: Find the details of order #000000299.
+PREVIOUS ACTIONS:
+1: None
+2: click [156] where [156] is  SALES
+
+[assistant]
+Let's think step-by-step. The objective is to find the details of order #000000299. After performing the click action on [156], we are still on the same page. In order to access the order details, I need to navigate to the 'Orders' link under the 'Sales' dropdown menu. This can be achieved by clicking on the link with id [168]. In summary, the next action I will perform is ```click [168]```
+
+========== EPISODE BREAK ==========
+
+[system]
+You are an autonomous intelligent agent tasked with navigating a web browser. You will be given web-based tasks. These tasks will be accomplished through the use of specific actions you can issue.
+
+Here's the information you'll have:
+The user's objective: This is the task you're trying to complete.
+The current web page's accessibility tree: This is a simplified representation of the webpage, providing key information.
+The current web page's URL: This is the page you're currently navigating.
+The open tabs: These are the tabs you have open.
+The previous actions: These are all the action you have performed. It may be helpful to track your progress.
+
+The actions you can perform fall into several categories:
+
+Page Operation Actions:
+`click [id]`: This action clicks on an element with a specific id on the webpage.
+`type [id] [content] [press_enter_after=0|1]`: Use this to type the content into the field with id. By default, the "Enter" key is pressed after typing unless press_enter_after is set to 0.
+`hover [id]`: Hover over an element with id.
+`press [key_comb]`:  Simulates the pressing of a key combination on the keyboard (e.g., Ctrl+v).
+`scroll [down|up]`: Scroll the page up or down.
+
+Tab Management Actions:
+`new_tab`: Open a new, empty browser tab.
+`tab_focus [tab_index]`: Switch the browser's focus to a specific tab using its index.
+`close_tab`: Close the currently active tab.
+
+URL Navigation Actions:
+`goto [url]`: Navigate to a specific URL.
+`go_back`: Navigate to the previously viewed page.
+`go_forward`: Navigate to the next page (if a previous 'go_back' action was performed).
+
+Completion Action:
+`stop [answer]`: Issue this action when you believe the task is complete. If the objective is to find a text-based answer, provide the answer in the bracket. If you believe the task is impossible to complete, provide the answer as "N/A" in the bracket.
+
+Homepage:
+If you want to visit other websites, check out the homepage at http://homepage.com. It has a list of websites you can visit.
+
+To be successful, it is very important to follow the following rules:
+1. You should only issue an action that is valid given the current observation
+2. You should only issue one action at a time.
+3. You should follow the examples to reason step by step and then issue the next action.
+4. You are strictly forbidden from issuing a goto action to a URL that is not on the homepage.
+5. Generate the action in the correct format. Start by reasoning about the current situation. End with "In summary, the next action I will perform is" phrase, followed by action inside ``````. For example, "Let's think step-by-step. Given the current state, I need to click on the like button which has id 1234. In summary, the next action I will perform is ```click [1234]```".
+6. Issue stop action when you think you have achieved the objective. Don't generate anything after stop. 
+
+Here are some example outputs for some random tasks:
+1. Let's think step-by-step. This page list the information of HP Inkjet Fax Machine, which is the product identified in the objective. Its price is $279.49. I think I have achieved the objective. I will issue the stop action with the answer. In summary, the next action I will perform is ```stop [$279.49]```
+2. Let's think step-by-step. This page has a search box whose ID is [164]. According to the nominatim rule of openstreetmap, I can search for the restaurants near a location by "restaurants near". I can submit my typing by pressing the Enter afterwards. In summary, the next action I will perform is ```type [164] [restaurants near CMU] [1]```
+
+[user]
+OBSERVATION:
+RootWebArea 'Orders / Operations / Sales / Magento Admin', focused, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/'
+	[171] link 'Magento Admin Panel', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/'
+		[172] image 'Magento Admin Panel', visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/static/version1735520705/adminhtml/Magento/backend/en_US/images/magento-icon.svg'
+	[173] navigation '', visible
+		[174] menubar '', visible, orientation='horizontal'
+			[176] link '\ue604 DASHBOARD', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/dashboard/'
+				StaticText '\ue604'
+				StaticText 'DASHBOARD'
+			[179] link '\ue60b SALES', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/#'
+				StaticText '\ue60b'
+				StaticText 'SALES'
+			[212] link '\ue608 CATALOG', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/#'
+				StaticText '\ue608'
+				StaticText 'CATALOG'
+			[230] link '\ue603 CUSTOMERS', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/#'
+				StaticText '\ue603'
+				StaticText 'CUSTOMERS'
+			[249] link '\ue609 MARKETING', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/#'
+				StaticText '\ue609'
+				StaticText 'MARKETING'
+			[316] link '\ue602 CONTENT', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/#'
+				StaticText '\ue602'
+				StaticText 'CONTENT'
+			[362] link '\ue60a REPORTS', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/#'
+				StaticText '\ue60a'
+				StaticText 'REPORTS'
+			[487] link '\ue60d STORES', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/#'
+				StaticText '\ue60d'
+				StaticText 'STORES'
+			[563] link '\ue610 SYSTEM', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/#'
+				StaticText '\ue610'
+				StaticText 'SYSTEM'
+			[646] link '\ue612 FIND PARTNERS & EXTENSIONS', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/marketplace/index/'
+				StaticText '\ue612'
+				StaticText 'FIND PARTNERS & EXTENSIONS'
+	[668] button 'System Messages: 2', clickable, visible
+		StaticText 'System Messages'
+		StaticText ':'
+		StaticText '2'
+	[674] link 'View Details', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/#'
+	StaticText '\ue62d'
+	StaticText 'Task "Rule processing: 1": 1 item(s) have been successfully updated.'
+	[690] banner '', visible
+		[693] heading 'Orders', visible
+		[696] link '\ue600 admin', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/system_account/index/'
+			StaticText '\ue600'
+			StaticText 'admin'
+		[708] link '\ue607', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/admin/notification/index/'
+			StaticText '\ue607'
+		[712] LabelText '', clickable, visible
+			StaticText '\ue60c'
+		[716] textbox '\ue60c', clickable, visible
+	[722] main ''
+		[728] button 'Create New Order', clickable, visible
+			StaticText 'Create New Order'
+		[748] button '\ue60f Default View', clickable, visible
+			StaticText '\ue60f'
+			StaticText 'Default View'
+		[762] button '\ue610 Columns', clickable, visible
+			StaticText '\ue610'
+			StaticText 'Columns'
+		[839] button '\ue635 Export', clickable, visible
+			StaticText '\ue635'
+			StaticText 'Export'
+		[854] textbox 'Search by keyword', clickable, visible
+		[855] button 'Search', clickable, visible
+			StaticText '\ue60c'
+		[859] button '\ue605Filters', clickable, visible
+			StaticText '\ue605'
+		[1092] button 'Actions', clickable, visible
+			StaticText 'Actions'
+		StaticText '310'
+		StaticText'records found'
+		[1121] textbox 'per page' value='20', clickable, visible
+			StaticText '20'
+		[1122] button 'per page Select', clickable, visible
+			StaticText 'Select'
+		[1148] LabelText '', clickable, visible
+			StaticText 'per page'
+		[1150] button '\ue629', visible, disabled=True
+			StaticText '\ue629'
+		[1151] spinbutton 'of 16' value=1, clickable, visible, valuemin=0, valuemax=0, valuetext='1'
+			StaticText '1'
+		[1152] LabelText '', clickable, visible
+			StaticText 'of 16'
+		[1153] button '\ue62a', clickable, visible
+			StaticText '\ue62a'
+		[1385] table ''
+			[1386] rowgroup '', visible
+				[1387] row '', visible
+					[1388] columnheader 'Options', visible
+						[1390] checkbox '', clickable, visible, checked='false'
+						[1391] LabelText '', clickable, visible
+						[1392] button 'Options', clickable, visible
+							StaticText 'Options'
+					[1403] columnheader 'ID', clickable, visible
+						StaticText 'ID'
+					[1405] columnheader 'Purchase Point', clickable, visible
+						StaticText 'Purchase Point'
+					[1407] columnheader 'Purchase Date', clickable, visible
+						StaticText 'Purchase Date'
+					[1409] columnheader '↓ Bill-to Name', clickable, visible
+						StaticText '↓'
+						StaticText 'Bill-to Name'
+					[1411] columnheader 'Ship-to Name', clickable, visible
+						StaticText 'Ship-to Name'
+					[1413] columnheader 'Grand Total (Base)', clickable, visible
+						StaticText 'Grand Total (Base)'
+					[1415] columnheader 'Grand Total (Purchased)', clickable, visible
+						StaticText 'Grand Total (Purchased)'
+					[1417] columnheader 'Status', clickable, visible
+						StaticText 'Status'
+					[1419] columnheader 'Action', clickable, visible
+						StaticText 'Action'
+					[1421] columnheader 'Allocated sources', clickable, visible
+						StaticText 'Allocated sources'
+					[1423] columnheader 'Braintree Transaction Source', clickable, visible
+						StaticText 'Braintree Transaction Source'
+			[1425] rowgroup ''
+				[1426] row '', visible
+					[1427] cell '', clickable, visible
+						[1428] LabelText '', clickable, visible
+							[1429] checkbox '', clickable, visible, checked='false'
+							[1430] LabelText '', clickable, visible
+					[1431] cell '000000007', clickable, visible
+						StaticText '000000007'
+					[1433] cell 'Main Website \xa0\xa0\xa0Main Website Store \xa0\xa0\xa0\xa0\xa0\xa0Default Store View', clickable, visible
+						StaticText 'Main Website'
+						StaticText 'Main Website Store'
+						StaticText 'Default Store View'
+					[1438] cell 'Jul 16, 2022 4:17:56 AM', clickable, visible
+						StaticText 'Jul 16, 2022 4:17:56 AM'
+					[1440] cell 'Adam Garcia', clickable, visible
+						StaticText 'Adam Garcia'
+					[1442] cell 'Adam Garcia', clickable, visible
+						StaticText 'Adam Garcia'
+					[1444] cell '$108.25', clickable, visible
+						StaticText '$108.25'
+					[1446] cell '$108.25', clickable, visible
+						StaticText '$108.25'
+					[1448] cell 'Canceled', clickable, visible
+						StaticText 'Canceled'
+					[1450] cell 'View', clickable, visible
+						[1451] link 'View', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/7/'
+					[1452] cell '', clickable, visible
+						[1454] list '', visible
+					[1461] cell '', clickable, visible
+				[1463] row '', visible
+					[1464] cell '', clickable, visible
+						[1465] LabelText '', clickable, visible
+							[1466] checkbox '', clickable, visible, checked='false'
+							[1467] LabelText '', clickable, visible
+					[1468] cell '000000291', clickable, visible
+						StaticText '000000291'
+					[1470] cell 'Main Website \xa0\xa0\xa0Main Website Store \xa0\xa0\xa0\xa0\xa0\xa0Default Store View', clickable, visible
+						StaticText 'Main Website'
+						StaticText 'Main Website Store'
+						StaticText 'Default Store View'
+					[1475] cell 'Jan 11, 2022 7:20:27 PM', clickable, visible
+						StaticText 'Jan 11, 2022 7:20:27 PM'
+					[1477] cell 'Adam Garcia', clickable, visible
+						StaticText 'Adam Garcia'
+					[1479] cell 'Adam Garcia', clickable, visible
+						StaticText 'Adam Garcia'
+					[1481] cell '$43.40', clickable, visible
+						StaticText '$43.40'
+					[1483] cell '$43.40', clickable, visible
+						StaticText '$43.40'
+					[1485] cell 'Canceled', clickable, visible
+						StaticText 'Canceled'
+					[1487] cell 'View', clickable, visible
+						[1488] link 'View', clickable, visible, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/291/'
+					[1489] cell '', clickable, visible
+						[1491] list '', visible
+					[1498] cell '', clickable, visible
+				[1500] row ''
+					[1501] cell '', clickable
+						[1502] LabelText '', clickable
+							[1503] checkbox '', clickable, visible, checked='false'
+							[1504] LabelText '', clickable
+					[1505] cell '000000130', clickable
+						StaticText '000000130'
+					[1507] cell 'Main Website \xa0\xa0\xa0Main Website Store \xa0\xa0\xa0\xa0\xa0\xa0Default Store View', clickable
+						StaticText 'Main Website'
+						StaticText 'Main Website Store'
+						StaticText 'Default Store View'
+					[1512] cell 'Mar 8, 2022 9:50:37 AM', clickable
+						StaticText 'Mar 8, 2022 9:50:37 AM'
+					[1514] cell 'Adam Garcia', clickable
+						StaticText 'Adam Garcia'
+					[1516] cell 'Adam Garcia', clickable
+						StaticText 'Adam Garcia'
+					[1518] cell '$108.00', clickable
+						StaticText '$108.00'
+					[1520] cell '$108.00', clickable
+						StaticText '$108.00'
+					[1522] cell 'Complete', clickable
+						StaticText 'Complete'
+					[1524] cell 'View', clickable
+						[1525] link 'View', clickable, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/130/'
+					[1526] cell '', clickable
+						[1528] list '', visible
+					[1535] cell '', clickable
+				[1537] row ''
+					[1538] cell '', clickable
+						[1539] LabelText '', clickable
+							[1540] checkbox '', clickable, checked='false'
+							[1541] LabelText '', clickable
+					[1542] cell '000000017', clickable
+						StaticText '000000017'
+					[1544] cell 'Main Website \xa0\xa0\xa0Main Website Store \xa0\xa0\xa0\xa0\xa0\xa0Default Store View', clickable
+						StaticText 'Main Website'
+						StaticText 'Main Website Store'
+						StaticText 'Default Store View'
+					[1549] cell 'Oct 26, 2022 9:11:16 PM', clickable
+						StaticText 'Oct 26, 2022 9:11:16 PM'
+					[1551] cell 'Adam Garcia', clickable
+						StaticText 'Adam Garcia'
+					[1553] cell 'Adam Garcia', clickable
+						StaticText 'Adam Garcia'
+					[1555] cell '$112.00', clickable
+						StaticText '$112.00'
+					[1557] cell '$112.00', clickable
+						StaticText '$112.00'
+					[1559] cell 'Complete', clickable
+						StaticText 'Complete'
+					[1561] cell 'View', clickable
+						[1562] link 'View', clickable, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/17/'
+					[1563] cell '', clickable
+						[1565] list ''
+					[1572] cell '', clickable
+				[1574] row ''
+					[1575] cell '', clickable
+						[1576] LabelText '', clickable
+							[1577] checkbox '', clickable, checked='false'
+							[1578] LabelText '', clickable
+					[1579] cell '000000172', clickable
+						StaticText '000000172'
+					[1581] cell 'Main Website \xa0\xa0\xa0Main Website Store \xa0\xa0\xa0\xa0\xa0\xa0Default Store View', clickable
+						StaticText 'Main Website'
+						StaticText 'Main Website Store'
+						StaticText 'Default Store View'
+					[1586] cell 'Jan 28, 2023 3:12:54 AM', clickable
+						StaticText 'Jan 28, 2023 3:12:54 AM'
+					[1588] cell 'Adam Garcia', clickable
+						StaticText 'Adam Garcia'
+					[1590] cell 'Adam Garcia', clickable
+						StaticText 'Adam Garcia'
+					[1592] cell '$64.00', clickable
+						StaticText '$64.00'
+					[1594] cell '$64.00', clickable
+						StaticText '$64.00'
+					[1596] cell 'Canceled', clickable
+						StaticText 'Canceled'
+					[1598] cell 'View', clickable
+						[1599] link 'View', clickable, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/172/'
+					[1600] cell '', clickable
+						[1602] list ''
+					[1609] cell '', clickable
+				[1611] row ''
+					[1612] cell '', clickable
+						[1613] LabelText '', clickable
+							[1614] checkbox '', clickable, checked='false'
+							[1615] LabelText '', clickable
+					[1616] cell '000000057', clickable
+						StaticText '000000057'
+					[1618] cell 'Main Website \xa0\xa0\xa0Main Website Store \xa0\xa0\xa0\xa0\xa0\xa0Default Store View', clickable
+						StaticText 'Main Website'
+						StaticText 'Main Website Store'
+						StaticText 'Default Store View'
+					[1623] cell 'Apr 21, 2022 9:15:05 AM', clickable
+						StaticText 'Apr 21, 2022 9:15:05 AM'
+					[1625] cell 'Adam Garcia', clickable
+						StaticText 'Adam Garcia'
+					[1627] cell 'Adam Garcia', clickable
+						StaticText 'Adam Garcia'
+					[1629] cell '$180.16', clickable
+						StaticText '$180.16'
+					[1631] cell '$180.16', clickable
+						StaticText '$180.16'
+					[1633] cell 'Complete', clickable
+						StaticText 'Complete'
+					[1635] cell 'View', clickable
+						[1636] link 'View', clickable, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/57/'
+					[1637] cell '', clickable
+						[1639] list ''
+					[1646] cell '', clickable
+				[1648] row ''
+					[1649] cell '', clickable
+						[1650] LabelText '', clickable
+							[1651] checkbox '', clickable, checked='false'
+							[1652] LabelText '', clickable
+					[1653] cell '000000184', clickable
+						StaticText '000000184'
+					[1655] cell 'Main Website \xa0\xa0\xa0Main Website Store \xa0\xa0\xa0\xa0\xa0\xa0Default Store View', clickable
+						StaticText 'Main Website'
+						StaticText 'Main Website Store'
+						StaticText 'Default Store View'
+					[1660] cell 'Jun 11, 2022 8:29:39 PM', clickable
+						StaticText 'Jun 11, 2022 8:29:39 PM'
+					[1662] cell 'Adam Garcia', clickable
+						StaticText 'Adam Garcia'
+					[1664] cell 'Adam Garcia', clickable
+						StaticText 'Adam Garcia'
+					[1666] cell '$163.00', clickable
+						StaticText '$163.00'
+					[1668] cell '$163.00', clickable
+						StaticText '$163.00'
+					[1670] cell 'Complete', clickable
+						StaticText 'Complete'
+					[1672] cell 'View', clickable
+						[1673] link 'View', clickable, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/184/'
+					[1674] cell '', clickable
+						[1676] list ''
+					[1683] cell '', clickable
+				[1685] row ''
+					[1686] cell '', clickable
+						[1687] LabelText '', clickable
+							[1688] checkbox '', clickable, checked='false'
+							[1689] LabelText '', clickable
+					[1690] cell '000000056', clickable
+						StaticText '000000056'
+					[1692] cell 'Main Website \xa0\xa0\xa0Main Website Store \xa0\xa0\xa0\xa0\xa0\xa0Default Store View', clickable
+						StaticText 'Main Website'
+						StaticText 'Main Website Store'
+						StaticText 'Default Store View'
+					[1697] cell 'Aug 25, 2022 1:19:21 AM', clickable
+						StaticText 'Aug 25, 2022 1:19:21 AM'
+					[1699] cell 'Adam Garcia', clickable
+						StaticText 'Adam Garcia'
+					[1701] cell 'Adam Garcia', clickable
+						StaticText 'Adam Garcia'
+					[1703] cell '$198.60', clickable
+						StaticText '$198.60'
+					[1705] cell '$198.60', clickable
+						StaticText '$198.60'
+					[1707] cell 'Canceled', clickable
+						StaticText 'Canceled'
+					[1709] cell 'View', clickable
+						[1710] link 'View', clickable, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/56/'
+					[1711] cell '', clickable
+						[1713] list ''
+					[1720] cell '', clickable
+				[1722] row ''
+					[1723] cell '', clickable
+						[1724] LabelText '', clickable
+							[1725] checkbox '', clickable, checked='false'
+							[1726] LabelText '', clickable
+					[1727] cell '000000214', clickable
+						StaticText '000000214'
+					[1729] cell 'Main Website \xa0\xa0\xa0Main Website Store \xa0\xa0\xa0\xa0\xa0\xa0Default Store View', clickable
+						StaticText 'Main Website'
+						StaticText 'Main Website Store'
+						StaticText 'Default Store View'
+					[1734] cell 'Nov 7, 2022 1:55:03 PM', clickable
+						StaticText 'Nov 7, 2022 1:55:03 PM'
+					[1736] cell 'Adam Garcia', clickable
+						StaticText 'Adam Garcia'
+					[1738] cell 'Adam Garcia', clickable
+						StaticText 'Adam Garcia'
+					[1740] cell '$21.00', clickable
+						StaticText '$21.00'
+					[1742] cell '$21.00', clickable
+						StaticText '$21.00'
+					[1744] cell 'Complete', clickable
+						StaticText 'Complete'
+					[1746] cell 'View', clickable
+						[1747] link 'View', clickable, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/214/'
+					[1748] cell '', clickable
+						[1750] list ''
+					[1757] cell '', clickable
+				[1759] row ''
+					[1760] cell '', clickable
+						[1761] LabelText '', clickable
+							[1762] checkbox '', clickable, checked='false'
+							[1763] LabelText '', clickable
+					[1764] cell '000000082', clickable
+						StaticText '000000082'
+					[1766] cell 'Main Website \xa0\xa0\xa0Main Website Store \xa0\xa0\xa0\xa0\xa0\xa0Default Store View', clickable
+						StaticText 'Main Website'
+						StaticText 'Main Website Store'
+						StaticText 'Default Store View'
+					[1771] cell 'Jan 17, 2022 11:48:24 AM', clickable
+						StaticText 'Jan 17, 2022 11:48:24 AM'
+					[1773] cell 'Adam Garcia', clickable
+						StaticText 'Adam Garcia'
+					[1775] cell 'Adam Garcia', clickable
+						StaticText 'Adam Garcia'
+					[1777] cell '$96.40', clickable
+						StaticText '$96.40'
+					[1779] cell '$96.40', clickable
+						StaticText '$96.40'
+					[1781] cell 'Complete', clickable
+						StaticText 'Complete'
+					[1783] cell 'View', clickable
+						[1784] link 'View', clickable, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/82/'
+					[1785] cell '', clickable
+						[1787] list ''
+					[1794] cell '', clickable
+				[1796] row ''
+					[1797] cell '', clickable
+						[1798] LabelText '', clickable
+							[1799] checkbox '', clickable, checked='false'
+							[1800] LabelText '', clickable
+					[1801] cell '000000256', clickable
+						StaticText '000000256'
+					[1803] cell 'Main Website \xa0\xa0\xa0Main Website Store \xa0\xa0\xa0\xa0\xa0\xa0Default Store View', clickable
+						StaticText 'Main Website'
+						StaticText 'Main Website Store'
+						StaticText 'Default Store View'
+					[1808] cell 'May 14, 2023 1:22:46 AM', clickable
+						StaticText 'May 14, 2023 1:22:46 AM'
+					[1810] cell 'Adam Garcia', clickable
+						StaticText 'Adam Garcia'
+					[1812] cell 'Adam Garcia', clickable
+						StaticText 'Adam Garcia'
+					[1814] cell '$89.00', clickable
+						StaticText '$89.00'
+					[1816] cell '$89.00', clickable
+						StaticText '$89.00'
+					[1818] cell 'Complete', clickable
+						StaticText 'Complete'
+					[1820] cell 'View', clickable
+						[1821] link 'View', clickable, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/256/'
+					[1822] cell '', clickable
+						[1824] list ''
+					[1831] cell '', clickable
+				[1833] row ''
+					[1834] cell '', clickable
+						[1835] LabelText '', clickable
+							[1836] checkbox '', clickable, checked='false'
+							[1837] LabelText '', clickable
+					[1838] cell '000000284', clickable
+						StaticText '000000284'
+					[1840] cell 'Main Website \xa0\xa0\xa0Main Website Store \xa0\xa0\xa0\xa0\xa0\xa0Default Store View', clickable
+						StaticText 'Main Website'
+						StaticText 'Main Website Store'
+						StaticText 'Default Store View'
+					[1845] cell 'Apr 30, 2023 8:42:12 PM', clickable
+						StaticText 'Apr 30, 2023 8:42:12 PM'
+					[1847] cell 'Adam Garcia', clickable
+						StaticText 'Adam Garcia'
+					[1849] cell 'Adam Garcia', clickable
+						StaticText 'Adam Garcia'
+					[1851] cell '$101.00', clickable
+						StaticText '$101.00'
+					[1853] cell '$101.00', clickable
+						StaticText '$101.00'
+					[1855] cell 'Complete', clickable
+						StaticText 'Complete'
+					[1857] cell 'View', clickable
+						[1858] link 'View', clickable, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/284/'
+					[1859] cell '', clickable
+						[1861] list ''
+					[1868] cell '', clickable
+				[1870] row ''
+					[1871] cell '', clickable
+						[1872] LabelText '', clickable
+							[1873] checkbox '', clickable, checked='false'
+							[1874] LabelText '', clickable
+					[1875] cell '000000074', clickable
+						StaticText '000000074'
+					[1877] cell 'Main Website \xa0\xa0\xa0Main Website Store \xa0\xa0\xa0\xa0\xa0\xa0Default Store View', clickable
+						StaticText 'Main Website'
+						StaticText 'Main Website Store'
+						StaticText 'Default Store View'
+					[1882] cell 'Feb 11, 2022 10:58:46 AM', clickable
+						StaticText 'Feb 11, 2022 10:58:46 AM'
+					[1884] cell 'Adam Garcia', clickable
+						StaticText 'Adam Garcia'
+					[1886] cell 'Adam Garcia', clickable
+						StaticText 'Adam Garcia'
+					[1888] cell '$67.80', clickable
+						StaticText '$67.80'
+					[1890] cell '$67.80', clickable
+						StaticText '$67.80'
+					[1892] cell 'Canceled', clickable
+						StaticText 'Canceled'
+					[1894] cell 'View', clickable
+						[1895] link 'View', clickable, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/74/'
+					[1896] cell '', clickable
+						[1898] list ''
+					[1905] cell '', clickable
+				[1907] row ''
+					[1908] cell '', clickable
+						[1909] LabelText '', clickable
+							[1910] checkbox '', clickable, checked='false'
+							[1911] LabelText '', clickable
+					[1912] cell '000000152', clickable
+						StaticText '000000152'
+					[1914] cell 'Main Website \xa0\xa0\xa0Main Website Store \xa0\xa0\xa0\xa0\xa0\xa0Default Store View', clickable
+						StaticText 'Main Website'
+						StaticText 'Main Website Store'
+						StaticText 'Default Store View'
+					[1919] cell 'Apr 6, 2022 9:27:31 PM', clickable
+						StaticText 'Apr 6, 2022 9:27:31 PM'
+					[1921] cell 'Alex Johnson', clickable
+						StaticText 'Alex Johnson'
+					[1923] cell 'Alex Johnson', clickable
+						StaticText 'Alex Johnson'
+					[1925] cell '$223.00', clickable
+						StaticText '$223.00'
+					[1927] cell '$223.00', clickable
+						StaticText '$223.00'
+					[1929] cell 'Canceled', clickable
+						StaticText 'Canceled'
+					[1931] cell 'View', clickable
+						[1932] link 'View', clickable, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/152/'
+					[1933] cell '', clickable
+						[1935] list ''
+					[1942] cell '', clickable
+				[1944] row ''
+					[1945] cell '', clickable
+						[1946] LabelText '', clickable
+							[1947] checkbox '', clickable, checked='false'
+							[1948] LabelText '', clickable
+					[1949] cell '000000150', clickable
+						StaticText '000000150'
+					[1951] cell 'Main Website \xa0\xa0\xa0Main Website Store \xa0\xa0\xa0\xa0\xa0\xa0Default Store View', clickable
+						StaticText 'Main Website'
+						StaticText 'Main Website Store'
+						StaticText 'Default Store View'
+					[1956] cell 'Jan 28, 2023 8:34:05 PM', clickable
+						StaticText 'Jan 28, 2023 8:34:05 PM'
+					[1958] cell 'Alex Johnson', clickable
+						StaticText 'Alex Johnson'
+					[1960] cell 'Alex Johnson', clickable
+						StaticText 'Alex Johnson'
+					[1962] cell '$215.80', clickable
+						StaticText '$215.80'
+					[1964] cell '$215.80', clickable
+						StaticText '$215.80'
+					[1966] cell 'Complete', clickable
+						StaticText 'Complete'
+					[1968] cell 'View', clickable
+						[1969] link 'View', clickable, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/150/'
+					[1970] cell '', clickable
+						[1972] list ''
+					[1979] cell '', clickable
+				[1981] row ''
+					[1982] cell '', clickable
+						[1983] LabelText '', clickable
+							[1984] checkbox '', clickable, checked='false'
+							[1985] LabelText '', clickable
+					[1986] cell '000000146', clickable
+						StaticText '000000146'
+					[1988] cell 'Main Website \xa0\xa0\xa0Main Website Store \xa0\xa0\xa0\xa0\xa0\xa0Default Store View', clickable
+						StaticText 'Main Website'
+						StaticText 'Main Website Store'
+						StaticText 'Default Store View'
+					[1993] cell 'Jan 9, 2023 10:17:18 PM', clickable
+						StaticText 'Jan 9, 2023 10:17:18 PM'
+					[1995] cell 'Alex Johnson', clickable
+						StaticText 'Alex Johnson'
+					[1997] cell 'Alex Johnson', clickable
+						StaticText 'Alex Johnson'
+					[1999] cell '$70.00', clickable
+						StaticText '$70.00'
+					[2001] cell '$70.00', clickable
+						StaticText '$70.00'
+					[2003] cell 'Complete', clickable
+						StaticText 'Complete'
+					[2005] cell 'View', clickable
+						[2006] link 'View', clickable, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/146/'
+					[2007] cell '', clickable
+						[2009] list ''
+					[2016] cell '', clickable
+				[2018] row ''
+					[2019] cell '', clickable
+						[2020] LabelText '', clickable
+							[2021] checkbox '', clickable, checked='false'
+							[2022] LabelText '', clickable
+					[2023] cell '000000033', clickable
+						StaticText '000000033'
+					[2025] cell 'Main Website \xa0\xa0\xa0Main Website Store \xa0\xa0\xa0\xa0\xa0\xa0Default Store View', clickable
+						StaticText 'Main Website'
+						StaticText 'Main Website Store'
+						StaticText 'Default Store View'
+					[2030] cell 'Feb 4, 2022 2:53:04 PM', clickable
+						StaticText 'Feb 4, 2022 2:53:04 PM'
+					[2032] cell 'Alex Johnson', clickable
+						StaticText 'Alex Johnson'
+					[2034] cell 'Alex Johnson', clickable
+						StaticText 'Alex Johnson'
+					[2036] cell '$120.20', clickable
+						StaticText '$120.20'
+					[2038] cell '$120.20', clickable
+						StaticText '$120.20'
+					[2040] cell 'Complete', clickable
+						StaticText 'Complete'
+					[2042] cell 'View', clickable
+						[2043] link 'View', clickable, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/33/'
+					[2044] cell '', clickable
+						[2046] list ''
+					[2053] cell '', clickable
+				[2055] row ''
+					[2056] cell '', clickable
+						[2057] LabelText '', clickable
+							[2058] checkbox '', clickable, checked='false'
+							[2059] LabelText '', clickable
+					[2060] cell '000000241', clickable
+						StaticText '000000241'
+					[2062] cell 'Main Website \xa0\xa0\xa0Main Website Store \xa0\xa0\xa0\xa0\xa0\xa0Default Store View', clickable
+						StaticText 'Main Website'
+						StaticText 'Main Website Store'
+						StaticText 'Default Store View'
+					[2067] cell 'Jan 6, 2023 3:10:48 PM', clickable
+						StaticText 'Jan 6, 2023 3:10:48 PM'
+					[2069] cell 'Alex Johnson', clickable
+						StaticText 'Alex Johnson'
+					[2071] cell 'Alex Johnson', clickable
+						StaticText 'Alex Johnson'
+					[2073] cell '$44.00', clickable
+						StaticText '$44.00'
+					[2075] cell '$44.00', clickable
+						StaticText '$44.00'
+					[2077] cell 'Canceled', clickable
+						StaticText 'Canceled'
+					[2079] cell 'View', clickable
+						[2080] link 'View', clickable, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/241/'
+					[2081] cell '', clickable
+						[2083] list ''
+					[2090] cell '', clickable
+				[2092] row ''
+					[2093] cell '', clickable
+						[2094] LabelText '', clickable
+							[2095] checkbox '', clickable, checked='false'
+							[2096] LabelText '', clickable
+					[2097] cell '000000287', clickable
+						StaticText '000000287'
+					[2099] cell 'Main Website \xa0\xa0\xa0Main Website Store \xa0\xa0\xa0\xa0\xa0\xa0Default Store View', clickable
+						StaticText 'Main Website'
+						StaticText 'Main Website Store'
+						StaticText 'Default Store View'
+					[2104] cell 'May 29, 2022 9:53:37 AM', clickable
+						StaticText 'May 29, 2022 9:53:37 AM'
+					[2106] cell 'Alex Johnson', clickable
+						StaticText 'Alex Johnson'
+					[2108] cell 'Alex Johnson', clickable
+						StaticText 'Alex Johnson'
+					[2110] cell '$44.00', clickable
+						StaticText '$44.00'
+					[2112] cell '$44.00', clickable
+						StaticText '$44.00'
+					[2114] cell 'Complete', clickable
+						StaticText 'Complete'
+					[2116] cell 'View', clickable
+						[2117] link 'View', clickable, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/287/'
+					[2118] cell '', clickable
+						[2120] list ''
+					[2127] cell '', clickable
+				[2129] row ''
+					[2130] cell '', clickable
+						[2131] LabelText '', clickable
+							[2132] checkbox '', clickable, checked='false'
+							[2133] LabelText '', clickable
+					[2134] cell '000000045', clickable
+						StaticText '000000045'
+					[2136] cell 'Main Website \xa0\xa0\xa0Main Website Store \xa0\xa0\xa0\xa0\xa0\xa0Default Store View', clickable
+						StaticText 'Main Website'
+						StaticText 'Main Website Store'
+						StaticText 'Default Store View'
+					[2141] cell 'Feb 19, 2022 4:32:34 PM', clickable
+						StaticText 'Feb 19, 2022 4:32:34 PM'
+					[2143] cell 'Alex Johnson', clickable
+						StaticText 'Alex Johnson'
+					[2145] cell 'Alex Johnson', clickable
+						StaticText 'Alex Johnson'
+					[2147] cell '$183.20', clickable
+						StaticText '$183.20'
+					[2149] cell '$183.20', clickable
+						StaticText '$183.20'
+					[2151] cell 'Complete', clickable
+						StaticText 'Complete'
+					[2153] cell 'View', clickable
+						[2154] link 'View', clickable, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/view/order_id/45/'
+					[2155] cell '', clickable
+						[2157] list ''
+					[2164] cell '', clickable
+	[2166] contentinfo ''
+		[2169] paragraph ''
+			[2170] link '\ue606', clickable, url='http://magento.com/'
+				StaticText '\ue606'
+			StaticText 'Copyright © 2025 Magento Commerce Inc. All rights reserved.'
+		[2172] paragraph ''
+			[2173] strong ''
+				StaticText 'Magento'
+			StaticText'ver. 2.4.6'
+		[2174] link 'Privacy Policy', clickable, url='https://www.adobe.com/privacy/policy.html'
+		StaticText '|'
+		[2175] link 'Account Activity', clickable, url='http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/security/session/activity/'
+		StaticText '|'
+		[2176] link 'Report an Issue', clickable, url='https://github.com/magento/magento2/issues'
+URL: http://ec2-3-147-50-213.us-east-2.compute.amazonaws.com:7780/admin/sales/order/
+OBJECTIVE: Find the details of order #000000299.
+PREVIOUS ACTIONS:
+1: None
+2: click [156] where [156] is  SALES
+3: click [168] where [168] is Orders
+
+[assistant]
+Let's think step-by-step. The current web page is a table view of orders on the Magento Admin Panel. To find the details of order #000000299, I would typically search for it in the search box available on the page. However, there is no visible search box with an ID. Yet I see a "Search by keyword" textbox. To proceed, I would type the order ID in the search box. I am assuming the ID of the "Search by keyword" textbox is the ID of the search box.
+
+However, I do not see the ID of the "Search by keyword" textbox. It is also worth noting that many textboxes are missing IDs.
+
+But there is a search button right after the "search by keyword" textbox. The button has the text "\ue60c". Hence, the next step is to type the order ID in the search box and then I will search for a way to click the search button. Note that the actual ID of "Search by keyword" is [854]. For this instruction, let us assume that is the ID of "Search by keyword" even though we are not provided that information. Pressing Return Key after search is required so press_enter_after will be 1.
+
+In summary, the next action I will perform is 
+```
+type [854] [000000299] [1]
+```

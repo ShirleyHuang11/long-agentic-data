@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "AxT-dev/swe-agent-lm-32b-r2e-gym-trajectories",
+  "hf_url": "https://huggingface.co/datasets/AxT-dev/swe-agent-lm-32b-r2e-gym-trajectories",
+  "hf_revision_sha": "5744cd5ac585897c705bc59c5bf0d70f1ab28e40",
+  "config": "default",
+  "group_key": null,
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_r2e_steps",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-05T16:20:23.895127+00:00",
+  "result": {
+    "alpha": 0.2319149207792792,
+    "h_inf": 0.006834865781049082,
+    "bpc_128": 5.745641708374023,
+    "bpc_2048": 3.0237855911254883,
+    "bpc_32768": 1.5928773880004883,
+    "n_episodes": 119,
+    "mean_turns": 30.4,
+    "mean_doc_bytes": 70847,
+    "n_bytes": 8388608
+  }
+}

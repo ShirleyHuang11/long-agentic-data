@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "McGill-NLP/weblinx",
+  "hf_url": "https://huggingface.co/datasets/McGill-NLP/weblinx",
+  "hf_revision_sha": "a30ff2cbecb75f2d04fac75a2b92721c6c9e3f13",
+  "config": "chat",
+  "group_key": "demo",
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_weblinx_episode",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-05T15:01:56.096191+00:00",
+  "result": {
+    "alpha": 0.4888424258047844,
+    "h_inf": 1.9484579586185309,
+    "bpc_128": 6.301453814135916,
+    "bpc_2048": 3.0708984375,
+    "bpc_32768": 2.237884521484375,
+    "n_episodes": 969,
+    "mean_turns": 25.2,
+    "mean_doc_bytes": 1646,
+    "n_bytes": 1599183
+  }
+}

@@ -1,0 +1,267 @@
+[turn 4]
+click(uid=None)
+
+[turn 5]
+click(uid="f1d2b03c-8fc6-445b")
+
+[turn 8]
+click(uid="1b010db4-3df2-4c0f")
+
+[turn 28]
+click(uid="93150d4c-2748-487f")
+
+[turn 29]
+say(speaker="navigator", utterance="Which class would you prefer from the below?")
+
+[turn 30]
+click(uid="0cfe742a-535e-4d63")
+
+[turn 31]
+click(uid="4571a8f0-de36-485a")
+
+[turn 32]
+click(uid="4571a8f0-de36-485a")
+
+[turn 33]
+click(uid="368b7a33-f5b0-4689")
+
+[turn 34]
+click(uid="972bb1de-b2c0-43d6")
+
+[turn 35]
+say(speaker="navigator", utterance="Basic economy \n\tEconomy \n\tBusiness class \n\tMixed")
+
+[turn 36]
+click(uid="30055ff1-690c-4466")
+
+[turn 38]
+click(uid="dc4a42e0-c198-4684")
+
+[turn 39]
+click(uid="fe1332cc-ba72-4a9f")
+
+[turn 41]
+click(uid="a927acd4-89aa-4868")
+
+[turn 43]
+click(uid="a2ec58a9-5e85-4b2a")
+
+[turn 45]
+click(uid="a72d7e07-d1f9-4ba2")
+
+[turn 46]
+click(uid="ff4c45e1-fb18-409a")
+
+[turn 47]
+click(uid="9892a1ae-2a27-4955")
+
+[turn 49]
+click(uid="a015c06d-7b2f-41ed")
+
+[turn 51]
+click(uid="aca05ad8-38c4-4f5e")
+
+[turn 52]
+click(uid="cf36e67e-2854-4e72")
+
+[turn 53]
+click(uid="30055ff1-690c-4466")
+
+[turn 54]
+click(uid="dc4a42e0-c198-4684")
+
+[turn 55]
+click(uid="882af4c0-ca3e-4c99")
+
+[turn 57]
+click(uid="47858875-0dc9-4a91")
+
+[turn 58]
+click(uid="432f2cdd-9ae9-494e")
+
+[turn 59]
+click(uid="ef51c0c5-ddfd-4f28")
+
+[turn 61]
+click(uid="62a7062f-56e2-4a5a")
+
+[turn 62]
+click(uid="e76969d9-7d04-478c")
+
+[turn 63]
+click(uid="d4abd551-b687-443b")
+
+[turn 65]
+click(uid="890d6040-66ed-4de5")
+
+[turn 66]
+click(uid="4561e713-1df0-44a5")
+
+[turn 67]
+click(uid="d9d94995-0160-4b83")
+
+[turn 69]
+say(speaker="navigator", utterance="1.14:20 - 16:25(3h 05m)\n\tHeydar Aliyev (BAK) - Antalya (AYT)\n\tAzerbaijan Airlines 125\n\tNarrow-body jet\n\tAirbus A320-100/200\n\t2.05:40 - 07:40(3h 00m)\n\tAnadoluJet 7859\n\tOperated by 6Y For Anadolujet ...")
+
+[turn 71]
+click(uid="2632bbee-59da-4a97")
+
+[turn 72]
+click(uid="30055ff1-690c-4466")
+
+[turn 73]
+click(uid="65a4ed4f-c7e0-4197")
+
+[turn 75]
+text_input(text="Best\n14:20–16:25\nGYDHeydar Aliyev\n-\nAYTAntalya\ndirect\n3h 05m\nAzerbaijan Airlines\n₹ 26,107\n/ person\n₹ 104,425 total\nEconomy\nSelect", uid="ca306560-e8d2-472b")
+
+[turn 76]
+say(speaker="navigator", utterance="₹ 26,107/person")
+
+[turn 78]
+say(speaker="navigator", utterance="Welcome.")
+
+========== EPISODE BREAK ==========
+
+[turn 5]
+click(uid="6ff252d1-67b9-447f")
+
+[turn 6]
+click(uid="59fb5773-1b06-4e0e")
+
+[turn 7]
+load(url="https://accounts.google.com/o/oauth2/auth?access_type=offline&client_id=962117701855-10q4onisriiu0ahdi4pvhv6uiov9j3cm.apps.googleusercontent.com&redirect_uri=https%3A%2F%2Ftry.discourse.org%2Fauth%...")
+
+[turn 8]
+click(uid="7750da1b-1412-4b61")
+
+[turn 9]
+click(uid="a281028e-6cfc-4d9a")
+
+[turn 10]
+click(uid="a281028e-6cfc-4d9a")
+
+[turn 11]
+text_input(text="webtasks.navigator@gmail.com", uid="a281028e-6cfc-4d9a")
+
+[turn 12]
+click(uid="66a617d0-85cb-4d07")
+
+[turn 13]
+click(uid="4aece8d0-7e2c-45d6")
+
+[turn 14]
+click(uid="66039ca9-423f-4a4d")
+
+[turn 15]
+say(speaker="navigator", utterance="Login done")
+
+[turn 17]
+say(speaker="navigator", utterance="Alright!")
+
+[turn 18]
+click(uid="f61ca5bb-2a8d-48ce")
+
+[turn 19]
+click(uid="99b43251-0d28-4331")
+
+[turn 20]
+say(speaker="navigator", utterance="Here it is!")
+
+[turn 22]
+click(uid="3ff61c84-aafd-47bb")
+
+[turn 23]
+text_input(text="Best free games to-play on PC", uid="3ff61c84-aafd-47bb")
+
+[turn 24]
+say(speaker="navigator", utterance="Title added")
+
+[turn 26]
+say(speaker="navigator", utterance="Okay")
+
+[turn 27]
+click(uid="2e5b1ec5-d87c-48e7")
+
+[turn 29]
+scroll(x=0, y=300)
+
+[turn 30]
+say(speaker="navigator", utterance="Can I add bullet points for the options?")
+
+[turn 32]
+say(speaker="navigator", utterance="Alright!")
+
+[turn 33]
+click(uid="2e5b1ec5-d87c-48e7")
+
+[turn 35]
+click(uid="2e5b1ec5-d87c-48e7")
+
+[turn 36]
+click(uid="2e5b1ec5-d87c-48e7")
+
+[turn 38]
+click(uid="2e5b1ec5-d87c-48e7")
+
+[turn 39]
+click(uid="2e5b1ec5-d87c-48e7")
+
+[turn 40]
+click(uid="2e5b1ec5-d87c-48e7")
+
+[turn 41]
+click(uid="2e5b1ec5-d87c-48e7")
+
+[turn 42]
+say(speaker="navigator", utterance="Done")
+
+[turn 44]
+say(speaker="navigator", utterance="Sure")
+
+[turn 45]
+click(uid="f2088ca6-ca84-40ca")
+
+========== EPISODE BREAK ==========
+
+[turn 7]
+click(uid="897f1f53-13f5-4967")
+
+[turn 8]
+text_input(text="Annotations", uid="897f1f53-13f5-4967")
+
+[turn 9]
+click(uid="97a0babb-fefd-4f4d")
+
+[turn 11]
+click(uid="04dcb557-2a66-4498")
+
+[turn 12]
+click(uid="d57d7236-1d49-4773")
+
+[turn 13]
+say(speaker="navigator", utterance="Can you tell me the title name?")
+
+[turn 15]
+click(uid="ee8ec66c-ba15-48ba")
+
+[turn 16]
+click(uid="d45d41b0-d0b0-4431")
+
+[turn 18]
+click(uid="8efed3d0-b72b-4227")
+
+[turn 19]
+say(speaker="navigator", utterance="Added.")
+
+[turn 22]
+click(uid="bc35036d-3642-4fc3")
+
+[turn 23]
+say(speaker="navigator", utterance="Done.")
+
+[turn 24]
+scroll(x=0, y=-2)
+
+[turn 26]
+say(speaker="navigator", utterance="Okay.")

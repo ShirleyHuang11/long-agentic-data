@@ -3,10 +3,11 @@
   "hf_url": "https://huggingface.co/datasets/osunlp/Mind2Web",
   "hf_revision_sha": "17ece8eb89862368edc0cc806acee6fca5163474",
   "config": "default",
+  "group_key": null,
   "splits": [
     "train"
   ],
-  "serializer": "ser_mind2web",
+  "serializer": "ser_mind2web_fullobs",
   "serializer_doc": "",
   "sampling": {
     "mode": "streaming, first-N episodes per split (no shuffle)",
@@ -23,16 +24,16 @@
       32768
     ]
   },
-  "collected_at_utc": "2026-06-05T14:39:47.990020+00:00",
+  "collected_at_utc": "2026-06-05T15:32:31.810999+00:00",
   "result": {
-    "alpha": 0.4204276166867677,
-    "h_inf": 1.6963279634071835,
-    "bpc_128": 6.0866731227651965,
-    "bpc_2048": 3.0648549641148324,
-    "bpc_32768": 2.1229154146634617,
-    "n_episodes": 1009,
-    "mean_turns": 7.7,
-    "mean_doc_bytes": 423,
-    "n_bytes": 429581
+    "alpha": 0.427103888085302,
+    "h_inf": 0.29730586347267707,
+    "bpc_128": 4.248241424560547,
+    "bpc_2048": 1.5062761306762695,
+    "bpc_32768": 0.6672458648681641,
+    "n_episodes": 129,
+    "mean_turns": 7.9,
+    "mean_doc_bytes": 65038,
+    "n_bytes": 8388608
   }
 }
