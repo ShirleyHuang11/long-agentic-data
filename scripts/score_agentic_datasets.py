@@ -94,6 +94,16 @@ def ser_agentnet_actions(row):
     return "\n\n".join(parts), len(row["traj"])
 
 
+def ser_rebel_actions(row):
+    # Counter-test for finding 15: action-only view of a machine-generated
+    # trajectory set. ALFWorld expert actions come from a rule-based planner,
+    # so unlike AgentNet's human action stream we expect H_inf to stay low.
+    steps = json.loads(row["steps"])
+    parts = [f"[task]\n{row.get('task') or ''}"]
+    parts += [s.get("ground_truth_action") or "" for s in steps]
+    return "\n\n".join(parts), len(steps)
+
+
 def ser_rebel_steps(row):
     # ReBel ALFWorld: `steps` is a JSON-encoded list of step dicts (idx + obs/
     # action/... fields); render each non-idx field as its own labelled line.
@@ -453,6 +463,9 @@ REGISTRY = [
     ("xlangai/AgentNet", None, ["train"], ser_agentnet, "agentnet-text"),
     # --- loop iter 33: annotation-stripped action view (within-dataset ablation) ---
     ("xlangai/AgentNet", None, ["train"], ser_agentnet_actions, "agentnet-actions"),
+    # --- loop iter 34: action-origin counter-test (planner-generated actions) ---
+    ("Decix/ReBel-ALFWorld-SFT-Trajectories", None, ["train"],
+     ser_rebel_actions, "rebel-alfworld-actions"),
 ]
 
 

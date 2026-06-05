@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "Decix/ReBel-ALFWorld-SFT-Trajectories",
+  "hf_url": "https://huggingface.co/datasets/Decix/ReBel-ALFWorld-SFT-Trajectories",
+  "hf_revision_sha": "a1bcc26ef9b4e097e2a4df54ddad352c3879cf18",
+  "config": "default",
+  "group_key": null,
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_rebel_actions",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-05T20:47:51.136941+00:00",
+  "result": {
+    "alpha": 0.5162727285440404,
+    "h_inf": 0.4326304517356247,
+    "bpc_128": 4.586393229166666,
+    "bpc_2048": 1.4252604166666667,
+    "bpc_32768": 0.6698404947916666,
+    "n_episodes": 426,
+    "mean_turns": 12.7,
+    "mean_doc_bytes": 286,
+    "n_bytes": 122898
+  }
+}
