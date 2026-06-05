@@ -4,7 +4,7 @@
 
 **选集偏好：长 horizon、长 context 优先 —— 单 episode 越长（turns 多、bytes 大）越优先收录。** 每轮迭代只动一个 section，向其中追加 markdown 行即可。
 
-α / H∞ 协议（3-point analytical estimation, n₁=128 / n₂=2048 / n₃=32768，zstd-19）：α 是 BPC ~ N^(−α) 关于上下文长度的标度指数（高 α = 模板性强 / 长程可压），H∞ 是外推到无穷上下文的不可压熵（BPC；低 H∞ = 模板退化信号）。每数据集采样 ≤1500 episodes 或 8 MB，一个 *document* = 一条完整 serialized 轨迹。脚本：`scripts/score_agentic_datasets.py`；逐数据集 provenance（pinned HF revision SHA、采样参数、原始分数）：`data/provenance/<slug>.json`；前 3 条 episode 原文：`samples_cache/<slug>.txt`。协议细节与诚实 caveats 见 `data/COLLECTION_LOG.md`。
+α / H∞ 协议（3-point analytical estimation, n₁=128 / n₂=2048 / n₃=32768，zstd-19）：α 是 BPC ~ N^(−α) 关于上下文长度的标度指数（高 α = 模板性强 / 长程可压），H∞ 是外推到无穷上下文的不可压熵（BPC；低 H∞ = 模板退化信号）。每数据集采样 ≤1500 episodes 或 8 MB，一个 *document* = 一条完整 serialized 轨迹。脚本：`scripts/score_agentic_datasets.py`；逐数据集 provenance（pinned HF revision SHA、采样参数、原始分数）：`data/provenance/<slug>.json`；前 3 条 episode 原文：`samples_cache/<slug>.txt`。协议细节与诚实 caveats 见 `data/COLLECTION_LOG.md`。Seed-σ（iter 30 起）：`scripts/seed_sigma.py` 在不相交 episode 切片上重复评分，结果存 `data/seed_sigma.csv`；σ 量级见发现 14 —— 同质管线 H∞ σ≈0.03–0.04，异质 repo-scale σ≈0.24，跨集群差异 ≫ σ。
 
 ---
 
@@ -136,6 +136,7 @@
 11. **H∞ 探针的生成器分辨率有限**（iter 21）：DTap 同任务受控对照下，Opus-4.6 / Sonnet-4.5 / Gemini-3-Pro 三家 frontier 的 H∞ 紧聚 0.71–0.81（α 0.28–0.30）—— H∞ 一刀切开 frontier（0.7–1.6）vs 小模型自产 rollout（≈0，发现 6），但 **frontier 内部排名不可分**（无 σ 时 0.1 差异不可解读）。
 12. **长 horizon ≠ 高信息密度**（iter 23）：aider-polyglot 同任务受控对照下，7B/30B/32B 中型生成器全落 H∞ 0–0.08 模板带，且 episode 反而最长（94–150 turns / 160–322KB·ep⁻¹，全 registry turns 与 bytes 双纪录）—— **失败重试循环膨胀 horizon**；bytes/turns 排行必须配 H∞ 解读，与发现 6/11 合并成完整生成器谱系：frontier 0.7–1.6 ≫ 中型 ≈0。
 13. **SFT 剂量不改变签名带**（iter 25）：同任务同架构下，Qwen3-32B 经 1k vs 100k agentic SFT 后的轨迹均 H∞=0（α 0.22→0.21），×100 数据量只拉长 episode（23.6→46.1 turns）—— **决定 H∞ 带的是生成器能力档位，不是 agentic SFT 剂量**（此对照限单一 32B 架构 + polyglot 任务，外推需谨慎）。
+14. **seed-σ 量化：跨集群结论稳健，带内排名不可做**（iter 30）：5 个不相交切片重复评分（4 个代表集 ×5 seed，`data/seed_sigma.csv`）：同质管线 H∞ 极稳（Toucan-Kimi 1.346±0.041、glaive 1.034±0.034）；**异质 repo-scale 集 σ 大一个量级**（SWE-ZERO-12M 0.820±0.244 —— 切片组成主导，单切片 H∞ 0.60–1.23）；模板带在 0 处精确钉死（APP1 五 seed 全 0.000）；α 普遍比 H∞ 稳（σ 0.003–0.022）。**推论：集群级发现（0 vs 0.6–1.6）≫ σ 全部站得住；异质集内 <0.3 的 H∞ 差异不可解读 —— 发现 11 的"frontier 内部不可分"获定量背书**；offset-0 复跑与 registry 数字逐位一致（确定性验证 ✓）。
 
 ## 候选队列（按预期 horizon 长度排序，每轮从顶部取 2–3 个）
 
@@ -200,3 +201,4 @@
 | 27 | 2026-06-05 | **teacher 对照 + 大漏网轮**：Toucan OSS/Qwen3 切片 ×2 → §III（**同管线三 teacher H∞ 0.57–1.34，teacher 选择移动 H∞ 逾 2×**，半受控 caveat）；smolagents/gaia-traces → §III（22.9k 下载的漏网大户，gpt-4o code-agent，H∞=1.44 健康带上沿，发现 9 四证） |
 | 28 | 2026-06-05 | **终轮收尾（iters 19–28 共 +21 集 / 剔除 11 候选 / 新发现 11–13）**：§V 刷新至 n=63 有效 / CSV 67 行（67 provenance / 67 samples 三方一致）；签名集群表重构（健康带成员扩至 frontier 全谱、新增"中型生成器失败空转"集群）；遗留：gated ×4（GAIA/OS-Genesis/xlam/ii-SWE-Pro-codex）待页面授权、Toucan SFT 切片、GUI-Odyssey/OSWorld 多模态协议、5-seed σ 升级、Claude Code 会话类别待真正释出。**循环结束** |
 | 29 | 2026-06-05 | **续 10 轮（用户指示，iters 29–38）**：+1 集 Toucan-1.5M SFT 切片 → §III（H∞=0.92 落三 teacher 区间中段，teacher 家族全覆盖）；布局策略落地（data/ 记录文件回 git 追踪，重物留 netscratch）；下一轮：5-seed σ 升级 |
+| 30 | 2026-06-05 | **5-seed σ 升级轮（遗留清单兑现）**：新增 `scripts/seed_sigma.py` + `data/seed_sigma.csv`（4 代表集 ×5 不相交切片 = 20 评分）；**发现 14 落档：同质管线 H∞ σ≈0.03–0.04，异质 repo-scale σ≈0.24，模板带精确 0，α 比 H∞ 稳一档；集群级结论全部 ≫ σ，带内 <0.3 差异不可解读**；offset-0 复跑逐位复现 registry 数字（确定性 ✓） |
