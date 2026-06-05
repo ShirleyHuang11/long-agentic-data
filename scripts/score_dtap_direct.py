@@ -42,6 +42,9 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", default="claudesdk/claude-opus-4-6")
     ap.add_argument("--slug", default="dtap-claude-opus-46")
+    ap.add_argument("--offset", type=int, default=0,
+                    help="skip first N files in round-robin order; results go "
+                         "to data/seed_sigma.csv instead of the registry CSV")
     args = ap.parse_args()
 
     api = HfApi()
@@ -57,6 +60,7 @@ def main():
         groups.setdefault(key, []).append(f)
     order = [f for batch in itertools.zip_longest(*groups.values())
              for f in batch if f is not None]
+    order = order[args.offset:]
 
     docs, turn_counts = [], []
     size = 0
@@ -88,6 +92,20 @@ def main():
     print(f"alpha={res['alpha']:.3f} H_inf={res['h_inf']:.3f} "
           f"episodes={res['n_episodes']} mean_turns={res['mean_turns']} "
           f"mean_bytes={res['mean_doc_bytes']}", flush=True)
+
+    if args.offset:
+        # sigma run: append to seed_sigma.csv, leave registry artifacts alone
+        fields = ["slug", "seed_offset", "alpha", "h_inf",
+                  "bpc_128", "bpc_2048", "bpc_32768",
+                  "n_episodes", "mean_turns", "n_bytes"]
+        with open("data/seed_sigma.csv", "a", newline="", encoding="utf-8") as f:
+            csv.DictWriter(f, fieldnames=fields).writerow({
+                "slug": args.slug, "seed_offset": args.offset,
+                **{k: res[k] for k in ("alpha", "h_inf", "bpc_128", "bpc_2048",
+                                       "bpc_32768", "n_episodes", "mean_turns",
+                                       "n_bytes")}})
+        print("appended -> data/seed_sigma.csv", flush=True)
+        return
 
     os.makedirs("samples_cache", exist_ok=True)
     with open(f"samples_cache/{args.slug}.txt", "w", encoding="utf-8") as f:

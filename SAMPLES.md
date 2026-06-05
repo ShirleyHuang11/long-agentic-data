@@ -122,7 +122,7 @@
 
 | 集群 | 签名 | 成员 | 解读 |
 | :--- | :--- | :--- | :--- |
-| **健康长轨迹（frontier 生成器）** | α 0.26–0.38, H∞ 0.57–1.63 | OpenHands 全家（rebench/Hero/Zero/SFT/Sampled/feedback）、SWE-smith、SWE-ZERO-12M、**JetBrains GPT-5.2（1.63 上界）**、DCAgent GLM-4.7、DTap 三家（Opus/Sonnet/Gemini 0.71–0.81）、Toucan（Kimi-K2/Qwen3）、MiroVerse、smolagents-gaia、II-Agent GAIA、Nemotron-search | 长程结构 + 真实语义密度并存；**长 context 训练首选**；frontier 生成器 + 真实环境响应是充分条件（发现 6/9/11） |
+| **健康长轨迹（frontier 生成器）** | α 0.26–0.38, H∞ 0.57–1.63 | OpenHands 全家（rebench/Hero/Zero/SFT/Sampled/feedback）、SWE-smith、SWE-ZERO-12M、**JetBrains GPT-5.2（1.63 上界）**、DCAgent GLM-4.7、DTap 三家（Opus/Sonnet/Gemini 0.71–0.81）、Toucan（Kimi-K2/Qwen3）、MiroVerse、smolagents-gaia、II-Agent GAIA、Nemotron-search | 长程结构 + 真实语义密度并存；**长 context 训练首选**；frontier 生成器 + 真实环境响应**必要而非充分 —— 还需任务/场景多样性**（发现 6/9/11/17） |
 | **蒸馏 SFT 模板退化** | α 0.05–0.26, **H∞=0** | AgentInstruct、AgentTraj-L、Agent-FLAN、CodeAct、ToolLLaMA-DFS、APIGen-MT、Lumos、ScienceWorld、tau-bench traces、nebius-SWE-agent、Ko-Agent（韩语）、APP1、ReBel-ALFWorld、factory-agent（韩语）、deep-research-sft、Fractal | 环境观测/系统提示/persona 模板主导；跨语言、跨域成立 —— 结构性重复照杀 H∞（发现 4/8） |
 | **中型生成器失败空转** | α 0.19–0.26, H∞ 0–0.08，episode 反而最长 | aider-polyglot 家族（7B/30B/32B、ntc-1k/100k）、R2E-Gym SWE-agent-LM-32B、Kwai-Klear-66k（0.26 边缘） | **失败重试循环膨胀 horizon**：turns/bytes 双纪录全在此集群；SFT 剂量 ×100 救不回（发现 12/13） |
 | **compact 高密度** | α 0.40–0.49, H∞ 1.7–1.95 | WebLINX/Mind2Web action 视图、FireAct | 人写/多样内容、observation 已剥离；短 episode 但语义密度全场最高 |
@@ -147,6 +147,7 @@
 14. **seed-σ 量化：跨集群结论稳健，带内排名不可做**（iter 30）：5 个不相交切片重复评分（4 个代表集 ×5 seed，`data/seed_sigma.csv`）：同质管线 H∞ 极稳（Toucan-Kimi 1.346±0.041、glaive 1.034±0.034）；**异质 repo-scale 集 σ 大一个量级**（SWE-ZERO-12M 0.820±0.244 —— 切片组成主导，单切片 H∞ 0.60–1.23）；模板带在 0 处精确钉死（APP1 五 seed 全 0.000）；α 普遍比 H∞ 稳（σ 0.003–0.022）。**推论：集群级发现（0 vs 0.6–1.6）≫ σ 全部站得住；异质集内 <0.3 的 H∞ 差异不可解读 —— 发现 11 的"frontier 内部不可分"获定量背书**；offset-0 复跑与 registry 数字逐位一致（确定性验证 ✓）。
 15. **退化在标注层，不在演示本体；剥离后的上限由动作流来源决定**（iters 33–34）：AgentNet 同 episode 两视图对照 —— 含 VLM 生成 observation/thought/reflection 的全文本视图 H∞=0.00，剥离后仅留人类演示动作流 H∞=1.43。**机器生成的标注文本即使"内容丰富"也呈模板签名；人类行为流本身高密度**。反向对照（iter 34）：对 planner 生成动作流的 ReBel-ALFWorld 做同样剥离仅恢复至 0.43（α=0.52 全场最高，小语料 caveat）—— **剥离观测总能抬 H∞，但天花板分级：人类 1.43 ≫ planner 0.43 ≫ 并入观测后 0.00**。对 GUI/具身数据的训练含义：标注层提供监督信号但稀释长程密度，配比需权衡。
 16. **观测的密度角色随域反转**（iter 35）：对 frontier SWE rollout 做 assistant-only 剥离，H∞ 不升反降（JetBrains 1.63→0.72）或持平（swe-rebench-OH 0.67→0.66）—— **SWE 域观测是真实代码库内容（文件体/diff/测试输出），承载而非稀释密度；web/GUI 域观测是渲染样板，稀释密度**（对照发现 3/15）。"剥观测能提密度"仅对样板型环境成立；数据清洗策略必须分域。
+17. **frontier 生成器必要非充分 —— 场景多样性是另一条腿**（iter 37）：DTap 三切片各取第 2 个不相交样本（深位 offset，轮询序耗尽小组后由 600-episode 级恶意场景族主导）：Opus 0.71→0.25、Sonnet 0.81→**0.08**、Gemini 0.74→0.44 —— **同一 frontier 模型在重复场景族上照样落入模板带**。发现 8（结构性重复杀 H∞）与发现 11（frontier vs 中型一刀切）统一为：**健康 H∞ = frontier 生成器 × 任务/场景多样性，两者缺一不可**；iter-21 的 0.71–0.81 紧聚是"均衡头部组合"上的受控对照，绝对值随组成大幅漂移（发现 14 异质 σ 的极端情形）。
 
 ## 候选队列（按预期 horizon 长度排序，每轮从顶部取 2–3 个）
 
@@ -223,3 +224,4 @@
 | 34 | 2026-06-05 | **动作来源反向对照轮**：+1 集 ReBel-ALFWorld action 视图 → §III（planner 动作流剥离观测仅恢复至 H∞=0.43，**发现 15 补全分级：人类 1.43 ≫ planner 0.43 ≫ 并观测 0.00**；α=0.52 全 registry 最高；小语料 caveat） |
 | 35 | 2026-06-05 | **frontier agent 文本切片轮**：+2 视图 → §I（JetBrains assistant-only **H∞ 1.63→0.72**、swe-rebench-OH 0.67→0.66 持平）；**发现 16 落档：观测的密度角色随域反转 —— SWE 观测是真实代码内容承载密度，web/GUI 观测是渲染样板稀释密度；数据清洗必须分域** |
 | 36 | 2026-06-05 | **任务来源对照 + GDPval 轮**：JetBrains × SWE-smith → §I（同 harness 合成 issue H∞=1.25 vs 真实 1.63，与发现 7 同向但 Δ≈1.5σ 谨慎表述）；**GDPval → §IV（220 题人写专业任务，H∞=1.67 任务语料新高：人写专业 > 人写 issue > 合成 issue）**；kaggle-notebooks（非轨迹）、swe-lancer（空壳）剔除 |
+| 37 | 2026-06-05 | **DTap 第 2 seed 校验轮（诚实修正）**：`score_dtap_direct.py` 增 `--offset` σ 模式；深位样本三家齐跌（Opus 0.25 / Sonnet **0.08** / Gemini 0.44）—— 重复场景族主导的深尾切片把 frontier rollout 也钉进模板带；**发现 17 落档：健康 H∞ = frontier 生成器 × 场景多样性，缺一不可**；集群表"充分条件"措辞改为"必要非充分" |
