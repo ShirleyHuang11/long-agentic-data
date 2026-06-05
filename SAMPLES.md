@@ -18,6 +18,8 @@
 | SWE-smith-trajectories | SWE 轨迹 | 5k 条 | 64.2 / 96,001 | 训练 SWE-agent-LM-32B 用的轨迹（`xml` split）；H∞=0.56 介于模板退化与 NL 之间 | 0.285 | 0.56 | [`SWE-bench/SWE-smith-trajectories`](https://huggingface.co/datasets/SWE-bench/SWE-smith-trajectories) |
 | SWE-Zero OpenHands 轨迹 | SWE 轨迹 | 数万条 | 63.7 / 79,325 | NVIDIA 在 SWE-Fixer-Train-110K 任务上跑 OpenHands 的轨迹（带 license 字段）；H∞=1.21 全轨迹类最高 —— 模板退化最少 | 0.315 | 1.21 | [`nvidia/SWE-Zero-openhands-trajectories`](https://huggingface.co/datasets/nvidia/SWE-Zero-openhands-trajectories) |
 | JetBrains GPT-5.2 轨迹 | SWE 轨迹（frontier 混采） | 166 条采样（test−verified） | 28.4 / 50,829 | mini-swe-agent 跑 SWE-bench test−verified 的 GPT-5.2/5-mini 混合 rollout；**H∞=1.63 全 registry 轨迹类最高**（超 OpenHands 0.6–1.2 一档）—— frontier 生成器信号最强样本（发现 6 上界更新） | 0.346 | 1.63 | [`JetBrains-Research/agent-trajectories-swe-bench-test-minus-verified`](https://huggingface.co/datasets/JetBrains-Research/agent-trajectories-swe-bench-test-minus-verified) |
+| JetBrains (assistant-only 视图) | SWE 轨迹（agent 文本切片） | 同 JetBrains（采样 841 段） | 13.8 / 9,988 | 同源仅留 assistant 轮（思考+命令，剥离 repo 观测）；**H∞ 1.63→0.72 —— SWE 域观测是真实代码内容、承载密度，与 web/GUI 相反（发现 16）** | 0.239 | 0.72 | 同上 |
+| swe-rebench-OH (assistant-only 视图) | SWE 轨迹（agent 文本切片） | 同 swe-rebench-OH（采样 681 段） | 64.2 / 12,324 | 同上对 OpenHands dump：H∞ 0.67→0.66 几乎不变 —— agent 文本与观测密度均衡的情形 | 0.227 | 0.66 | 同上 |
 | DCAgent terminus-2 × GLM-4.7 轨迹 | SWE/终端轨迹 | 数百条（采样 133） | 36.9 / 63,185 | terminus-2 agent 跑 GLM-4.7 在 SWE-Gym sampled 任务上的 traces（含 result 标注，首行 AgentTimeoutError —— 含失败 episode）；**第 4 家 frontier 生成器落 0.7–1.6 健康带（发现 11 扩展）**；终端 agent 类别首个有内容的释出 | 0.307 | 0.91 | [`DCAgent/...glm_4.7_traces_jupiter`](https://huggingface.co/datasets/DCAgent/neulab-swe-gym-openhands-sampled-trajectories-sandboxes_glm_4.7_traces_jupiter) |
 | OpenHands-SFT-Trajectories | SWE 轨迹 | 数百条（success.oss） | 39.0 / 62,786 | SWE-Gym 官方 SFT 轨迹（成功 episode 过滤）；H∞=1.11 健康 | 0.349 | 1.11 | [`SWE-Gym/OpenHands-SFT-Trajectories`](https://huggingface.co/datasets/SWE-Gym/OpenHands-SFT-Trajectories) |
 | OpenHands-Sampled-Trajectories | SWE 轨迹（未过滤） | 数千条（train.raw） | 28.3 / 32,300 | SFT 版的未过滤原始采样（含失败 episode）；**与 SFT 版对照：成功过滤对 α/H∞ 几乎无影响**（Δα=0.015, ΔH∞=0.01），但成功 episode 更长（39.0 vs 28.3 turns） | 0.334 | 1.10 | [`SWE-Gym/OpenHands-Sampled-Trajectories`](https://huggingface.co/datasets/SWE-Gym/OpenHands-Sampled-Trajectories) |
@@ -98,7 +100,7 @@
 
 ---
 
-## V. 总览速查（α × H∞ × horizon，迭代 34 时点，n=68 有效 / CSV 72 行含 4 项已剔除）
+## V. 总览速查（α × H∞ × horizon，迭代 35 时点，n=70 有效 / CSV 74 行含 4 项已剔除）
 
 ### Horizon 排行（bytes·ep⁻¹ 前五，仅 H∞>0.3 的健康轨迹；H∞≈0 的"空转膨胀"纪录（aider-polyglot 7B 322KB / R2EGym-32B 149.8 turns）见发现 12）
 
@@ -142,6 +144,7 @@
 13. **SFT 剂量不改变签名带**（iter 25）：同任务同架构下，Qwen3-32B 经 1k vs 100k agentic SFT 后的轨迹均 H∞=0（α 0.22→0.21），×100 数据量只拉长 episode（23.6→46.1 turns）—— **决定 H∞ 带的是生成器能力档位，不是 agentic SFT 剂量**（此对照限单一 32B 架构 + polyglot 任务，外推需谨慎）。
 14. **seed-σ 量化：跨集群结论稳健，带内排名不可做**（iter 30）：5 个不相交切片重复评分（4 个代表集 ×5 seed，`data/seed_sigma.csv`）：同质管线 H∞ 极稳（Toucan-Kimi 1.346±0.041、glaive 1.034±0.034）；**异质 repo-scale 集 σ 大一个量级**（SWE-ZERO-12M 0.820±0.244 —— 切片组成主导，单切片 H∞ 0.60–1.23）；模板带在 0 处精确钉死（APP1 五 seed 全 0.000）；α 普遍比 H∞ 稳（σ 0.003–0.022）。**推论：集群级发现（0 vs 0.6–1.6）≫ σ 全部站得住；异质集内 <0.3 的 H∞ 差异不可解读 —— 发现 11 的"frontier 内部不可分"获定量背书**；offset-0 复跑与 registry 数字逐位一致（确定性验证 ✓）。
 15. **退化在标注层，不在演示本体；剥离后的上限由动作流来源决定**（iters 33–34）：AgentNet 同 episode 两视图对照 —— 含 VLM 生成 observation/thought/reflection 的全文本视图 H∞=0.00，剥离后仅留人类演示动作流 H∞=1.43。**机器生成的标注文本即使"内容丰富"也呈模板签名；人类行为流本身高密度**。反向对照（iter 34）：对 planner 生成动作流的 ReBel-ALFWorld 做同样剥离仅恢复至 0.43（α=0.52 全场最高，小语料 caveat）—— **剥离观测总能抬 H∞，但天花板分级：人类 1.43 ≫ planner 0.43 ≫ 并入观测后 0.00**。对 GUI/具身数据的训练含义：标注层提供监督信号但稀释长程密度，配比需权衡。
+16. **观测的密度角色随域反转**（iter 35）：对 frontier SWE rollout 做 assistant-only 剥离，H∞ 不升反降（JetBrains 1.63→0.72）或持平（swe-rebench-OH 0.67→0.66）—— **SWE 域观测是真实代码库内容（文件体/diff/测试输出），承载而非稀释密度；web/GUI 域观测是渲染样板，稀释密度**（对照发现 3/15）。"剥观测能提密度"仅对样板型环境成立；数据清洗策略必须分域。
 
 ## 候选队列（按预期 horizon 长度排序，每轮从顶部取 2–3 个）
 
@@ -214,3 +217,4 @@
 | 32 | 2026-06-05 | **桌面 computer-use 破冰轮**：+1 集 AgentNet 文本侧 → §II（**registry 首个桌面 GUI 条目**，步级 obs/thought/action/reflection 全文本无需图像解码，新增 `ser_agentnet`；H∞=0 —— VLM 标注蒸馏 + 屏幕描述重复双机制）；ming9999-recovery（JSONL 损坏）、laion gym-v2（tar.gz 二进制行）、cua-dev 系（需图像解码）均不可评分 |
 | 33 | 2026-06-05 | **标注剥离 ablation 轮**：+1 集 AgentNet action 视图 → §II（同 episode 剥离 VLM 标注：**H∞ 0.00→1.43，发现 15 落档 —— 退化在机器标注层，人类演示动作流本身高密度**；iter-32 的"双机制不可分"就此分离）；观测坍缩集群更名"观测/标注坍缩"并扩员 |
 | 34 | 2026-06-05 | **动作来源反向对照轮**：+1 集 ReBel-ALFWorld action 视图 → §III（planner 动作流剥离观测仅恢复至 H∞=0.43，**发现 15 补全分级：人类 1.43 ≫ planner 0.43 ≫ 并观测 0.00**；α=0.52 全 registry 最高；小语料 caveat） |
+| 35 | 2026-06-05 | **frontier agent 文本切片轮**：+2 视图 → §I（JetBrains assistant-only **H∞ 1.63→0.72**、swe-rebench-OH 0.67→0.66 持平）；**发现 16 落档：观测的密度角色随域反转 —— SWE 观测是真实代码内容承载密度，web/GUI 观测是渲染样板稀释密度；数据清洗必须分域** |

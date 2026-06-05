@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "nebius/SWE-rebench-openhands-trajectories",
+  "hf_url": "https://huggingface.co/datasets/nebius/SWE-rebench-openhands-trajectories",
+  "hf_revision_sha": "35455389ab51bf5e2306bfd436ef72d0f98bf882",
+  "config": "default",
+  "group_key": null,
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_trajectory_assistant",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-05T20:50:03.091140+00:00",
+  "result": {
+    "alpha": 0.2273624238609131,
+    "h_inf": 0.6572130957772133,
+    "bpc_128": 6.107959747314453,
+    "bpc_2048": 3.5591259002685547,
+    "bpc_32768": 2.2021570205688477,
+    "n_episodes": 681,
+    "mean_turns": 64.2,
+    "mean_doc_bytes": 12324,
+    "n_bytes": 8388608
+  }
+}

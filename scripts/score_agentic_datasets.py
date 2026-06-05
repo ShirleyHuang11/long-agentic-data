@@ -104,6 +104,29 @@ def ser_rebel_actions(row):
     return "\n\n".join(parts), len(steps)
 
 
+def _assistant_only(msgs):
+    if not msgs:
+        return "", 0
+    keys = msgs[0].keys()
+    rk = "role" if "role" in keys else "from"
+    tk = "content" if "content" in keys else ("value" if "value" in keys else "text")
+    kept = [m for m in msgs if m.get(rk) in ("assistant", "gpt", "agent")]
+    return _turns_chatml(kept, rk, tk), len(kept)
+
+
+def ser_messages_assistant(row):
+    # Agent-text-only view: keep assistant turns, drop env observations —
+    # completes the finding-15 decomposition for frontier SWE rollouts.
+    msgs = row["messages"]
+    if isinstance(msgs, str):
+        msgs = json.loads(msgs)
+    return _assistant_only(msgs)
+
+
+def ser_trajectory_assistant(row):
+    return _assistant_only(row["trajectory"])
+
+
 def ser_rebel_steps(row):
     # ReBel ALFWorld: `steps` is a JSON-encoded list of step dicts (idx + obs/
     # action/... fields); render each non-idx field as its own labelled line.
@@ -466,6 +489,11 @@ REGISTRY = [
     # --- loop iter 34: action-origin counter-test (planner-generated actions) ---
     ("Decix/ReBel-ALFWorld-SFT-Trajectories", None, ["train"],
      ser_rebel_actions, "rebel-alfworld-actions"),
+    # --- loop iter 35: frontier agent-text-only views (finding-15 trichotomy) ---
+    ("JetBrains-Research/agent-trajectories-swe-bench-test-minus-verified", None,
+     ["train"], ser_messages_assistant, "jetbrains-swe-assistant-only"),
+    ("nebius/SWE-rebench-openhands-trajectories", None, ["train"],
+     ser_trajectory_assistant, "swe-rebench-oh-assistant-only"),
 ]
 
 
