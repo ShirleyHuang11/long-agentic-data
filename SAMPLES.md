@@ -90,11 +90,12 @@
 | SWE-bench Verified | SWE 基准 | 500 题 | 1 / 6,225 | 人工核验过的 SWE-bench 子集；非轨迹（problem+patch），H∞=1.57 在 NL 正常区间 | 0.334 | 1.57 | [`princeton-nlp/SWE-bench_Verified`](https://huggingface.co/datasets/princeton-nlp/SWE-bench_Verified) |
 | SWE-Gym | SWE 训练任务 | 2.4k 任务 | 1 / 14,005 | 可执行 repo 训练环境的任务集（problem+patch 序列化）；**轨迹版见候选队列 OpenHands-\*-Trajectories** | 0.395 | 1.22 | [`SWE-Gym/SWE-Gym`](https://huggingface.co/datasets/SWE-Gym/SWE-Gym) |
 | SWE-rebench (test) | SWE 基准 | 21k+ 任务（rolling） | 1 / 34,235 | SWE-bench 的 rolling 扩充（含 install_config/docker 镜像元数据）；单题文本最长的基准型条目 | 0.299 | 0.84 | [`nebius/SWE-rebench`](https://huggingface.co/datasets/nebius/SWE-rebench) |
+| Nemotron-RL-Injection-v1 | 注入攻击任务语料（非轨迹） | 大规模（采样 1272） | 3 / 2,202 | 间接 prompt-injection RL 任务定义（input + **environment 含注入载荷** + 攻击元数据，10+ 域）；α=0.04/H∞=0 近纯模板 —— 合成环境本身高度模板化（对照：DTap 真实对抗 rollout H∞ 0.71–0.81）；⚠️ prompt-only 视图会得到虚高 α=0.40，载荷必须并入文档 | 0.043 | 0.00 | [`nvidia/Nemotron-RL-Agentic-Indirect-Prompt-Injection-v1`](https://huggingface.co/datasets/nvidia/Nemotron-RL-Agentic-Indirect-Prompt-Injection-v1) |
 | R2E-Gym-Lite | SWE 训练任务（合成 issue） | 数千任务 | 1 / 21,992 | 合成 problem_statement + commit hunks（whole-file 内容已排除，hunks 截 8KB）；**合成 issue H∞=0.89 < 人写 SWE-bench-Verified 1.57**，与 SWE-rebench 持平 | 0.381 | 0.89 | [`R2E-Gym/R2E-Gym-Lite`](https://huggingface.co/datasets/R2E-Gym/R2E-Gym-Lite) |
 
 ---
 
-## V. 总览速查（α × H∞ × horizon，迭代 29 时点，n=64 有效 / CSV 68 行含 4 项已剔除）
+## V. 总览速查（α × H∞ × horizon，迭代 31 时点，n=65 有效 / CSV 69 行含 4 项已剔除）
 
 ### Horizon 排行（bytes·ep⁻¹ 前五，仅 H∞>0.3 的健康轨迹；H∞≈0 的"空转膨胀"纪录（aider-polyglot 7B 322KB / R2EGym-32B 149.8 turns）见发现 12）
 
@@ -159,6 +160,9 @@
 | `israel-adewuyi/kwaiklear-sample-level-agent-trajectories-2.2M` | SWE per-step 派生 | Kwai-Klear 66k（已入 §I）的 sample-level 重切分（question=该步上文）—— 同源 + per-step 前缀重叠双重排除 | ⚠️ 派生剔除 (iter 22) |
 | `JohnBeanerson/claude-code-sessions-test` | Claude Code 会话（新类别） | raw 直读实查：单 session 5 行 3.3KB（"hey there" 测试 dump）—— 空壳；**Claude Code session 类别本身仍待真正释出** | ⚠️ 空壳剔除 (iter 24) |
 | `danielliu99/mcp-universe-traces` | MCP「traces」（实为 verdict） | 实查：results=评测 config+判分列表，无轨迹内容 | ⚠️ 非轨迹剔除 (iter 23) |
+| `valoomba/agentic-codeact-trajectories` | SWE 轨迹（打分派生） | 实查：source=SWE-ZERO-12M（已入 §I）的过滤/打分重切分 | ⚠️ 派生剔除 (iter 31) |
+| `poolside-laguna-hackathon/py-bug-trace-laguna-xs-2-l3-rollouts` | bug-fix RL rollouts | 实查：单轮 prompt+completion+reward，非长程轨迹 | ⚠️ 单轮域外 (iter 31) |
+| `aec-bench/release-model-rollouts` | 工程域评测 rollouts | 实查 rollouts config：纯 trial 元数据（无 >1KB 内容字段）；transcripts 或在 artifacts config（文件型，待探） | ⚠️ 元数据-only (iter 31) |
 | `OpenGVLab/GUI-Odyssey` (24k 下载) | GUI 轨迹（多模态） | 跨 app 导航轨迹 | 多模态扩展 |
 | AppWorld 完整 rollouts | 交互轨迹 | `satyakic/appworld-rollouts-*` 是 event-sourcing 日志（重建复杂），弃；`hamishivi/rlenv-appworld-train` 实测是 90 条任务 prompt 非 rollout，且 3-point 拟合 artifact（α=−0.17, H∞=9.9）→ 不入 registry | ⚠️ 官方轨迹 dump 未找到 |
 | tau-bench 官方/更大轨迹源 | 工具调用轨迹 | `sammshen/taubench-sonnet-traces` 实测整个 dump 是**单次 run 的代理日志**（聚合后仅 1 episode，29KB < 32KB oracle 块）→ oracle 不适用，不入 registry；`annon124816/tau_bench`（2.3k 下载）实测是 parquet 校验清单非数据 (iter 10)；jkazdan 50 条已入 §III，更大源仍缺 | ⚠️ 待更大轨迹源 |
@@ -202,3 +206,4 @@
 | 28 | 2026-06-05 | **终轮收尾（iters 19–28 共 +21 集 / 剔除 11 候选 / 新发现 11–13）**：§V 刷新至 n=63 有效 / CSV 67 行（67 provenance / 67 samples 三方一致）；签名集群表重构（健康带成员扩至 frontier 全谱、新增"中型生成器失败空转"集群）；遗留：gated ×4（GAIA/OS-Genesis/xlam/ii-SWE-Pro-codex）待页面授权、Toucan SFT 切片、GUI-Odyssey/OSWorld 多模态协议、5-seed σ 升级、Claude Code 会话类别待真正释出。**循环结束** |
 | 29 | 2026-06-05 | **续 10 轮（用户指示，iters 29–38）**：+1 集 Toucan-1.5M SFT 切片 → §III（H∞=0.92 落三 teacher 区间中段，teacher 家族全覆盖）；布局策略落地（data/ 记录文件回 git 追踪，重物留 netscratch）；下一轮：5-seed σ 升级 |
 | 30 | 2026-06-05 | **5-seed σ 升级轮（遗留清单兑现）**：新增 `scripts/seed_sigma.py` + `data/seed_sigma.csv`（4 代表集 ×5 不相交切片 = 20 评分）；**发现 14 落档：同质管线 H∞ σ≈0.03–0.04，异质 repo-scale σ≈0.24，模板带精确 0，α 比 H∞ 稳一档；集群级结论全部 ≫ σ，带内 <0.3 差异不可解读**；offset-0 复跑逐位复现 registry 数字（确定性 ✓） |
+| 31 | 2026-06-05 | +1 集：Nemotron-RL-Injection-v1 → §IV（注入攻击任务语料，**载荷在 environment 字段 —— prompt-only 视图 α 虚高 0.40 vs 全文档 0.04**，新增 `ser_nemotron_inj`；近纯模板，对照 DTap 真实对抗 rollout 0.71–0.81）；DTap 框架普查确认仅 3 切片（无第 4 frontier）；3 候选剔除：valoomba（SWE-ZERO 派生）、poolside-laguna（单轮）、aec-bench rollouts（纯元数据） |

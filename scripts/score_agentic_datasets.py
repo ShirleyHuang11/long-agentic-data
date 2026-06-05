@@ -62,6 +62,15 @@ def ser_trajectory_auto(row):
     return _msgs_auto(row["trajectory"])
 
 
+def ser_nemotron_inj(row):
+    # Injection task corpus: the attack payload lives in `environment` (e.g.
+    # chart_notes carrying the injected instruction), so serialize input
+    # messages + environment JSON — prompt-only view is near-pure template.
+    doc, n = _msgs_auto(row["responses_create_params"]["input"])
+    env = json.dumps(row.get("environment") or {}, ensure_ascii=False)
+    return f"{doc}\n\n[environment]\n{env}", n + 1
+
+
 def ser_rebel_steps(row):
     # ReBel ALFWorld: `steps` is a JSON-encoded list of step dicts (idx + obs/
     # action/... fields); render each non-idx field as its own labelled line.
@@ -411,6 +420,12 @@ REGISTRY = [
     ("Agent-Ark/Toucan-1.5M", "Qwen3", ["train"], ser_swesmith, "toucan-15m-qwen3"),
     # --- loop iter 29: complete the Toucan teacher family ---
     ("Agent-Ark/Toucan-1.5M", "SFT", ["train"], ser_swesmith, "toucan-15m-sft"),
+    # --- loop iter 31: adversarial indirect-prompt-injection task corpus ---
+    # Rows are RL task definitions (input messages + environment + attack
+    # metadata), not rollouts -> section IV. Environment carries the injected
+    # payload, so it is part of the document (see ser_nemotron_inj).
+    ("nvidia/Nemotron-RL-Agentic-Indirect-Prompt-Injection-v1", None, ["train"],
+     ser_nemotron_inj, "nemotron-rl-injection-v1"),
 ]
 
 

@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "nvidia/Nemotron-RL-Agentic-Indirect-Prompt-Injection-v1",
+  "hf_url": "https://huggingface.co/datasets/nvidia/Nemotron-RL-Agentic-Indirect-Prompt-Injection-v1",
+  "hf_revision_sha": "d738d4f361cc38bb4d7a42b9066776dade5332f5",
+  "config": "default",
+  "group_key": null,
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_nemotron_inj",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-05T20:40:41.926663+00:00",
+  "result": {
+    "alpha": 0.042554321661849775,
+    "h_inf": 0.0,
+    "bpc_128": 6.468322698268004,
+    "bpc_2048": 3.839208378920496,
+    "bpc_32768": 1.5026912913602941,
+    "n_episodes": 1272,
+    "mean_turns": 3,
+    "mean_doc_bytes": 2202,
+    "n_bytes": 2808426
+  }
+}
