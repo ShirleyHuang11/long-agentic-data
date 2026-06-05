@@ -409,6 +409,8 @@ REGISTRY = [
      ser_messages_auto, "smolagents-gaia-traces"),
     ("Agent-Ark/Toucan-1.5M", "OSS", ["train"], ser_swesmith, "toucan-15m-oss"),
     ("Agent-Ark/Toucan-1.5M", "Qwen3", ["train"], ser_swesmith, "toucan-15m-qwen3"),
+    # --- loop iter 29: complete the Toucan teacher family ---
+    ("Agent-Ark/Toucan-1.5M", "SFT", ["train"], ser_swesmith, "toucan-15m-sft"),
 ]
 
 

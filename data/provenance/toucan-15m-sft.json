@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "Agent-Ark/Toucan-1.5M",
+  "hf_url": "https://huggingface.co/datasets/Agent-Ark/Toucan-1.5M",
+  "hf_revision_sha": "0df3cf37f2abefb380370cfb02eabea2a35ae782",
+  "config": "SFT",
+  "group_key": null,
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_swesmith",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-05T20:32:29.884127+00:00",
+  "result": {
+    "alpha": 0.3147393091728564,
+    "h_inf": 0.9240969285252331,
+    "bpc_128": 6.095635414123535,
+    "bpc_2048": 3.085002899169922,
+    "bpc_32768": 1.8270225524902344,
+    "n_episodes": 1140,
+    "mean_turns": 9.9,
+    "mean_doc_bytes": 7361,
+    "n_bytes": 8388608
+  }
+}

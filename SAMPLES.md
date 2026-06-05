@@ -77,6 +77,7 @@
 | MiroVerse agentic SFT (WaltonFuture) | 搜索/多跳工具 SFT 聚合 | 多 split（采样 152） | 12.9 / 55,307 | MiroVerse 系多源聚合（split 标源：2WikiMultihopQA 等，长工具链搜索）；H∞=1.21 与 II-Agent GAIA/Nemotron-search 同在真实搜索健康带（发现 9 再证） | 0.245 | 1.21 | [`WaltonFuture/agentic-sft-new`](https://huggingface.co/datasets/WaltonFuture/agentic-sft-new) |
 | Toucan-1.5M (OSS) | MCP 工具轨迹（teacher 对照） | 同 repo（采样 309） | 11.9 / 27,245 | 同管线 gpt-oss teacher 切片；H∞=0.57 为三 teacher 最低、episode 反而最长（27KB）—— verbose ≠ 密度 | 0.382 | 0.57 | 同上 |
 | Toucan-1.5M (Qwen3) | MCP 工具轨迹（teacher 对照） | 同 repo（采样 730） | 6.4 / 11,494 | 同管线 Qwen3 teacher 切片；**三 teacher H∞ 0.57–1.34（Kimi-K2 1.34 > Qwen3 1.10 > OSS 0.57）—— 同管线下 teacher 选择移动 H∞ 逾 2×**（⚠️ 各切片任务组成未必严格一致，非完全受控） | 0.342 | 1.10 | 同上 |
+| Toucan-1.5M (SFT) | MCP 工具轨迹（成品混合） | 同 repo（采样 1140） | 9.9 / 7,361 | 官方成品 SFT 混合切片；H∞=0.92 落于三 teacher 区间（0.57–1.34）中段 —— 与跨 teacher 混合的预期一致；teacher 家族至此全覆盖 | 0.315 | 0.92 | 同上 |
 | smolagents GAIA traces | 多跳研究/代码 agent 轨迹 | 数千条（采样 1120） | 6.0 / 7,511 | HF open-deep-research 系 GAIA traces（code-as-action，gpt-4o 生成；22.9k 下载量为本轮扫描最高）；H∞=1.44 健康带上沿 —— 真实多跳搜索再证发现 9 | 0.301 | 1.44 | [`smolagents/gaia-traces`](https://huggingface.co/datasets/smolagents/gaia-traces) |
 | II-Agent GAIA 轨迹 | 多跳研究/工具轨迹 | 165 条（GAIA val 全集） | 46.6 / 20,984 | II-Agent 跑 GAIA validation 的完整 tool_call trace（含 judge 标注）；**绕开 GAIA gate 的轨迹代理**；H∞=1.25 健康 —— 多跳搜索内容多样 | 0.197 | 1.25 | [`Intelligent-Internet/ii-agent_gaia-benchmark_validation`](https://huggingface.co/datasets/Intelligent-Internet/ii-agent_gaia-benchmark_validation) |
 | deep-research SFT (0406) | 深度研究轨迹 | 数百条 | 32.5 / 52,522 | 多源调研 SFT（长工具链 + 综合报告）；episode 长但 H∞=0 —— 蒸馏签名 | 0.179 | 0.00 | [`kylemontgomery/deep-research-sft-0406`](https://huggingface.co/datasets/kylemontgomery/deep-research-sft-0406) |
@@ -93,7 +94,7 @@
 
 ---
 
-## V. 总览速查（α × H∞ × horizon，迭代 28 收尾时点，n=63 有效 / CSV 67 行含 4 项已剔除）
+## V. 总览速查（α × H∞ × horizon，迭代 29 时点，n=64 有效 / CSV 68 行含 4 项已剔除）
 
 ### Horizon 排行（bytes·ep⁻¹ 前五，仅 H∞>0.3 的健康轨迹；H∞≈0 的"空转膨胀"纪录（aider-polyglot 7B 322KB / R2EGym-32B 149.8 turns）见发现 12）
 
@@ -198,3 +199,4 @@
 | 26 | 2026-06-05 | +2 集 → §III：ReBel-ALFWorld（α=0.11/H∞=0，与多环境模板集群同签名）；factory-agent task_rollouts（韩语工厂域，`hf-json:` 直读分支新增至 iter_docs，n=70 caveat，H∞=0 —— 合成环境模板跨语言照杀）；SkyRL-SQL 系实查为 RL 任务 prompt 非轨迹剔除 |
 | 27 | 2026-06-05 | **teacher 对照 + 大漏网轮**：Toucan OSS/Qwen3 切片 ×2 → §III（**同管线三 teacher H∞ 0.57–1.34，teacher 选择移动 H∞ 逾 2×**，半受控 caveat）；smolagents/gaia-traces → §III（22.9k 下载的漏网大户，gpt-4o code-agent，H∞=1.44 健康带上沿，发现 9 四证） |
 | 28 | 2026-06-05 | **终轮收尾（iters 19–28 共 +21 集 / 剔除 11 候选 / 新发现 11–13）**：§V 刷新至 n=63 有效 / CSV 67 行（67 provenance / 67 samples 三方一致）；签名集群表重构（健康带成员扩至 frontier 全谱、新增"中型生成器失败空转"集群）；遗留：gated ×4（GAIA/OS-Genesis/xlam/ii-SWE-Pro-codex）待页面授权、Toucan SFT 切片、GUI-Odyssey/OSWorld 多模态协议、5-seed σ 升级、Claude Code 会话类别待真正释出。**循环结束** |
+| 29 | 2026-06-05 | **续 10 轮（用户指示，iters 29–38）**：+1 集 Toucan-1.5M SFT 切片 → §III（H∞=0.92 落三 teacher 区间中段，teacher 家族全覆盖）；布局策略落地（data/ 记录文件回 git 追踪，重物留 netscratch）；下一轮：5-seed σ 升级 |
