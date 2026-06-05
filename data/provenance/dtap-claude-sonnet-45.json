@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "AI-Secure/DTap-Bench-Agent-Trajectories",
+  "hf_url": "https://huggingface.co/datasets/AI-Secure/DTap-Bench-Agent-Trajectories",
+  "hf_revision_sha": "bc8df903c9ca9d749d772b2a44111db127519621",
+  "config": "claudesdk/claude-sonnet-4-5",
+  "group_key": null,
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_dtap (direct JSON-per-episode loader, scripts/score_dtap_direct.py; round-robin across domain/{benign,malicious} groups)",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "round-robin over domain-label groups, first-k file per group (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-05T18:14:47.005672+00:00",
+  "result": {
+    "alpha": 0.2828148620301576,
+    "h_inf": 0.8120641948577081,
+    "bpc_128": 6.033446311950684,
+    "bpc_2048": 3.195713996887207,
+    "bpc_32768": 1.9002408981323242,
+    "n_episodes": 482,
+    "mean_turns": 16.0,
+    "mean_doc_bytes": 17493,
+    "n_bytes": 8388608
+  }
+}

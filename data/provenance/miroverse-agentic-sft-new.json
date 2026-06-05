@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "WaltonFuture/agentic-sft-new",
+  "hf_url": "https://huggingface.co/datasets/WaltonFuture/agentic-sft-new",
+  "hf_revision_sha": "33361b28eac3699443f606042f9ec8ab1ff9c89f",
+  "config": "default",
+  "group_key": null,
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_messages_auto",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-05T18:26:16.593245+00:00",
+  "result": {
+    "alpha": 0.24514790847869716,
+    "h_inf": 1.2079353210365815,
+    "bpc_128": 6.209466934204102,
+    "bpc_2048": 3.7425708770751953,
+    "bpc_32768": 2.492417335510254,
+    "n_episodes": 152,
+    "mean_turns": 12.9,
+    "mean_doc_bytes": 55307,
+    "n_bytes": 8388608
+  }
+}

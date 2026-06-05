@@ -1,8 +1,10 @@
-# Heavy artifacts on scratch — symlinks in repo point to $SCRATCH/long-agentic-data/
-data/
+# Layout policy (2026-06-05): data record files (provenance, CSV, logs) live in
+# the repo; heavy artifacts (sample caches, env, checkpoints) live on
+# $SCRATCH/long-agentic-data/ — samples_cache/ is a symlink there.
 samples_cache/
 papers/
 __pycache__/
 *.pyc
-.venv/
 .claude/
+.venv/
+venv/

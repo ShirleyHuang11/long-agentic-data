@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "DCAgent3/aider_polyglot_nemotron_terminal_corpus_unified_100000__Qwen3_32B_20260520_100037",
+  "hf_url": "https://huggingface.co/datasets/DCAgent3/aider_polyglot_nemotron_terminal_corpus_unified_100000__Qwen3_32B_20260520_100037",
+  "hf_revision_sha": "b258785a247d97fe086e7a0d4451218c7911469a",
+  "config": "default",
+  "group_key": null,
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_conversations_auto",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-05T18:30:05.407422+00:00",
+  "result": {
+    "alpha": 0.21202110014703088,
+    "h_inf": 0.0,
+    "bpc_128": 5.804547309875488,
+    "bpc_2048": 3.112311363220215,
+    "bpc_32768": 1.616715431213379,
+    "n_episodes": 68,
+    "mean_turns": 46.1,
+    "mean_doc_bytes": 124389,
+    "n_bytes": 8388608
+  }
+}

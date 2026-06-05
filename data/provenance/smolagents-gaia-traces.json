@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "smolagents/gaia-traces",
+  "hf_url": "https://huggingface.co/datasets/smolagents/gaia-traces",
+  "hf_revision_sha": "c857777b09b42620dbf3c54b2e582541959cdb08",
+  "config": "default",
+  "group_key": null,
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_messages_auto",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-05T18:37:47.539530+00:00",
+  "result": {
+    "alpha": 0.3014008930032536,
+    "h_inf": 1.436264201229077,
+    "bpc_128": 6.252449035644531,
+    "bpc_2048": 3.524503707885742,
+    "bpc_32768": 2.3416996002197266,
+    "n_episodes": 1120,
+    "mean_turns": 6.0,
+    "mean_doc_bytes": 7511,
+    "n_bytes": 8388608
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "AlienKevin/SWE-ZERO-12M-trajectories",
+  "hf_url": "https://huggingface.co/datasets/AlienKevin/SWE-ZERO-12M-trajectories",
+  "hf_revision_sha": "44e028077c55e7255c328516c8bd76080fbb3840",
+  "config": "default",
+  "group_key": null,
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_messages_auto",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-05T18:02:33.176714+00:00",
+  "result": {
+    "alpha": 0.26394442506567967,
+    "h_inf": 0.7975583043746213,
+    "bpc_128": 5.680798530578613,
+    "bpc_2048": 3.1465816497802734,
+    "bpc_32768": 1.9275274276733398,
+    "n_episodes": 325,
+    "mean_turns": 31.9,
+    "mean_doc_bytes": 25824,
+    "n_bytes": 8388608
+  }
+}

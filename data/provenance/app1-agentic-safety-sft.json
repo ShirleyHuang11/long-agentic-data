@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "AI45Research/APP1-Agentic-Safety-SFT-Data",
+  "hf_url": "https://huggingface.co/datasets/AI45Research/APP1-Agentic-Safety-SFT-Data",
+  "hf_revision_sha": "6ed56799527517de7868314abd9b6b8e7e9e2105",
+  "config": "default",
+  "group_key": null,
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_messages_auto",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-05T18:30:31.180486+00:00",
+  "result": {
+    "alpha": 0.059387112603742784,
+    "h_inf": 0.0,
+    "bpc_128": 6.020649799671752,
+    "bpc_2048": 3.4169095814020856,
+    "bpc_32768": 1.2084551509122672,
+    "n_episodes": 1500,
+    "mean_turns": 3,
+    "mean_doc_bytes": 3534,
+    "n_bytes": 5303421
+  }
+}

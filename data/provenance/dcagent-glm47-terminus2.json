@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "DCAgent/neulab-swe-gym-openhands-sampled-trajectories-sandboxes_glm_4.7_traces_jupiter",
+  "hf_url": "https://huggingface.co/datasets/DCAgent/neulab-swe-gym-openhands-sampled-trajectories-sandboxes_glm_4.7_traces_jupiter",
+  "hf_revision_sha": "401aed568cd054bff5636db739b0cacc89d8f67d",
+  "config": "default",
+  "group_key": null,
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_conversations_auto",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-05T18:19:37.325446+00:00",
+  "result": {
+    "alpha": 0.3071616027491137,
+    "h_inf": 0.9126038403924985,
+    "bpc_128": 5.880772590637207,
+    "bpc_2048": 3.032608985900879,
+    "bpc_32768": 1.8172473907470703,
+    "n_episodes": 133,
+    "mean_turns": 36.9,
+    "mean_doc_bytes": 63185,
+    "n_bytes": 8388608
+  }
+}

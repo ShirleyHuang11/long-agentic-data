@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "DCAgent2/aider_polyglot_SWE_agent_LM_7B_20260429_173705-traces",
+  "hf_url": "https://huggingface.co/datasets/DCAgent2/aider_polyglot_SWE_agent_LM_7B_20260429_173705-traces",
+  "hf_revision_sha": "1098ccabf50b9a1c5dd0eab192d6bc83058d9338",
+  "config": "default",
+  "group_key": null,
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_conversations_auto",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-05T18:24:05.423198+00:00",
+  "result": {
+    "alpha": 0.2628023793640045,
+    "h_inf": 0.0,
+    "bpc_128": 4.657834053039551,
+    "bpc_2048": 1.8566036224365234,
+    "bpc_32768": 0.5048322677612305,
+    "n_episodes": 36,
+    "mean_turns": 114.7,
+    "mean_doc_bytes": 322104,
+    "n_bytes": 8388608
+  }
+}

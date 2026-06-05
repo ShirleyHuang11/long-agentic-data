@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "hamishivi/rlenv-appworld-train",
+  "hf_url": "https://huggingface.co/datasets/hamishivi/rlenv-appworld-train",
+  "hf_revision_sha": "04e1c2764546503e58e7ef0dd1f7d1fd22d507e4",
+  "config": "default",
+  "group_key": null,
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_messages_auto",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-05T15:15:33.616839+00:00",
+  "result": {
+    "alpha": -0.16574033820493084,
+    "h_inf": 9.937885438753428,
+    "bpc_128": 6.156159525188188,
+    "bpc_2048": 3.950167932242991,
+    "bpc_32768": 0.4573567708333333,
+    "n_episodes": 90,
+    "mean_turns": 2,
+    "mean_doc_bytes": 2447,
+    "n_bytes": 221130
+  }
+}

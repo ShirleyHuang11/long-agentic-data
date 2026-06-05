@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "JetBrains-Research/agent-trajectories-swe-bench-test-minus-verified",
+  "hf_url": "https://huggingface.co/datasets/JetBrains-Research/agent-trajectories-swe-bench-test-minus-verified",
+  "hf_revision_sha": "dd79e2540cab4c0cc2c5bab6ea71ddd7ac6c1775",
+  "config": "default",
+  "group_key": null,
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_messages_auto",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-05T18:09:35.892838+00:00",
+  "result": {
+    "alpha": 0.3460008392238601,
+    "h_inf": 1.62514230732656,
+    "bpc_128": 5.779199600219727,
+    "bpc_2048": 3.2167863845825195,
+    "bpc_32768": 2.234987258911133,
+    "n_episodes": 166,
+    "mean_turns": 28.4,
+    "mean_doc_bytes": 50829,
+    "n_bytes": 8388608
+  }
+}

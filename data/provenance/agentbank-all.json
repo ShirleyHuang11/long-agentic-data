@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "Solaris99/AgentBank",
+  "hf_url": "https://huggingface.co/datasets/Solaris99/AgentBank",
+  "hf_revision_sha": "6d718ff70e64b6c82236b839075763a4d5187180",
+  "config": "alfred+alfworld+apps+gsm8k+hotpotqa+humaneval+intercode_bash+intercode_sql+iqa+math+mathqa+mbpp+mbpp_before+mind2web+rearrange+strategyqa+triviaqa+webarena+webshop",
+  "group_key": null,
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_conversations",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-05T15:01:07.286825+00:00",
+  "result": {
+    "alpha": 0.48194113391399923,
+    "h_inf": 0.14585014339942054,
+    "bpc_128": 6.01036262512207,
+    "bpc_2048": 1.687255859375,
+    "bpc_32768": 0.5509872436523438,
+    "n_episodes": 807,
+    "mean_turns": 67.3,
+    "mean_doc_bytes": 10396,
+    "n_bytes": 8388608
+  }
+}

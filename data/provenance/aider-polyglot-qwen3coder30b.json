@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "DCAgent2/aider_polyglot_Qwen3_Coder_30B_A3B_Instruct_20260430_164230-traces",
+  "hf_url": "https://huggingface.co/datasets/DCAgent2/aider_polyglot_Qwen3_Coder_30B_A3B_Instruct_20260430_164230-traces",
+  "hf_revision_sha": "4d9f4476986956f5f1f86d2076530094456f692c",
+  "config": "default",
+  "group_key": null,
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_conversations_auto",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-05T18:23:50.444769+00:00",
+  "result": {
+    "alpha": 0.2305815007542208,
+    "h_inf": 0.08263819483327461,
+    "bpc_128": 5.70710563659668,
+    "bpc_2048": 3.050431251525879,
+    "bpc_32768": 1.6486167907714844,
+    "n_episodes": 53,
+    "mean_turns": 94.3,
+    "mean_doc_bytes": 160392,
+    "n_bytes": 8388608
+  }
+}

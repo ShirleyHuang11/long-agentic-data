@@ -1,0 +1,43 @@
+{
+  "hf_dataset": "THUDM/AgentInstruct",
+  "hf_url": "https://huggingface.co/datasets/THUDM/AgentInstruct",
+  "hf_revision_sha": "e252cf78ced8a0ea5f62cfd591784cdbbddbac8a",
+  "config": "default",
+  "splits": [
+    "os",
+    "db",
+    "alfworld",
+    "webshop",
+    "mind2web",
+    "kg"
+  ],
+  "serializer": "ser_conversations",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-05T14:05:55.960145+00:00",
+  "result": {
+    "alpha": 0.10525533115900414,
+    "h_inf": 0.0,
+    "bpc_128": 6.093187177693125,
+    "bpc_2048": 3.3173896982579842,
+    "bpc_32768": 1.2441585286458334,
+    "n_episodes": 1500,
+    "mean_turns": 12.8,
+    "mean_doc_bytes": 3290,
+    "n_bytes": 4939441
+  }
+}

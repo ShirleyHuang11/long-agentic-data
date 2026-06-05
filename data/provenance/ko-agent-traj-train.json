@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "taejoon89/Ko-Agent-Trajectories-1.0",
+  "hf_url": "https://huggingface.co/datasets/taejoon89/Ko-Agent-Trajectories-1.0",
+  "hf_revision_sha": "b979252f04ff55f05eeb167e10fe1993aea06584",
+  "config": "train",
+  "group_key": null,
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_messages_auto",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-05T18:19:47.459990+00:00",
+  "result": {
+    "alpha": 0.23166745104068445,
+    "h_inf": 0.0,
+    "bpc_128": 7.206829071044922,
+    "bpc_2048": 3.7720508575439453,
+    "bpc_32768": 1.9651126861572266,
+    "n_episodes": 1500,
+    "mean_turns": 8.5,
+    "mean_doc_bytes": 4835,
+    "n_bytes": 8388608
+  }
+}
