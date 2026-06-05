@@ -1,3 +1,7 @@
-.venv/
-.claude/
+# Heavy artifacts on scratch — symlinks in repo point to $SCRATCH/long-agentic-data/
+data/
+samples_cache/
+papers/
 __pycache__/
+*.pyc
+.venv/

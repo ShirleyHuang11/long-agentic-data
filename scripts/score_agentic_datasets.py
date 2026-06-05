@@ -62,6 +62,17 @@ def ser_trajectory_auto(row):
     return _msgs_auto(row["trajectory"])
 
 
+def ser_rebel_steps(row):
+    # ReBel ALFWorld: `steps` is a JSON-encoded list of step dicts (idx + obs/
+    # action/... fields); render each non-idx field as its own labelled line.
+    steps = json.loads(row["steps"])
+    parts = []
+    for s in steps:
+        body = "\n".join(f"[{k}]\n{v}" for k, v in s.items() if k != "idx" and v)
+        parts.append(body)
+    return "\n\n".join(parts), len(steps)
+
+
 def ser_messages_auto(row):
     return _msgs_auto(row["messages"])
 
@@ -350,6 +361,54 @@ REGISTRY = [
      ser_messages_auto, "deep-research-sft-0406"),
     ("FractalAIResearch/DeepResearch-SFT", None, ["train"],
      ser_fractal_dr, "fractal-deepresearch-sft"),
+    # --- loop iter 19: new SWE rollout dumps + Toucan MCP tool-agentic ---
+    ("AlienKevin/SWE-ZERO-12M-trajectories", None, ["train"],
+     ser_messages_auto, "swe-zero-12m-traj"),
+    ("Kwai-Klear/SWE-smith-mini_swe_agent_plus-trajectories-66k", None, ["train"],
+     ser_messages_auto, "kwai-klear-mini-swe-66k"),
+    # Toucan messages are a JSON-encoded string -> ser_swesmith handles both.
+    ("Agent-Ark/Toucan-1.5M", "Kimi-K2", ["train"],
+     ser_swesmith, "toucan-15m-kimi-k2"),
+    # --- loop iter 20 ---
+    # mini-swe-agent rollouts (GPT-5.2/5-mini mixture) on SWE-bench test-verified.
+    ("JetBrains-Research/agent-trajectories-swe-bench-test-minus-verified", None,
+     ["train"], ser_messages_auto, "jetbrains-swe-test-minus-verified"),
+    # --- loop iter 22 ---
+    # terminus-2 agent + GLM-4.7 traces on SWE-Gym sampled tasks.
+    ("DCAgent/neulab-swe-gym-openhands-sampled-trajectories-sandboxes_glm_4.7_traces_jupiter",
+     None, ["train"], ser_conversations_auto, "dcagent-glm47-terminus2"),
+    # Korean tool-calling dialogues (glm-5.1 generated) — first non-English entry.
+    ("taejoon89/Ko-Agent-Trajectories-1.0", "train", ["train"],
+     ser_messages_auto, "ko-agent-traj-train"),
+    # --- loop iter 23: mid-size generator contrast on identical polyglot tasks ---
+    ("DCAgent2/aider_polyglot_Qwen3_Coder_30B_A3B_Instruct_20260430_164230-traces",
+     None, ["train"], ser_conversations_auto, "aider-polyglot-qwen3coder30b"),
+    ("DCAgent2/aider_polyglot_SWE_agent_LM_7B_20260429_173705-traces",
+     None, ["train"], ser_conversations_auto, "aider-polyglot-sweagentlm7b"),
+    ("DCAgent2/aider_polyglot_R2EGym_32B_Agent_20260505_060450-traces",
+     None, ["train"], ser_conversations_auto, "aider-polyglot-r2egym32b"),
+    # --- loop iter 24: MiroVerse-style aggregated search/multihop agentic SFT ---
+    ("WaltonFuture/agentic-sft-new", None, ["train"],
+     ser_messages_auto, "miroverse-agentic-sft-new"),
+    # --- loop iter 25: SFT-corpus-scale ablation (same model/tasks, 1k vs 100k) ---
+    ("DCAgent3/aider_polyglot_nemotron_terminal_corpus_unified_1000__Qwen3_32B_20260520_085722",
+     None, ["train"], ser_conversations_auto, "aider-polyglot-qwen32b-ntc1k"),
+    ("DCAgent3/aider_polyglot_nemotron_terminal_corpus_unified_100000__Qwen3_32B_20260520_100037",
+     None, ["train"], ser_conversations_auto, "aider-polyglot-qwen32b-ntc100k"),
+    ("AI45Research/APP1-Agentic-Safety-SFT-Data", None, ["train"],
+     ser_messages_auto, "app1-agentic-safety-sft"),
+    # --- loop iter 26 ---
+    ("Decix/ReBel-ALFWorld-SFT-Trajectories", None, ["train"],
+     ser_rebel_steps, "rebel-alfworld-sft"),
+    # Korean factory-operations agent rollouts; JSONL direct-read (CastError on
+    # the hub loader), task_rollouts = the long-horizon split. n=70 caveat.
+    ("hf-json:SeongryongJung/factory-agent-rollouts", None, ["task_rollouts"],
+     ser_messages_auto, "factory-agent-task-rollouts"),
+    # --- loop iter 27: smolagents GAIA traces + Toucan teacher contrast ---
+    ("smolagents/gaia-traces", None, ["train"],
+     ser_messages_auto, "smolagents-gaia-traces"),
+    ("Agent-Ark/Toucan-1.5M", "OSS", ["train"], ser_swesmith, "toucan-15m-oss"),
+    ("Agent-Ark/Toucan-1.5M", "Qwen3", ["train"], ser_swesmith, "toucan-15m-qwen3"),
 ]
 
 
@@ -357,7 +416,15 @@ def iter_docs(path, cfg, splits, ser, group_key=None):
     cfgs = cfg if isinstance(cfg, list) else [cfg]
     for c in cfgs:
         for split in splits:
-            ds = load_dataset(path, c, split=split, streaming=True)
+            if path.startswith("hf-json:"):
+                # Raw JSONL direct-read (bypasses datasets schema cast — loop
+                # iters 17/26): split names the .jsonl file inside the repo.
+                repo = path[len("hf-json:"):]
+                ds = load_dataset(
+                    "json", data_files=f"hf://datasets/{repo}/{split}.jsonl",
+                    split="train", streaming=True)
+            else:
+                ds = load_dataset(path, c, split=split, streaming=True)
             if group_key is None:
                 for row in ds:
                     yield ser(row)
@@ -402,7 +469,7 @@ def score_entry(path, cfg, splits, ser, slug, seed_offset=0, group_key=None):
     # Provenance sidecar: exact source revision + sampling protocol, so every
     # number in the registry is traceable to a pinned upstream snapshot.
     try:
-        sha = HfApi().dataset_info(path).sha
+        sha = HfApi().dataset_info(path.removeprefix("hf-json:")).sha
     except Exception:
         sha = "unresolved"
     prov = {

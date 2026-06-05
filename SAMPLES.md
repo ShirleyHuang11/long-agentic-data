@@ -17,10 +17,19 @@
 | SWE-Hero OpenHands 轨迹 | SWE 轨迹 | 数万条 | 125.0 / 141,052 | SWE-Zero 的姊妹 dump，horizon 第二长（125 turns / 141 KB·ep⁻¹） | 0.318 | 0.81 | [`nvidia/SWE-Hero-openhands-trajectories`](https://huggingface.co/datasets/nvidia/SWE-Hero-openhands-trajectories) |
 | SWE-smith-trajectories | SWE 轨迹 | 5k 条 | 64.2 / 96,001 | 训练 SWE-agent-LM-32B 用的轨迹（`xml` split）；H∞=0.56 介于模板退化与 NL 之间 | 0.285 | 0.56 | [`SWE-bench/SWE-smith-trajectories`](https://huggingface.co/datasets/SWE-bench/SWE-smith-trajectories) |
 | SWE-Zero OpenHands 轨迹 | SWE 轨迹 | 数万条 | 63.7 / 79,325 | NVIDIA 在 SWE-Fixer-Train-110K 任务上跑 OpenHands 的轨迹（带 license 字段）；H∞=1.21 全轨迹类最高 —— 模板退化最少 | 0.315 | 1.21 | [`nvidia/SWE-Zero-openhands-trajectories`](https://huggingface.co/datasets/nvidia/SWE-Zero-openhands-trajectories) |
+| JetBrains GPT-5.2 轨迹 | SWE 轨迹（frontier 混采） | 166 条采样（test−verified） | 28.4 / 50,829 | mini-swe-agent 跑 SWE-bench test−verified 的 GPT-5.2/5-mini 混合 rollout；**H∞=1.63 全 registry 轨迹类最高**（超 OpenHands 0.6–1.2 一档）—— frontier 生成器信号最强样本（发现 6 上界更新） | 0.346 | 1.63 | [`JetBrains-Research/agent-trajectories-swe-bench-test-minus-verified`](https://huggingface.co/datasets/JetBrains-Research/agent-trajectories-swe-bench-test-minus-verified) |
+| DCAgent terminus-2 × GLM-4.7 轨迹 | SWE/终端轨迹 | 数百条（采样 133） | 36.9 / 63,185 | terminus-2 agent 跑 GLM-4.7 在 SWE-Gym sampled 任务上的 traces（含 result 标注，首行 AgentTimeoutError —— 含失败 episode）；**第 4 家 frontier 生成器落 0.7–1.6 健康带（发现 11 扩展）**；终端 agent 类别首个有内容的释出 | 0.307 | 0.91 | [`DCAgent/...glm_4.7_traces_jupiter`](https://huggingface.co/datasets/DCAgent/neulab-swe-gym-openhands-sampled-trajectories-sandboxes_glm_4.7_traces_jupiter) |
 | OpenHands-SFT-Trajectories | SWE 轨迹 | 数百条（success.oss） | 39.0 / 62,786 | SWE-Gym 官方 SFT 轨迹（成功 episode 过滤）；H∞=1.11 健康 | 0.349 | 1.11 | [`SWE-Gym/OpenHands-SFT-Trajectories`](https://huggingface.co/datasets/SWE-Gym/OpenHands-SFT-Trajectories) |
 | OpenHands-Sampled-Trajectories | SWE 轨迹（未过滤） | 数千条（train.raw） | 28.3 / 32,300 | SFT 版的未过滤原始采样（含失败 episode）；**与 SFT 版对照：成功过滤对 α/H∞ 几乎无影响**（Δα=0.015, ΔH∞=0.01），但成功 episode 更长（39.0 vs 28.3 turns） | 0.334 | 1.10 | [`SWE-Gym/OpenHands-Sampled-Trajectories`](https://huggingface.co/datasets/SWE-Gym/OpenHands-Sampled-Trajectories) |
 | OpenHands-Verifier-Trajectories | 验证器 (judge) 轨迹 | 数千条（train.mixture） | 3 / 63,167 | judge 对轨迹的评估对话（验证器训练数据），非 agent rollout 本体 | 0.339 | 1.07 | [`SWE-Gym/OpenHands-Verifier-Trajectories`](https://huggingface.co/datasets/SWE-Gym/OpenHands-Verifier-Trajectories) |
 | SWE-agent-trajectories | SWE 轨迹 | 80k 条 | 56.2 / 58,315 | Nebius 用 SWE-agent 修真实 GitHub issue 的完整轨迹（含失败）；规模 × 长度乘积最大 | 0.153 | 0.00 | [`nebius/SWE-agent-trajectories`](https://huggingface.co/datasets/nebius/SWE-agent-trajectories) |
+| Kwai-Klear mini-swe-agent+ 轨迹 | SWE 轨迹 | 66k 条 | 54.2 / 61,450 | mini-swe-agent-plus 在 SWE-smith issue 上的端到端轨迹（Klear-AgentForge-8B SFT 语料，解题率随 log 数据量近线性升）；H∞=0.26 偏低 —— shell 观测 + SWE-smith 合成 issue 模板拉低语义密度 | 0.234 | 0.26 | [`Kwai-Klear/SWE-smith-mini_swe_agent_plus-trajectories-66k`](https://huggingface.co/datasets/Kwai-Klear/SWE-smith-mini_swe_agent_plus-trajectories-66k) |
+| SWE-ZERO-12M 轨迹 | SWE 轨迹（execution-free） | **12M 条 / 112B tokens**（采样 325） | 31.9 / 25,824 | 迄今最大 agentic-coding 轨迹释出（122K PRs / 3K repos / 16 语言，execution-free 管线绕开容器化天花板）；H∞=0.80 落健康集群 —— **无执行验证不必然模板退化** | 0.264 | 0.80 | [`AlienKevin/SWE-ZERO-12M-trajectories`](https://huggingface.co/datasets/AlienKevin/SWE-ZERO-12M-trajectories) |
+| aider-polyglot × Qwen3-Coder-30B | 代码练习轨迹（受控对照） | 53 条（dump 全量） | 94.3 / 160,392 | OpenHands agent 跑 aider-polyglot 练习（非 repo-scale）；DCAgent2 同任务多生成器家族之一 | 0.231 | 0.08 | [`DCAgent2/aider_polyglot_Qwen3_Coder_30B_...-traces`](https://huggingface.co/datasets/DCAgent2/aider_polyglot_Qwen3_Coder_30B_A3B_Instruct_20260430_164230-traces) |
+| aider-polyglot × SWE-agent-LM-7B | 代码练习轨迹（受控对照） | 36 条（dump 全量） | 114.7 / **322,104** | 同上 7B 切片；**bytes·ep⁻¹ 全 registry 最大 —— 但 H∞=0：失败重试循环膨胀 horizon（发现 12）** | 0.263 | 0.00 | [`DCAgent2/aider_polyglot_SWE_agent_LM_7B_...-traces`](https://huggingface.co/datasets/DCAgent2/aider_polyglot_SWE_agent_LM_7B_20260429_173705-traces) |
+| aider-polyglot × R2EGym-32B | 代码练习轨迹（受控对照） | 44 条（dump 全量） | **149.8** / 196,427 | 同上 32B 切片；**turns·ep⁻¹ 全 registry 最多 —— 同为 H∞=0 的空转膨胀**；三家中型同任务全落模板带（发现 12） | 0.185 | 0.00 | [`DCAgent2/aider_polyglot_R2EGym_32B_Agent_...-traces`](https://huggingface.co/datasets/DCAgent2/aider_polyglot_R2EGym_32B_Agent_20260505_060450-traces) |
+| aider-polyglot × Qwen3-32B (ntc-1k SFT) | 代码练习轨迹（SFT 剂量对照） | 132 条 | 23.6 / 63,937 | terminus-2 跑 nemotron-terminal-corpus **1k** SFT 后的 Qwen3-32B；H∞=0 | 0.221 | 0.00 | [`DCAgent3/aider_polyglot_nemotron_terminal_corpus_unified_1000__Qwen3_32B_...`](https://huggingface.co/datasets/DCAgent3/aider_polyglot_nemotron_terminal_corpus_unified_1000__Qwen3_32B_20260520_085722) |
+| aider-polyglot × Qwen3-32B (ntc-100k SFT) | 代码练习轨迹（SFT 剂量对照） | 68 条 | 46.1 / 124,389 | 同上 **100k** SFT 版；**×100 SFT 剂量不改 H∞=0 签名，只拉长 episode（发现 13）** | 0.212 | 0.00 | [`DCAgent3/aider_polyglot_nemotron_terminal_corpus_unified_100000__Qwen3_32B_...`](https://huggingface.co/datasets/DCAgent3/aider_polyglot_nemotron_terminal_corpus_unified_100000__Qwen3_32B_20260520_100037) |
 | Nemotron-RL-SWE-Pivot | SWE RL（per-step） | 大规模（采样 534） | 90.0 / 15,749 | OpenHands 风格 per-*step* RL 数据（context messages + expected_action + pass_rate）；⚠️ 同 episode 多 step 行 → 前缀重叠 caveat | 0.207 | 0.59 | [`nvidia/Nemotron-RL-Agentic-SWE-Pivot-v1`](https://huggingface.co/datasets/nvidia/Nemotron-RL-Agentic-SWE-Pivot-v1) |
 | R2E-Gym SWE-agent-LM 轨迹 | SWE 轨迹（自回滚） | 数百条 | 30.4 / 70,847 | SWE-agent-LM-32B 在 R2E-Gym 上的 rollout（thought/action 步级 + reward，131k ctx 跑）；**H∞≈0.01 —— 32B 自产 rollout 呈模板退化签名，与 frontier-model OpenHands dump（H∞ 0.6–1.2）形成"生成器规模"对照** | 0.232 | 0.01 | [`AxT-dev/swe-agent-lm-32b-r2e-gym-trajectories`](https://huggingface.co/datasets/AxT-dev/swe-agent-lm-32b-r2e-gym-trajectories) |
 
@@ -47,6 +56,8 @@
 | Lumos (ground-iterative) | 多环境轨迹 | 1.5k+ 条采样 | 5.2 / 1,762 | 统一 planning/grounding 格式的子目标→动作标注；episode 极短，H∞=0 模板退化 | 0.211 | 0.00 | [`ai2lumos/lumos_unified_ground_iterative`](https://huggingface.co/datasets/ai2lumos/lumos_unified_ground_iterative) |
 | tau-bench traces (jkazdan) | 工具调用轨迹 | ⚠️ 仅 50 条 | 27.6 / 7,453 | 非官方 tau-bench SFT traces（航司/零售客服多轮工具调用）；content=None 的 tool_calls 载荷被丢（近似文本视图）；n=50 低样本 + H∞=0 | 0.263 | 0.00 | [`jkazdan/taubench_traces_training_data`](https://huggingface.co/datasets/jkazdan/taubench_traces_training_data) |
 | ToolBench ToolLLaMA-DFS | 工具调用轨迹 | 18k+ 条（非官方镜像） | 7.2 / 9,757 | ToolLLaMA 的 DFS 决策树轨迹（AutoGPT 风格多步 API 调用）；H∞=0 —— API 响应模板主导 | 0.192 | 0.00 | [`Yhyu13/ToolBench_toolllama_G123_dfs`](https://huggingface.co/datasets/Yhyu13/ToolBench_toolllama_G123_dfs) |
+| Ko-Agent-Trajectories-1.0 | 韩语工具调用 SFT | 数千条（采样 1500，train config） | 8.5 / 4,835 | **registry 首个非英语条目**（韩语 persona/场景合成，glm-5.1-fp8 生成，韩国本地 API 域）；H∞=0 落蒸馏模板集群 —— persona/场景模板复用主导，frontier 生成器也救不回（与发现 8 一致：结构性重复 > 生成器质量） | 0.232 | 0.00 | [`taejoon89/Ko-Agent-Trajectories-1.0`](https://huggingface.co/datasets/taejoon89/Ko-Agent-Trajectories-1.0) |
+| APP1 Agentic-Safety-SFT | 安全行为 SFT | 大规模（采样 1500） | 3 / 3,534 | 上海 AI Lab 安全分支 SFT（safe/unsafe 分叉对，短工具调用）；α=0.06+H∞=0 与 Nemotron-RL-Conv-Pivot 并列近纯模板 | 0.059 | 0.00 | [`AI45Research/APP1-Agentic-Safety-SFT-Data`](https://huggingface.co/datasets/AI45Research/APP1-Agentic-Safety-SFT-Data) |
 | Nemotron-SFT-Agentic-v2 (interactive) | 客服/政策工具对话 | 大规模（采样 1158） | 11.0 / 7,251 | NVIDIA Nemotron 合成 agentic SFT（policy-条件化客服 + 工具） | 0.167 | 0.26 | [`nvidia/Nemotron-SFT-Agentic-v2`](https://huggingface.co/datasets/nvidia/Nemotron-SFT-Agentic-v2) |
 | Nemotron-SFT-Agentic-v2 (search) | 搜索智能体 SFT | 大规模（采样 111） | 24.8 / 76,289 | 多跳搜索轨迹（raw JSONL 直读绕过 `datasets` schema 推断失败；bad_lines=0 —— 数据本身无损）；**H∞=1.37 与 nnetnav-live 并列轨迹类第二** | 0.261 | 1.37 | 同上 |
 | Nemotron-SFT-Agentic-v2 (tool_calling) | 工具调用 SFT | 大规模（采样 1073） | 12.1 / 7,825 | 同上 JSONL 直读；落入模板集群（H∞=0），与 interactive split 同签名 | 0.157 | 0.00 | 同上 |
@@ -54,9 +65,19 @@
 | APIGen-MT-5k | 多轮工具调用轨迹 | 5k 条 | 15.2 / 5,747 | Salesforce 多轮 API 调用对话（tau-bench 风格航司/零售域）；H∞=0 模板退化 | 0.178 | 0.00 | [`Salesforce/APIGen-MT-5k`](https://huggingface.co/datasets/Salesforce/APIGen-MT-5k) |
 | Agent-FLAN | 多环境 SFT 轨迹 | 7 splits（采样 1500，首 split 主导） | 11.6 / 3,681 | InternLM 的 agent SFT 混合（AgentInstruct react/tflan + ToolBench 变体）；与 AgentInstruct/AgentTraj-L 同签名（低 α + H∞=0） | 0.113 | 0.00 | [`internlm/Agent-FLAN`](https://huggingface.co/datasets/internlm/Agent-FLAN) |
 | ScienceWorld expert 轨迹 | 具身环境轨迹 | 580 条（test） | 45.9 / 8,680 | ⚠️ repo 名叫 webshop 但实为 **ScienceWorld** expert 轨迹（think_act agent，reward 标注）；turns 多但环境观测模板化（H∞=0） | 0.251 | 0.00 | [`lclan/webshop_expert_trajectories`](https://huggingface.co/datasets/lclan/webshop_expert_trajectories) |
+| ReBel-ALFWorld SFT 轨迹 | 具身环境轨迹 | 数百条（采样 277） | 13.6 / 30,296 | ALFWorld 专项 SFT 轨迹（obs/action step 序列）；α=0.11+H∞=0 与 AgentInstruct/AgentTraj 多环境模板集群完全同签名 —— 具身模拟器观测模板主导 | 0.108 | 0.00 | [`Decix/ReBel-ALFWorld-SFT-Trajectories`](https://huggingface.co/datasets/Decix/ReBel-ALFWorld-SFT-Trajectories) |
+| factory-agent task rollouts | 工厂运营 agent rollouts | ⚠️ 仅 70 条 | 24.7 / 7,714 | 韩语工厂运营 agent（GLM-4.x via openrouter，含 eval checks + 39 tool calls/ep）；JSONL 直读（hub loader CastError，发现 10 再证）；合成环境工具返回模板化 → H∞=0（与 Ko-Agent 同：**非英语 ≠ 例外，结构性重复照杀 H∞**） | 0.218 | 0.00 | [`SeongryongJung/factory-agent-rollouts`](https://huggingface.co/datasets/SeongryongJung/factory-agent-rollouts) |
 | FireAct (multitask-multimethod) | QA+搜索工具轨迹 | 2k+ 条 | 5.1 / 930 | ReAct/CoT/Reflexion 混合方法的 QA 搜索轨迹；episode 极短但 **H∞=1.80 全 registry 第二** —— 内容多样性高、模板低 | 0.397 | 1.80 | [`zwhe99/FireAct`](https://huggingface.co/datasets/zwhe99/FireAct) |
 | glaive-FC-v2 | 函数调用对话 | 113k 条 | 5.6 / 2,272 | 合成函数调用对话（raw text turns）；**短 FC 对话 H∞=1.05 反而高于 ToolLLaMA/APIGen 等轨迹型工具集（H∞=0）**—— 无重复环境观测 | 0.280 | 1.05 | [`glaiveai/glaive-function-calling-v2`](https://huggingface.co/datasets/glaiveai/glaive-function-calling-v2) |
 | Hermes-FC-v1 (func_calling) | 函数调用对话（多轮） | 数千条 | 4.6 / 6,788 | NousResearch XML-tools 风格多轮 FC；同上，H∞=0.78 健康区间 | 0.259 | 0.78 | [`NousResearch/hermes-function-calling-v1`](https://huggingface.co/datasets/NousResearch/hermes-function-calling-v1) |
+| DTap-Bench Claude-Opus-4.6 轨迹 | 多域安全评测轨迹 | ~10k episode 文件（采样 443，24 个 domain×label 组轮询） | 18.1 / 19,194 | Claude Opus 4.6 在 12 域（browser/code/finance/medical…）benign+**malicious** 任务上的完整轨迹（judge 标注另存）；唯一的对抗性安全评测轨迹源；frontier 生成器 → H∞=0.71 健康；另有 Sonnet-4.5 / Gemini-3-Pro 平行切片可做生成器对照 | 0.277 | 0.71 | [`AI-Secure/DTap-Bench-Agent-Trajectories`](https://huggingface.co/datasets/AI-Secure/DTap-Bench-Agent-Trajectories) |
+| DTap-Bench Sonnet-4.5 切片 | 多域安全评测轨迹 | 同上（采样 482，24 组） | 16.0 / 17,493 | 与 Opus 切片**同任务同域**的平行 rollout —— 受控生成器对照 | 0.283 | 0.81 | 同上 |
+| DTap-Bench Gemini-3-Pro 切片 | 多域安全评测轨迹 | 同上（采样 364，仅 13 组 —— 该切片域覆盖较少） | 13.6 / 23,110 | 同上第三家对照；**三家 frontier H∞ 紧聚 0.71–0.81（发现 11）** | 0.302 | 0.74 | 同上 |
+| Toucan-1.5M (Kimi-K2) | MCP 工具轨迹（合成） | 1.5M 条（采样 553） | 18.0 / 15,177 | 最大全合成 tool-agent 集（495 个**真实 MCP server** / 2000+ tools，真实工具执行，多轮+并行调用）；**H∞=1.34 与 Nemotron-search/nnetnav-live 并列轨迹类第二梯队 —— 合成任务 + 真实环境响应不模板退化**，再证发现 8/9 | 0.374 | 1.34 | [`Agent-Ark/Toucan-1.5M`](https://huggingface.co/datasets/Agent-Ark/Toucan-1.5M) |
+| MiroVerse agentic SFT (WaltonFuture) | 搜索/多跳工具 SFT 聚合 | 多 split（采样 152） | 12.9 / 55,307 | MiroVerse 系多源聚合（split 标源：2WikiMultihopQA 等，长工具链搜索）；H∞=1.21 与 II-Agent GAIA/Nemotron-search 同在真实搜索健康带（发现 9 再证） | 0.245 | 1.21 | [`WaltonFuture/agentic-sft-new`](https://huggingface.co/datasets/WaltonFuture/agentic-sft-new) |
+| Toucan-1.5M (OSS) | MCP 工具轨迹（teacher 对照） | 同 repo（采样 309） | 11.9 / 27,245 | 同管线 gpt-oss teacher 切片；H∞=0.57 为三 teacher 最低、episode 反而最长（27KB）—— verbose ≠ 密度 | 0.382 | 0.57 | 同上 |
+| Toucan-1.5M (Qwen3) | MCP 工具轨迹（teacher 对照） | 同 repo（采样 730） | 6.4 / 11,494 | 同管线 Qwen3 teacher 切片；**三 teacher H∞ 0.57–1.34（Kimi-K2 1.34 > Qwen3 1.10 > OSS 0.57）—— 同管线下 teacher 选择移动 H∞ 逾 2×**（⚠️ 各切片任务组成未必严格一致，非完全受控） | 0.342 | 1.10 | 同上 |
+| smolagents GAIA traces | 多跳研究/代码 agent 轨迹 | 数千条（采样 1120） | 6.0 / 7,511 | HF open-deep-research 系 GAIA traces（code-as-action，gpt-4o 生成；22.9k 下载量为本轮扫描最高）；H∞=1.44 健康带上沿 —— 真实多跳搜索再证发现 9 | 0.301 | 1.44 | [`smolagents/gaia-traces`](https://huggingface.co/datasets/smolagents/gaia-traces) |
 | II-Agent GAIA 轨迹 | 多跳研究/工具轨迹 | 165 条（GAIA val 全集） | 46.6 / 20,984 | II-Agent 跑 GAIA validation 的完整 tool_call trace（含 judge 标注）；**绕开 GAIA gate 的轨迹代理**；H∞=1.25 健康 —— 多跳搜索内容多样 | 0.197 | 1.25 | [`Intelligent-Internet/ii-agent_gaia-benchmark_validation`](https://huggingface.co/datasets/Intelligent-Internet/ii-agent_gaia-benchmark_validation) |
 | deep-research SFT (0406) | 深度研究轨迹 | 数百条 | 32.5 / 52,522 | 多源调研 SFT（长工具链 + 综合报告）；episode 长但 H∞=0 —— 蒸馏签名 | 0.179 | 0.00 | [`kylemontgomery/deep-research-sft-0406`](https://huggingface.co/datasets/kylemontgomery/deep-research-sft-0406) |
 | Fractal DeepResearch-SFT | 深度研究报告 | 72 条采样 | 1 / 118,099 | plan+report 单文档（118 KB/ep，全 registry 第 4 长）；H∞=0 —— 合成报告模板主导 | 0.180 | 0.00 | [`FractalAIResearch/DeepResearch-SFT`](https://huggingface.co/datasets/FractalAIResearch/DeepResearch-SFT) |
@@ -72,9 +93,9 @@
 
 ---
 
-## V. 总览速查（α × H∞ × horizon，迭代 18 收尾时点，n=42 有效 / CSV 46 行含 4 项已剔除）
+## V. 总览速查（α × H∞ × horizon，迭代 28 收尾时点，n=63 有效 / CSV 67 行含 4 项已剔除）
 
-### Horizon 排行（bytes·ep⁻¹ 前五）
+### Horizon 排行（bytes·ep⁻¹ 前五，仅 H∞>0.3 的健康轨迹；H∞≈0 的"空转膨胀"纪录（aider-polyglot 7B 322KB / R2EGym-32B 149.8 turns）见发现 12）
 
 | # | 数据集 | bytes·ep⁻¹ | turns | α | H∞ |
 | :- | :--- | :--- | :--- | :--- | :--- |
@@ -86,17 +107,18 @@
 
 （Fractal DeepResearch 单文档报告 118 KB/ep 按字节可排 #4，但 turns=1 非轨迹，不入此榜。）
 
-**长 horizon 即 SWE + 搜索：** bytes·ep⁻¹ 前 5 全部是 repo-scale 代码智能体轨迹；真·长轨迹（>20 turns 且 >50KB）存在于 SWE/OpenHands 生态、真实用户会话、以及 iter 17 抢救的 Nemotron-v2 search split（24.8 turns / 76 KB·ep⁻¹ / H∞=1.37）。
+**长 horizon 即 SWE + 搜索：** bytes·ep⁻¹ 前 5（健康带内）全部是 repo-scale 代码智能体轨迹；真·长轨迹（>20 turns 且 >50KB 且 H∞>0.3）存在于 SWE/OpenHands 生态、真实用户会话、Nemotron-v2 search、以及 iters 19–27 新收的 SWE-ZERO-12M / Kwai-Klear / JetBrains / DCAgent-GLM-4.7。无过滤的原始 bytes/turns 纪录（aider-polyglot 7B 322KB·ep⁻¹ / R2EGym-32B 149.8 turns）均为 H∞=0 空转膨胀，见发现 12。
 
 ### 签名集群（α × H∞ 象限，对照 `data_format.md` §XIII）
 
 | 集群 | 签名 | 成员 | 解读 |
 | :--- | :--- | :--- | :--- |
-| **健康长轨迹** | α 0.29–0.36, H∞ 0.6–1.2 | OpenHands 全家（rebench/Hero/Zero/SFT/Sampled/feedback）、SWE-smith | 长程结构 + 真实语义密度并存；**长 context 训练首选** |
-| **蒸馏 SFT 模板退化** | α 0.10–0.26, **H∞=0** | AgentInstruct、AgentTraj-L、Agent-FLAN、CodeAct、ToolLLaMA-DFS、APIGen-MT、Lumos、ScienceWorld、tau-bench traces、nebius-SWE-agent | 环境观测/系统提示模板主导，外推到无穷上下文几乎全可压；与 math 综述"低α+H∞≈0 退化签名"一致 |
+| **健康长轨迹（frontier 生成器）** | α 0.26–0.38, H∞ 0.57–1.63 | OpenHands 全家（rebench/Hero/Zero/SFT/Sampled/feedback）、SWE-smith、SWE-ZERO-12M、**JetBrains GPT-5.2（1.63 上界）**、DCAgent GLM-4.7、DTap 三家（Opus/Sonnet/Gemini 0.71–0.81）、Toucan（Kimi-K2/Qwen3）、MiroVerse、smolagents-gaia、II-Agent GAIA、Nemotron-search | 长程结构 + 真实语义密度并存；**长 context 训练首选**；frontier 生成器 + 真实环境响应是充分条件（发现 6/9/11） |
+| **蒸馏 SFT 模板退化** | α 0.05–0.26, **H∞=0** | AgentInstruct、AgentTraj-L、Agent-FLAN、CodeAct、ToolLLaMA-DFS、APIGen-MT、Lumos、ScienceWorld、tau-bench traces、nebius-SWE-agent、Ko-Agent（韩语）、APP1、ReBel-ALFWorld、factory-agent（韩语）、deep-research-sft、Fractal | 环境观测/系统提示/persona 模板主导；跨语言、跨域成立 —— 结构性重复照杀 H∞（发现 4/8） |
+| **中型生成器失败空转** | α 0.19–0.26, H∞ 0–0.08，episode 反而最长 | aider-polyglot 家族（7B/30B/32B、ntc-1k/100k）、R2E-Gym SWE-agent-LM-32B、Kwai-Klear-66k（0.26 边缘） | **失败重试循环膨胀 horizon**：turns/bytes 双纪录全在此集群；SFT 剂量 ×100 救不回（发现 12/13） |
 | **compact 高密度** | α 0.40–0.49, H∞ 1.7–1.95 | WebLINX/Mind2Web action 视图、FireAct | 人写/多样内容、observation 已剥离；短 episode 但语义密度全场最高 |
 | **观测坍缩对照** | 同源 H∞ 1.7→0.3 / 1.95→0.0 | mind2web/weblinx full-obs vs action 视图 | **观测并入即 H∞ 坍缩** —— web 观测在长程上近乎纯模板冗余 |
-| **拟合 artifact（已剔除）** | α<0 或 H∞>8 | Nemotron-v1、rlenv-appworld | 近恒等文档集上 3-point 拟合失效；CSV 保留原始分，registry 不收 |
+| **拟合 artifact（已剔除）** | α<0 或 H∞>8 | Nemotron-v1、rlenv-appworld、Aguvis 文本侧 | 近恒等文档集上 3-point 拟合失效；CSV 保留原始分，registry 不收 |
 
 ### 累积发现
 
@@ -110,6 +132,9 @@
 8. **观测重复才是 H∞=0 的根因**（iter 12）：短 FC 对话（glaive 1.05 / hermes 0.78）H∞ 反而高于轨迹型工具集（ToolLLaMA/APIGen=0）—— 杀死 H∞ 的不是"工具调用"本身，而是逐 turn 重复的环境观测/模板。
 9. **同域不同签名**（iter 15–17）：同为"深度研究/搜索"域，蒸馏报告型 SFT（deep-research-sft / Fractal）H∞=0，而真实多跳搜索轨迹（II-Agent GAIA 1.25、Nemotron-v2 search 1.37）H∞ 健康 —— 域不决定签名，生成管线决定。
 10. **加载失败 ≠ 数据损坏**（iter 17）：Nemotron-v2 两 split 的 CastError/JSON 错全是 `datasets` schema 推断问题，raw JSONL 直读 bad_lines=0 全量可用 —— 弃用判定前先试绕过加载器。
+11. **H∞ 探针的生成器分辨率有限**（iter 21）：DTap 同任务受控对照下，Opus-4.6 / Sonnet-4.5 / Gemini-3-Pro 三家 frontier 的 H∞ 紧聚 0.71–0.81（α 0.28–0.30）—— H∞ 一刀切开 frontier（0.7–1.6）vs 小模型自产 rollout（≈0，发现 6），但 **frontier 内部排名不可分**（无 σ 时 0.1 差异不可解读）。
+12. **长 horizon ≠ 高信息密度**（iter 23）：aider-polyglot 同任务受控对照下，7B/30B/32B 中型生成器全落 H∞ 0–0.08 模板带，且 episode 反而最长（94–150 turns / 160–322KB·ep⁻¹，全 registry turns 与 bytes 双纪录）—— **失败重试循环膨胀 horizon**；bytes/turns 排行必须配 H∞ 解读，与发现 6/11 合并成完整生成器谱系：frontier 0.7–1.6 ≫ 中型 ≈0。
+13. **SFT 剂量不改变签名带**（iter 25）：同任务同架构下，Qwen3-32B 经 1k vs 100k agentic SFT 后的轨迹均 H∞=0（α 0.22→0.21），×100 数据量只拉长 episode（23.6→46.1 turns）—— **决定 H∞ 带的是生成器能力档位，不是 agentic SFT 剂量**（此对照限单一 32B 架构 + polyglot 任务，外推需谨慎）。
 
 ## 候选队列（按预期 horizon 长度排序，每轮从顶部取 2–3 个）
 
@@ -121,7 +146,17 @@
 | `OS-Copilot/OS-Genesis-web-data` / `-mobile-data` | GUI 轨迹 | OS-Genesis 反向合成的 GUI 轨迹 | ⛔ token 已配但仍 gated —— 需在数据集页面点"request access" (iter 12) |
 | `smolagents/aguvis-stage-2` (Aguvis) | GUI 轨迹（多模态） | 文本侧切片实测为拟合 artifact（α=−0.03/H∞=34.6：每行单 step + 巨型重复 system prompt）→ 不入 registry；真·多模态协议仍待设计 | ⚠️ 文本侧 artifact (iter 14) |
 | `webarena-x/webarena-infinity-trajectories` | WebArena 轨迹 | 实测仅截图 PNG，无文本轨迹 | ⚠️ 弃 (iter 15) |
-| `Intelligent-Internet/swebench-pro-*-ii-agent-trajectories` | SWE 轨迹（frontier 模型） | SWE-bench-Pro 上 Sonnet-4.5/GPT-5 轨迹 | ⛔ gated，需页面 request access (iter 15) |
+| `Intelligent-Internet/swebench-pro-*-ii-agent-trajectories` | SWE 轨迹（frontier 模型） | iter 25 复查：Sonnet-4.5 版已 404（repo 撤下）；gpt-5-codex 版仍 gated | ⛔ gated / 部分撤下 (iter 25 复查) |
+| `0xRyanxx/agent-consensus-rollouts-robust-scalar` | 多智能体共识博弈（per-step） | 实查：每行单 agent 单轮提案（proposal/stop_vote），токen 级元数据为主 —— 非长程工具轨迹 | ⚠️ 域外剔除 (iter 25) |
+| `VerlTool/SkyRL-SQL-Reproduction` 等 SkyRL 系 | SQL RL「轨迹」（实为任务 prompt） | 实查：prompt=schema+问题的 RL 任务定义，非 rollout —— 与 rlenv-appworld 同类 | ⚠️ 非轨迹剔除 (iter 26) |
+| `thoughtworks/agentic-coding-trajectories` | SWE 轨迹（聚合重打包） | manifest 实查：15k sessions 全部来自 3 个已入 registry 的源（swe-rebench-OH 5k + SWE-smith 5k + Kwai-Klear-mini 5k）—— 纯重打包无新信息 | ⚠️ 重打包剔除 (iter 20) |
+| `JetBrains-Research/agent-trajectories-swe-bench-test-minus-verified` | SWE 轨迹（GPT-5.2 混采） | mini-swe-agent 在 SWE-bench test−verified 上的 GPT-5.2/5-mini 混合 rollout；单 parquet | 待评分 (iter 19 发现) |
+| `mlfoundations/gelato-osworld-agent-trajectories` | GUI 轨迹（多模态） | OSWorld 上 gelato-30b 的 rollout；目录树为截图 PNG + result.txt，文本侧极薄 | ⚠️ 多模态为主 (iter 19) |
+| `VmaxRL/SWE-universe-repaired-bug-pilot-trajectories` | SWE「轨迹」（实为 verdict） | 实查 payload：SWETestVerdict-v2 grader 裁定 + 155KB 原始 pytest 输出，patch_diff=None，**无轨迹内容** —— repo 名误导 | ⚠️ 非轨迹剔除 (iter 22) |
+| `WenyiWU0111/CoMEM-agent-memory-trajectories` | Web「轨迹」（实为 URL 表） | 实查行 schema：13 个领域字段各存 URL 列表，无 action/observation —— 非轨迹 | ⚠️ 非轨迹剔除 (iter 22) |
+| `israel-adewuyi/kwaiklear-sample-level-agent-trajectories-2.2M` | SWE per-step 派生 | Kwai-Klear 66k（已入 §I）的 sample-level 重切分（question=该步上文）—— 同源 + per-step 前缀重叠双重排除 | ⚠️ 派生剔除 (iter 22) |
+| `JohnBeanerson/claude-code-sessions-test` | Claude Code 会话（新类别） | raw 直读实查：单 session 5 行 3.3KB（"hey there" 测试 dump）—— 空壳；**Claude Code session 类别本身仍待真正释出** | ⚠️ 空壳剔除 (iter 24) |
+| `danielliu99/mcp-universe-traces` | MCP「traces」（实为 verdict） | 实查：results=评测 config+判分列表，无轨迹内容 | ⚠️ 非轨迹剔除 (iter 23) |
 | `OpenGVLab/GUI-Odyssey` (24k 下载) | GUI 轨迹（多模态） | 跨 app 导航轨迹 | 多模态扩展 |
 | AppWorld 完整 rollouts | 交互轨迹 | `satyakic/appworld-rollouts-*` 是 event-sourcing 日志（重建复杂），弃；`hamishivi/rlenv-appworld-train` 实测是 90 条任务 prompt 非 rollout，且 3-point 拟合 artifact（α=−0.17, H∞=9.9）→ 不入 registry | ⚠️ 官方轨迹 dump 未找到 |
 | tau-bench 官方/更大轨迹源 | 工具调用轨迹 | `sammshen/taubench-sonnet-traces` 实测整个 dump 是**单次 run 的代理日志**（聚合后仅 1 episode，29KB < 32KB oracle 块）→ oracle 不适用，不入 registry；`annon124816/tau_bench`（2.3k 下载）实测是 parquet 校验清单非数据 (iter 10)；jkazdan 50 条已入 §III，更大源仍缺 | ⚠️ 待更大轨迹源 |
@@ -153,3 +188,13 @@
 | 15–16 | 2026-06-05 | 新类别扫描（computer-use / deep-research / browser-use）：+3 集 → §III（**II-Agent GAIA 轨迹 H∞=1.25 —— 绕 gate 的 GAIA 代理**；deep-research-sft 52KB/ep 与 Fractal 118KB/ep 均 H∞=0 蒸馏签名）；webarena-infinity 纯截图弃；ii-agent SWE-Pro gated |
 | 17 | 2026-06-05 | **JSONL 直读抢救 Nemotron-v2 两 split**（加载失败原是 `datasets` schema 推断，数据无损）：search 24.8 turns/76KB/H∞=1.37 轨迹类第二；tool_calling 模板集群；发现 9/10 落档 |
 | 18 | 2026-06-05 | **终轮收尾**：§V 刷新至 n=42 有效 / CSV 46 行（4 项剔除）；发现扩至 10 条；遗留：gated ×5（GAIA/OS-Genesis/xlam/ii-SWE-Pro ×2）等页面授权、GUI-Odyssey/OSWorld 多模态协议、5-seed σ 升级。**循环结束** |
+| 19 | 2026-06-05 | **续 10 轮（用户指示，iters 19–28）**：HF token 重配（~/.cache 被清，自 ~/.env 恢复）；新候选扫描 +3 集：**SWE-ZERO-12M → §I（迄今最大 agentic-coding 释出，12M 条/112B tokens，execution-free，H∞=0.80 健康）**、Kwai-Klear mini-swe-agent+ 66k → §I（54.2 turns/61KB 但 H∞=0.26 偏低）、**Toucan-1.5M Kimi-K2 → §III（最大合成 tool-agent 集，真实 MCP 执行，H∞=1.34 —— 合成+真实环境响应不退化，再证发现 8/9）**；4 新候选入队（thoughtworks 聚合、JetBrains GPT-5.2、DTap-Bench Claude 轨迹、gelato-OSWorld 多模态） |
+| 20 | 2026-06-05 | +2 集：**JetBrains GPT-5.2 轨迹 → §I（H∞=1.63 全 registry 轨迹类新高，frontier 生成器信号上界更新）**；DTap-Bench Opus-4.6 切片 → §III（新增 `scripts/score_dtap_direct.py` JSON-per-episode 直读 loader，24 domain×label 组轮询采样 443 eps，H∞=0.71 健康；唯一对抗性安全评测轨迹源）；thoughtworks 实查 manifest 后剔除（15k sessions 全来自 3 个已入 registry 的源，纯重打包）；Sonnet-4.5/Gemini-3-Pro 切片留队列做生成器对照 |
+| 21 | 2026-06-05 | **受控生成器对照轮**：DTap Sonnet-4.5（482 eps，H∞=0.81）+ Gemini-3-Pro（364 eps，仅 13 组，H∞=0.74）切片 → §III；**发现 11 落档：同任务下三家 frontier H∞ 紧聚 0.71–0.81 —— H∞ 探针分得开 frontier vs 小模型（≈0），分不开 frontier 内部** |
+| 22 | 2026-06-05 | +2 集：**DCAgent terminus-2 × GLM-4.7 → §I（36.9 turns/63KB，H∞=0.91 —— 第 4 家 frontier 落健康带；终端 agent 类别首个有内容释出）**；Ko-Agent-1.0 → §III（**首个非英语条目**，韩语合成工具调用，H∞=0 —— persona/场景模板复用主导，frontier 生成器救不回，发现 8 跨语言成立）；3 候选实查剔除：VmaxRL（grader verdict + pytest 输出非轨迹）、CoMEM（URL 表非轨迹）、kwaiklear-2.2M（已入集的 per-step 派生）；插曲：.venv 符号链接被外部清理，按新增 requirements.txt 重建 |
+| 23 | 2026-06-05 | **中型生成器受控对照轮**：DCAgent2 aider-polyglot 家族 ×3 → §I（同任务 OpenHands rollout：Qwen3-Coder-30B H∞=0.08 / SWE-agent-LM-7B H∞=0（**322KB·ep⁻¹ 全场最大**）/ R2EGym-32B H∞=0（**149.8 turns 全场最多**））；**发现 12 落档：中型生成器全落模板带且 episode 反而最长 —— 失败重试空转膨胀 horizon，长 horizon ≠ 信息密度**；horizon 排行加 H∞>0.3 过滤；mcp-universe-traces 剔除（verdict 非轨迹）；claude-code-sessions（teich 依赖）+ MiroVerse SFT 入队 |
+| 24 | 2026-06-05 | +1 集：MiroVerse agentic SFT → §III（12.9 turns/55KB，H∞=1.21 真实搜索健康带，发现 9 再证）；claude-code-sessions-test raw 直读实查为空壳（单 session 5 行测试 dump）剔除 —— Claude Code 会话类别仍待真正释出 |
+| 25 | 2026-06-05 | **SFT 剂量对照轮**：DCAgent3 Qwen3-32B ntc-1k/100k ×2 → §I（均 H∞=0，**发现 13：×100 agentic SFT 剂量不改签名带，只拉长 episode**）；APP1 安全 SFT → §III（α=0.06/H∞=0 近纯模板）；gated ×4 复查仍 blocked（Sonnet-4.5 SWE-Pro 已 404 撤下）；consensus-game per-step 域外剔除；factory-agent-rollouts 入队；插曲：scratch .venv 二次被删，迁至会话 /tmp 重建 |
+| 26 | 2026-06-05 | +2 集 → §III：ReBel-ALFWorld（α=0.11/H∞=0，与多环境模板集群同签名）；factory-agent task_rollouts（韩语工厂域，`hf-json:` 直读分支新增至 iter_docs，n=70 caveat，H∞=0 —— 合成环境模板跨语言照杀）；SkyRL-SQL 系实查为 RL 任务 prompt 非轨迹剔除 |
+| 27 | 2026-06-05 | **teacher 对照 + 大漏网轮**：Toucan OSS/Qwen3 切片 ×2 → §III（**同管线三 teacher H∞ 0.57–1.34，teacher 选择移动 H∞ 逾 2×**，半受控 caveat）；smolagents/gaia-traces → §III（22.9k 下载的漏网大户，gpt-4o code-agent，H∞=1.44 健康带上沿，发现 9 四证） |
+| 28 | 2026-06-05 | **终轮收尾（iters 19–28 共 +21 集 / 剔除 11 候选 / 新发现 11–13）**：§V 刷新至 n=63 有效 / CSV 67 行（67 provenance / 67 samples 三方一致）；签名集群表重构（健康带成员扩至 frontier 全谱、新增"中型生成器失败空转"集群）；遗留：gated ×4（GAIA/OS-Genesis/xlam/ii-SWE-Pro-codex）待页面授权、Toucan SFT 切片、GUI-Odyssey/OSWorld 多模态协议、5-seed σ 升级、Claude Code 会话类别待真正释出。**循环结束** |
