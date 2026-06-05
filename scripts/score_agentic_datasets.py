@@ -71,6 +71,20 @@ def ser_nemotron_inj(row):
     return f"{doc}\n\n[environment]\n{env}", n + 1
 
 
+def ser_agentnet(row):
+    # AgentNet (OSWorld-family computer-use): traj steps carry full textual
+    # observation/thought/action/reflection + pyautogui code; images are
+    # filename strings (excluded). First true desktop-GUI text-side entry.
+    parts = [f"[instruction]\n{row.get('instruction') or ''}"]
+    for s in row["traj"]:
+        v = s.get("value") or {}
+        body = "\n".join(f"[{k}]\n{v[k]}" for k in
+                         ("observation", "thought", "action", "code", "reflection")
+                         if v.get(k))
+        parts.append(body)
+    return "\n\n".join(parts), len(row["traj"])
+
+
 def ser_rebel_steps(row):
     # ReBel ALFWorld: `steps` is a JSON-encoded list of step dicts (idx + obs/
     # action/... fields); render each non-idx field as its own labelled line.
@@ -426,6 +440,8 @@ REGISTRY = [
     # payload, so it is part of the document (see ser_nemotron_inj).
     ("nvidia/Nemotron-RL-Agentic-Indirect-Prompt-Injection-v1", None, ["train"],
      ser_nemotron_inj, "nemotron-rl-injection-v1"),
+    # --- loop iter 32: first desktop computer-use entry (text side) ---
+    ("xlangai/AgentNet", None, ["train"], ser_agentnet, "agentnet-text"),
 ]
 
 

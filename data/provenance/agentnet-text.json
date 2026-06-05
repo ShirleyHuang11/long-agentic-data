@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "xlangai/AgentNet",
+  "hf_url": "https://huggingface.co/datasets/xlangai/AgentNet",
+  "hf_revision_sha": "d76ee50a63fad81cfdbe576416757d7c2091ed50",
+  "config": "default",
+  "group_key": null,
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_agentnet",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-05T20:43:50.167054+00:00",
+  "result": {
+    "alpha": 0.13571848724225197,
+    "h_inf": 0.0,
+    "bpc_128": 6.066193580627441,
+    "bpc_2048": 3.5615615844726562,
+    "bpc_32768": 1.842376708984375,
+    "n_episodes": 160,
+    "mean_turns": 16.7,
+    "mean_doc_bytes": 52850,
+    "n_bytes": 8388608
+  }
+}

@@ -43,6 +43,7 @@
 | WebLINX (action 视图) | Web 轨迹 | 2.3k demos / 155 站点 | 25.2 / 1,646 | 真人导航对话，episode=按 `demo` 聚合的 compact action 视图（raw `clean_html` ~100KB/turn 已排除）；**H∞=1.95 全 registry 最高** —— 真人行为语义密度最大 | 0.489 | 1.95 | [`McGill-NLP/weblinx`](https://huggingface.co/datasets/McGill-NLP/weblinx) |
 | Mind2Web (action 视图) | Web 轨迹 | 2,350 任务 / 137 站点 | 7.7 / 423 | **compact action 视图**（task + action_reprs），非全观测 | 0.420 | 1.70 | [`osunlp/Mind2Web`](https://huggingface.co/datasets/osunlp/Mind2Web) |
 | Mind2Web (全观测切片) | Web 轨迹（full-obs） | 同上，129 eps 采样 | 7.9 / 65,038 | 每步 `cleaned_html`（37–240KB/步）截断至 8KB；**与 action 视图对照：H∞ 1.70→0.30** —— HTML 观测样板主导长程冗余 | 0.427 | 0.30 | 同上 |
+| AgentNet (文本侧) | 桌面 computer-use 轨迹 | 大规模（采样 160） | 16.7 / 52,850 | **registry 首个桌面 GUI 条目**（OSWorld 家族；步级 observation/thought/action/reflection + pyautogui code 全文本，截图仅文件名可排除）；H∞=0 —— VLM 生成的标注层呈蒸馏签名 + 相邻步屏幕描述近重复（发现 3/8 双重机制，不可分） | 0.136 | 0.00 | [`xlangai/AgentNet`](https://huggingface.co/datasets/xlangai/AgentNet) |
 | WebLINX (全观测切片) | Web 轨迹（full-obs） | 同 WebLINX，116 eps 采样 | 29.1 / 72,353 | pruned DOM（~1.6–4.3KB/turn）全量 + action；**与 action 视图对照：H∞ 1.95→0.00** —— 相邻 turn 页面几乎不变，观测近乎纯冗余 | 0.203 | 0.00 | 同上 |
 
 ## III. 多环境 / 工具使用轨迹
@@ -95,7 +96,7 @@
 
 ---
 
-## V. 总览速查（α × H∞ × horizon，迭代 31 时点，n=65 有效 / CSV 69 行含 4 项已剔除）
+## V. 总览速查（α × H∞ × horizon，迭代 32 时点，n=66 有效 / CSV 70 行含 4 项已剔除）
 
 ### Horizon 排行（bytes·ep⁻¹ 前五，仅 H∞>0.3 的健康轨迹；H∞≈0 的"空转膨胀"纪录（aider-polyglot 7B 322KB / R2EGym-32B 149.8 turns）见发现 12）
 
@@ -171,7 +172,7 @@
 | `McGill-NLP/weblinx-browsergym` | Web 轨迹（BrowserGym 格式） | WebLINX 的 BrowserGym 重打包；认证后重试仍 ReadTimeout（文件树过大，metadata 列举本身超时）；compact/fullobs 两视图已入 registry，边际价值低 | ⚠️ 搁置（认证后仍超时，iter 12） |
 | `Hongliang1997/OpenWebVoyager-IL-Trajectories-GPT-4o` | Web 轨迹 | repo 布局损坏（SplitsNotFoundError），无法流式加载 | ⚠️ 弃 (iter 8) |
 | `gaia-benchmark/GAIA` | 多跳工具基准 | gated | ⛔ token 已配但仍 gated —— 需在数据集页面点"request access" (iter 12) |
-| OSWorld / AgentNet | GUI 轨迹 | 多模态（截图），需 schema 工作 | 多模态扩展 |
+| OSWorld / AgentNet | GUI 轨迹 | AgentNet 文本侧已入 §II（iter 32，H∞=0）；OSWorld 本体及 `mlfoundations-cua-dev/*`（需图像解码）、`ming9999/agentnet-recovery`（JSONL 损坏）、laion nemotron-gym v2 系（tar.gz 二进制行）均不可直接评分 | 文本侧已收；余为多模态/损坏 (iter 32) |
 
 ## 迭代日志
 
@@ -207,3 +208,4 @@
 | 29 | 2026-06-05 | **续 10 轮（用户指示，iters 29–38）**：+1 集 Toucan-1.5M SFT 切片 → §III（H∞=0.92 落三 teacher 区间中段，teacher 家族全覆盖）；布局策略落地（data/ 记录文件回 git 追踪，重物留 netscratch）；下一轮：5-seed σ 升级 |
 | 30 | 2026-06-05 | **5-seed σ 升级轮（遗留清单兑现）**：新增 `scripts/seed_sigma.py` + `data/seed_sigma.csv`（4 代表集 ×5 不相交切片 = 20 评分）；**发现 14 落档：同质管线 H∞ σ≈0.03–0.04，异质 repo-scale σ≈0.24，模板带精确 0，α 比 H∞ 稳一档；集群级结论全部 ≫ σ，带内 <0.3 差异不可解读**；offset-0 复跑逐位复现 registry 数字（确定性 ✓） |
 | 31 | 2026-06-05 | +1 集：Nemotron-RL-Injection-v1 → §IV（注入攻击任务语料，**载荷在 environment 字段 —— prompt-only 视图 α 虚高 0.40 vs 全文档 0.04**，新增 `ser_nemotron_inj`；近纯模板，对照 DTap 真实对抗 rollout 0.71–0.81）；DTap 框架普查确认仅 3 切片（无第 4 frontier）；3 候选剔除：valoomba（SWE-ZERO 派生）、poolside-laguna（单轮）、aec-bench rollouts（纯元数据） |
+| 32 | 2026-06-05 | **桌面 computer-use 破冰轮**：+1 集 AgentNet 文本侧 → §II（**registry 首个桌面 GUI 条目**，步级 obs/thought/action/reflection 全文本无需图像解码，新增 `ser_agentnet`；H∞=0 —— VLM 标注蒸馏 + 屏幕描述重复双机制）；ming9999-recovery（JSONL 损坏）、laion gym-v2（tar.gz 二进制行）、cua-dev 系（需图像解码）均不可评分 |
