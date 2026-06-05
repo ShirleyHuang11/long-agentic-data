@@ -18,6 +18,7 @@
 | SWE-smith-trajectories | SWE 轨迹 | 5k 条 | 64.2 / 96,001 | 训练 SWE-agent-LM-32B 用的轨迹（`xml` split）；H∞=0.56 介于模板退化与 NL 之间 | 0.285 | 0.56 | [`SWE-bench/SWE-smith-trajectories`](https://huggingface.co/datasets/SWE-bench/SWE-smith-trajectories) |
 | SWE-Zero OpenHands 轨迹 | SWE 轨迹 | 数万条 | 63.7 / 79,325 | NVIDIA 在 SWE-Fixer-Train-110K 任务上跑 OpenHands 的轨迹（带 license 字段）；H∞=1.21 全轨迹类最高 —— 模板退化最少 | 0.315 | 1.21 | [`nvidia/SWE-Zero-openhands-trajectories`](https://huggingface.co/datasets/nvidia/SWE-Zero-openhands-trajectories) |
 | JetBrains GPT-5.2 轨迹 | SWE 轨迹（frontier 混采） | 166 条采样（test−verified） | 28.4 / 50,829 | mini-swe-agent 跑 SWE-bench test−verified 的 GPT-5.2/5-mini 混合 rollout；**H∞=1.63 全 registry 轨迹类最高**（超 OpenHands 0.6–1.2 一档）—— frontier 生成器信号最强样本（发现 6 上界更新） | 0.346 | 1.63 | [`JetBrains-Research/agent-trajectories-swe-bench-test-minus-verified`](https://huggingface.co/datasets/JetBrains-Research/agent-trajectories-swe-bench-test-minus-verified) |
+| JetBrains × SWE-smith (合成任务) | SWE 轨迹（任务来源对照） | 186 条采样 | 24.6 / 45,273 | 同 harness/模型混采跑 **SWE-smith 合成 issue**；H∞=1.25 vs 真实 issue 版 1.63 —— 方向与发现 7（合成任务折扣）一致，但 Δ0.38≈1.5σ（发现 14），不下强结论 | 0.302 | 1.25 | [`JetBrains-Research/agent-trajectories-swesmith-random-subset`](https://huggingface.co/datasets/JetBrains-Research/agent-trajectories-swesmith-random-subset) |
 | JetBrains (assistant-only 视图) | SWE 轨迹（agent 文本切片） | 同 JetBrains（采样 841 段） | 13.8 / 9,988 | 同源仅留 assistant 轮（思考+命令，剥离 repo 观测）；**H∞ 1.63→0.72 —— SWE 域观测是真实代码内容、承载密度，与 web/GUI 相反（发现 16）** | 0.239 | 0.72 | 同上 |
 | swe-rebench-OH (assistant-only 视图) | SWE 轨迹（agent 文本切片） | 同 swe-rebench-OH（采样 681 段） | 64.2 / 12,324 | 同上对 OpenHands dump：H∞ 0.67→0.66 几乎不变 —— agent 文本与观测密度均衡的情形 | 0.227 | 0.66 | 同上 |
 | DCAgent terminus-2 × GLM-4.7 轨迹 | SWE/终端轨迹 | 数百条（采样 133） | 36.9 / 63,185 | terminus-2 agent 跑 GLM-4.7 在 SWE-Gym sampled 任务上的 traces（含 result 标注，首行 AgentTimeoutError —— 含失败 episode）；**第 4 家 frontier 生成器落 0.7–1.6 健康带（发现 11 扩展）**；终端 agent 类别首个有内容的释出 | 0.307 | 0.91 | [`DCAgent/...glm_4.7_traces_jupiter`](https://huggingface.co/datasets/DCAgent/neulab-swe-gym-openhands-sampled-trajectories-sandboxes_glm_4.7_traces_jupiter) |
@@ -92,6 +93,7 @@
 
 | 数据集 | 类别 | 规模 | 轨迹长度 (turns / bytes·ep⁻¹) | 特点 | α | H∞ | HF 镜像 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| GDPval | 跨行业专业任务基准 | 220 题（gold set 全量） | 1 / 2,276 | OpenAI 真实经济价值任务（44 职业，人写专业 prompt；参考/交付文件为二进制已排除）；**H∞=1.67 全部任务语料最高 —— 人写专业文本 > 人写 issue（Verified 1.57）> 合成 issue（0.84–0.89）**；⚠️ 语料仅 ~500KB | 0.234 | 1.67 | [`openai/gdpval`](https://huggingface.co/datasets/openai/gdpval) |
 | SWE-bench Verified | SWE 基准 | 500 题 | 1 / 6,225 | 人工核验过的 SWE-bench 子集；非轨迹（problem+patch），H∞=1.57 在 NL 正常区间 | 0.334 | 1.57 | [`princeton-nlp/SWE-bench_Verified`](https://huggingface.co/datasets/princeton-nlp/SWE-bench_Verified) |
 | SWE-Gym | SWE 训练任务 | 2.4k 任务 | 1 / 14,005 | 可执行 repo 训练环境的任务集（problem+patch 序列化）；**轨迹版见候选队列 OpenHands-\*-Trajectories** | 0.395 | 1.22 | [`SWE-Gym/SWE-Gym`](https://huggingface.co/datasets/SWE-Gym/SWE-Gym) |
 | SWE-rebench (test) | SWE 基准 | 21k+ 任务（rolling） | 1 / 34,235 | SWE-bench 的 rolling 扩充（含 install_config/docker 镜像元数据）；单题文本最长的基准型条目 | 0.299 | 0.84 | [`nebius/SWE-rebench`](https://huggingface.co/datasets/nebius/SWE-rebench) |
@@ -100,7 +102,7 @@
 
 ---
 
-## V. 总览速查（α × H∞ × horizon，迭代 35 时点，n=70 有效 / CSV 74 行含 4 项已剔除）
+## V. 总览速查（α × H∞ × horizon，迭代 36 时点，n=72 有效 / CSV 76 行含 4 项已剔除）
 
 ### Horizon 排行（bytes·ep⁻¹ 前五，仅 H∞>0.3 的健康轨迹；H∞≈0 的"空转膨胀"纪录（aider-polyglot 7B 322KB / R2EGym-32B 149.8 turns）见发现 12）
 
@@ -170,6 +172,8 @@
 | `valoomba/agentic-codeact-trajectories` | SWE 轨迹（打分派生） | 实查：source=SWE-ZERO-12M（已入 §I）的过滤/打分重切分 | ⚠️ 派生剔除 (iter 31) |
 | `poolside-laguna-hackathon/py-bug-trace-laguna-xs-2-l3-rollouts` | bug-fix RL rollouts | 实查：单轮 prompt+completion+reward，非长程轨迹 | ⚠️ 单轮域外 (iter 31) |
 | `aec-bench/release-model-rollouts` | 工程域评测 rollouts | 实查 rollouts config：纯 trial 元数据（无 >1KB 内容字段）；transcripts 或在 artifacts config（文件型，待探） | ⚠️ 元数据-only (iter 31) |
+| `jupyter-agent/kaggle-notebooks-edu-v0` | notebook 语料（非轨迹） | 实查：edu 过滤的人写 Kaggle notebook 语料（jupyter-agent 训练源），无 agent 交互结构 | ⚠️ 非轨迹剔除 (iter 36) |
+| `DCAgent2/swe-lancer` | SWE-Lancer traces | 实查：repo 无可加载数据文件 | ⚠️ 空壳剔除 (iter 36) |
 | `OpenGVLab/GUI-Odyssey` (24k 下载) | GUI 轨迹（多模态） | 跨 app 导航轨迹 | 多模态扩展 |
 | AppWorld 完整 rollouts | 交互轨迹 | `satyakic/appworld-rollouts-*` 是 event-sourcing 日志（重建复杂），弃；`hamishivi/rlenv-appworld-train` 实测是 90 条任务 prompt 非 rollout，且 3-point 拟合 artifact（α=−0.17, H∞=9.9）→ 不入 registry | ⚠️ 官方轨迹 dump 未找到 |
 | tau-bench 官方/更大轨迹源 | 工具调用轨迹 | `sammshen/taubench-sonnet-traces` 实测整个 dump 是**单次 run 的代理日志**（聚合后仅 1 episode，29KB < 32KB oracle 块）→ oracle 不适用，不入 registry；`annon124816/tau_bench`（2.3k 下载）实测是 parquet 校验清单非数据 (iter 10)；jkazdan 50 条已入 §III，更大源仍缺 | ⚠️ 待更大轨迹源 |
@@ -218,3 +222,4 @@
 | 33 | 2026-06-05 | **标注剥离 ablation 轮**：+1 集 AgentNet action 视图 → §II（同 episode 剥离 VLM 标注：**H∞ 0.00→1.43，发现 15 落档 —— 退化在机器标注层，人类演示动作流本身高密度**；iter-32 的"双机制不可分"就此分离）；观测坍缩集群更名"观测/标注坍缩"并扩员 |
 | 34 | 2026-06-05 | **动作来源反向对照轮**：+1 集 ReBel-ALFWorld action 视图 → §III（planner 动作流剥离观测仅恢复至 H∞=0.43，**发现 15 补全分级：人类 1.43 ≫ planner 0.43 ≫ 并观测 0.00**；α=0.52 全 registry 最高；小语料 caveat） |
 | 35 | 2026-06-05 | **frontier agent 文本切片轮**：+2 视图 → §I（JetBrains assistant-only **H∞ 1.63→0.72**、swe-rebench-OH 0.67→0.66 持平）；**发现 16 落档：观测的密度角色随域反转 —— SWE 观测是真实代码内容承载密度，web/GUI 观测是渲染样板稀释密度；数据清洗必须分域** |
+| 36 | 2026-06-05 | **任务来源对照 + GDPval 轮**：JetBrains × SWE-smith → §I（同 harness 合成 issue H∞=1.25 vs 真实 1.63，与发现 7 同向但 Δ≈1.5σ 谨慎表述）；**GDPval → §IV（220 题人写专业任务，H∞=1.67 任务语料新高：人写专业 > 人写 issue > 合成 issue）**；kaggle-notebooks（非轨迹）、swe-lancer（空壳）剔除 |

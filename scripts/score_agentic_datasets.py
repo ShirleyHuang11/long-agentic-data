@@ -127,6 +127,13 @@ def ser_trajectory_assistant(row):
     return _assistant_only(row["trajectory"])
 
 
+def ser_gdpval(row):
+    # GDPval: human-written professional task prompts (reference/deliverable
+    # files are binary and excluded) — section IV task corpus.
+    return (f"[sector]\n{row.get('sector') or ''}\n\n[occupation]\n"
+            f"{row.get('occupation') or ''}\n\n[prompt]\n{row.get('prompt') or ''}"), 1
+
+
 def ser_rebel_steps(row):
     # ReBel ALFWorld: `steps` is a JSON-encoded list of step dicts (idx + obs/
     # action/... fields); render each non-idx field as its own labelled line.
@@ -494,6 +501,10 @@ REGISTRY = [
      ["train"], ser_messages_assistant, "jetbrains-swe-assistant-only"),
     ("nebius/SWE-rebench-openhands-trajectories", None, ["train"],
      ser_trajectory_assistant, "swe-rebench-oh-assistant-only"),
+    # --- loop iter 36: real-vs-synthetic task contrast + GDPval task corpus ---
+    ("JetBrains-Research/agent-trajectories-swesmith-random-subset", None,
+     ["train"], ser_messages_auto, "jetbrains-swesmith-subset"),
+    ("openai/gdpval", None, ["train"], ser_gdpval, "gdpval-tasks"),
 ]
 
 

@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "openai/gdpval",
+  "hf_url": "https://huggingface.co/datasets/openai/gdpval",
+  "hf_revision_sha": "11e7900cdcac61bc4daf59e65feb238acda98fbf",
+  "config": "default",
+  "group_key": null,
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_gdpval",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-05T20:53:34.095851+00:00",
+  "result": {
+    "alpha": 0.2338050536878228,
+    "h_inf": 1.6694202955387718,
+    "bpc_128": 6.048688900203666,
+    "bpc_2048": 3.9596141581632653,
+    "bpc_32768": 2.8671061197916665,
+    "n_episodes": 220,
+    "mean_turns": 1,
+    "mean_doc_bytes": 2276,
+    "n_bytes": 502886
+  }
+}
