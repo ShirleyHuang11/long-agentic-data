@@ -92,10 +92,11 @@ for slug, r in rows.items():
                      b3=float(r["bpc_32768"])))
 
 # ---------------------------------------------------------- fig 1: signature map
+# Axis convention (user, 2026-06-06): H_inf on x, structure exponent on y.
 fig, ax = plt.subplots(figsize=(9.5, 7))
 for cat, col in COLORS.items():
     pts = [d for d in data if d["cat"] == cat]
-    ax.scatter([d["alpha"] for d in pts], [d["h"] for d in pts],
+    ax.scatter([d["h"] for d in pts], [d["alpha"] for d in pts],
                s=[18 + 14 * (d["bytes_ep"] ** 0.33) for d in pts],
                c=col, alpha=0.75, edgecolors="white", linewidths=0.5, label=cat)
 ann = {"weblinx-actions": "WebLINX act", "fireact-multitask": "FireAct",
@@ -107,14 +108,15 @@ ann = {"weblinx-actions": "WebLINX act", "fireact-multitask": "FireAct",
        "nemotron-rl-conv-tool-pivot": "Nemotron conv-pivot", "swe-bench-verified": "SWE-bench-V"}
 for d in data:
     if d["slug"] in ann:
-        ax.annotate(ann[d["slug"]], (d["alpha"], d["h"]), fontsize=7,
+        ax.annotate(ann[d["slug"]], (d["h"], d["alpha"]), fontsize=7,
                     xytext=(4, 4), textcoords="offset points")
-ax.axhline(0.3, color="k", lw=0.6, ls="--", alpha=0.5)
-ax.text(0.005, 0.32, "healthy threshold H$_\\infty$=0.3", fontsize=7, alpha=0.7)
-ax.set_xlabel("alpha (context-scaling exponent)")
-ax.set_ylabel("H$_\\infty$ (incompressible entropy, BPC)")
+ax.axvline(0.3, color="k", lw=0.6, ls="--", alpha=0.5)
+ax.text(0.32, 0.02, "healthy threshold H$_\\infty$=0.3", fontsize=7, alpha=0.7,
+        rotation=90)
+ax.set_xlabel("H$_\\infty$ (incompressible entropy, BPC) — content floor")
+ax.set_ylabel("alpha (context-scaling exponent) — structure")
 ax.set_title("Signature map: 72 agentic datasets/views (size ~ bytes/episode)")
-ax.legend(fontsize=7.5, loc="upper left", framealpha=0.9)
+ax.legend(fontsize=7.5, loc="upper right", framealpha=0.9)
 fig.tight_layout()
 fig.savefig(f"{OUT}/fig1_signature_map.png", dpi=160)
 
