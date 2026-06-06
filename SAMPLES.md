@@ -148,6 +148,23 @@
 15. **退化在标注层，不在演示本体；剥离后的上限由动作流来源决定**（iters 33–34）：AgentNet 同 episode 两视图对照 —— 含 VLM 生成 observation/thought/reflection 的全文本视图 H∞=0.00，剥离后仅留人类演示动作流 H∞=1.43。**机器生成的标注文本即使"内容丰富"也呈模板签名；人类行为流本身高密度**。反向对照（iter 34）：对 planner 生成动作流的 ReBel-ALFWorld 做同样剥离仅恢复至 0.43（α=0.52 全场最高，小语料 caveat）—— **剥离观测总能抬 H∞，但天花板分级：人类 1.43 ≫ planner 0.43 ≫ 并入观测后 0.00**。对 GUI/具身数据的训练含义：标注层提供监督信号但稀释长程密度，配比需权衡。
 16. **观测的密度角色随域反转**（iter 35）：对 frontier SWE rollout 做 assistant-only 剥离，H∞ 不升反降（JetBrains 1.63→0.72）或持平（swe-rebench-OH 0.67→0.66）—— **SWE 域观测是真实代码库内容（文件体/diff/测试输出），承载而非稀释密度；web/GUI 域观测是渲染样板，稀释密度**（对照发现 3/15）。"剥观测能提密度"仅对样板型环境成立；数据清洗策略必须分域。
 17. **frontier 生成器必要非充分 —— 场景多样性是另一条腿**（iter 37）：DTap 三切片各取第 2 个不相交样本（深位 offset，轮询序耗尽小组后由 600-episode 级恶意场景族主导）：Opus 0.71→0.25、Sonnet 0.81→**0.08**、Gemini 0.74→0.44 —— **同一 frontier 模型在重复场景族上照样落入模板带**。发现 8（结构性重复杀 H∞）与发现 11（frontier vs 中型一刀切）统一为：**健康 H∞ = frontier 生成器 × 任务/场景多样性，两者缺一不可**；iter-21 的 0.71–0.81 紧聚是"均衡头部组合"上的受控对照，绝对值随组成大幅漂移（发现 14 异质 σ 的极端情形）。
+18. **Hurst 单独不能给 agentic 数据打分 —— (H, H∞) 双轴才能分离 form 与 content**（iter 39）：按 Alabdulmohsin et al. (2402.01825) 协议（R/S on surprisal increments，此处用 order-3 byte n-gram surprisal 代理）测 9 个代表集：**模板/空转集的 Hurst 与健康集同档**（APIGen 0.80、Ko-Agent 0.83、aider-flail 0.77 vs JetBrains 0.78、Toucan 0.90、SWE-ZERO 0.93）—— **重复本身就是长程依赖**，Hurst 把 form-LRD 和 content-LRD 混在一起；且 Hurst 与 H∞ 在 agentic 域近正交（content 最高的 WebLINX-actions 1.95 反而 Hurst 最低 0.67，与零内容的 AgentNet 标注层并列）。⚠️ 原论文的"Hurst 预测下游精度"是**固定数据、跨模型**的结论；跨数据集选数据时 Hurst 必须配 H∞ 用：H 量组织度（fig8 x 轴），H∞ 量内容底（y 轴），四象限见 `figures/fig8_hurst_vs_hinf.png`。
+
+## VI. 研究 takeaway 与前瞻（iter 39 增设，吸收 reference_papers/ 四篇 + 用户方向）
+
+**三统计量画像（本 registry 的方法论收束）**：一个 agentic 语料由三个互补统计量刻画 ——
+- **H∞（内容底）**：无限上下文外推后剩多少真实内容；区分健康带 vs 模板带（发现 4/8/17）。
+- **γ, β（学习动力学）**：Cagnetta et al. (2602.07488) 证明 data-limited 学习曲线指数 α_D=γ/2β 仅由这两个数据统计量决定；agentic 数据 β≈0.2–0.5 ≪ 自然语言 0.9 → 预测 α_D 高达 0.3–1.0（fig7），**待小模型训练实验验证**。
+- **Hurst H（组织度）**：长程依赖强度，与下游精度相关（2402.01825，跨模型设定）；但在 agentic 域与 H∞ 近正交（发现 18）—— form 与 content 的依赖被混测。
+
+**form/content 分离算子**：视图分解（发现 15/16）按"谁写的 token"把同一 episode 切成 agent 文本 / 环境观测 / 机器标注 / 动作流四个切片分别测量 —— web/GUI 观测与机器标注是 form（剥之 H∞ 升），SWE 观测是 content（剥之 H∞ 降），人类动作流是纯 content（H∞ 1.43–1.95 且 Hurst 最低 —— 内容密度不靠形式重复）。(H, H∞) 双轴 + 视图分解 = 可操作的 content/form 隔离方法。
+
+**三个值得做的前瞻实验**（按杠杆排序）：
+1. **α_D 训练验证**：在健康带 vs 模板带语料上从头训小模型（GPT-2 级，Cagnetta 协议），看实测学习曲线指数是否符合 γ/2β 预测 —— 验证则得到第一个 agentic 数据价值的预测性理论，证伪则发现普适类边界，双赢。
+2. **短而分形 → 长度泛化**：固定 token 预算，对照"短 episode 高分形复杂度"（WebLINX/AgentNet action 视图，1–2KB/ep，H∞ 1.4–1.95）vs"长 episode 低密度"（aider-flail 322KB/ep，H∞=0）训练，测长任务外推 —— 2402.01825 的负结果（训练上下文 2K/4K/8K 不改下游）+ 自相似机制（小尺度模式镜像大尺度）支持"统计量 > 窗口长度"假设。
+3. **可验证合成代码 → 跨域长任务迁移**：GitHub 是 The Pile 中 LRD 最强的域（H=0.79）；发现 8/17 表明合成数据接真实验证器即健康（Toucan 模式）——**形式化验证的合成代码 = 无限量、零人力、可调 LRD（单函数→跨文件→repo 级依赖链）的 grounded 高密度语料**。实验：用受控 LRD 的验证代码语料预训练，测自然语言长任务的长度泛化是否随语料 (Hurst, γ, β) 而非随域/体量走 —— 若成立，"迁移是统计性的而非域性的"即为标题级结论。
+
+**与四篇参考文献的拼图关系**：2602.07488 给学习曲线理论（γ/β）；2402.01825 给组织度量与下游相关（Hurst）；ICLR'26 Intrinsic Entropy 给"最优上下文长度随数据量增长"（训练侧推论，其 Bayes-risk 拟合式即本 registry 的 oracle 方程）；本 registry 的贡献是把这些统计量第一次铺到 agentic 数据上，发现其占据与自然语言不同的统计相（低 β、高表观 LRD、H∞ 两极分化），并给出 form/content 分离与 17+1 条实证发现。
 
 ## 候选队列（按预期 horizon 长度排序，每轮从顶部取 2–3 个）
 
@@ -226,3 +243,4 @@
 | 36 | 2026-06-05 | **任务来源对照 + GDPval 轮**：JetBrains × SWE-smith → §I（同 harness 合成 issue H∞=1.25 vs 真实 1.63，与发现 7 同向但 Δ≈1.5σ 谨慎表述）；**GDPval → §IV（220 题人写专业任务，H∞=1.67 任务语料新高：人写专业 > 人写 issue > 合成 issue）**；kaggle-notebooks（非轨迹）、swe-lancer（空壳）剔除 |
 | 37 | 2026-06-05 | **DTap 第 2 seed 校验轮（诚实修正）**：`score_dtap_direct.py` 增 `--offset` σ 模式；深位样本三家齐跌（Opus 0.25 / Sonnet **0.08** / Gemini 0.44）—— 重复场景族主导的深尾切片把 frontier rollout 也钉进模板带；**发现 17 落档：健康 H∞ = frontier 生成器 × 场景多样性，缺一不可**；集群表"充分条件"措辞改为"必要非充分" |
 | 38 | 2026-06-05 | **终轮收尾（iters 29–38：+9 条目 / 7 候选剔除 / 发现 14–17 / σ 协议落地）**：n=72 有效（含 6 个同源视图条目）/ CSV 76 行 / provenance·samples 76·76 三方一致 / seed-σ 23 行；本批主线 = **视图分解方法学**（标注剥离、assistant-only、action-only、深位 seed）把"什么承载/杀死长程密度"拆到了机制层；遗留：gated ×4、多模态协议（OSWorld 截图侧 / GUI-Odyssey）、DTap 均衡组合 σ（分组配额采样器）、Claude Code 会话类别待真正释出。**循环结束** |
+| 39 | 2026-06-06 | **统计扩展分析轮（loop 外，用户指示）**：读入 `reference_papers/` 四篇；γ-β 相图（fig7，`measure_beta.py`/`gamma_beta.csv`：agentic β≈0.2–0.5 ≪ 自然语言 0.9，α_D 预测 0.3–1.0；AgentNet 标注层 β=1.3 最差象限）；**Hurst 协议落地（fig8，`measure_hurst.py`/`hurst.csv`，发现 18：模板/空转 Hurst 与健康集同档，(H, H∞) 双轴分离 form/content）**；图表套件 figs 1–8；新增 §VI 研究 takeaway 与前瞻（α_D 训练验证 / 短而分形→长度泛化 / 可验证合成代码迁移三实验） |
