@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "open-thoughts/OpenThoughts-Agent-v1-SFT",
+  "hf_url": "https://huggingface.co/datasets/open-thoughts/OpenThoughts-Agent-v1-SFT",
+  "hf_revision_sha": "c5dc896981f4e3b7c5382669b1d1be0bc4b6a1a6",
+  "config": "default",
+  "group_key": null,
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_conversations_auto",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-07T18:19:47.321861+00:00",
+  "result": {
+    "alpha": 0.13696566995143417,
+    "h_inf": 0.0,
+    "bpc_128": 6.112584114074707,
+    "bpc_2048": 3.30092716217041,
+    "bpc_32768": 1.3776617050170898,
+    "n_episodes": 656,
+    "mean_turns": 11.8,
+    "mean_doc_bytes": 12801,
+    "n_bytes": 8388608
+  }
+}

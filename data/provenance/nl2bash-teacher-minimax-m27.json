@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "penfever/nl2bash-tasks-cleaned-oracle-minimax-m27-131k-traces",
+  "hf_url": "https://huggingface.co/datasets/penfever/nl2bash-tasks-cleaned-oracle-minimax-m27-131k-traces",
+  "hf_revision_sha": "85ce2ffb472214f2adb3e4ac4ea4a9309eb90e21",
+  "config": "default",
+  "group_key": null,
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_conversations_auto",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-07T18:20:16.163579+00:00",
+  "result": {
+    "alpha": 0.1521048922420859,
+    "h_inf": 0.0,
+    "bpc_128": 6.124504089355469,
+    "bpc_2048": 3.3770275115966797,
+    "bpc_32768": 1.5749168395996094,
+    "n_episodes": 499,
+    "mean_turns": 11.1,
+    "mean_doc_bytes": 16829,
+    "n_bytes": 8388608
+  }
+}

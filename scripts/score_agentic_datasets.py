@@ -570,6 +570,19 @@ REGISTRY = [
     # --- loop iter 54: RL-FT mid-size checkpoint on finance-terminal tasks ---
     ("DCAgent3/financeagent_terminal_a3_rl_laion_exp_rpt_methods2test_large_v2_20260606_225633",
      None, ["train"], ser_conversations_auto, "dcagent3-financeagent-a3rl"),
+    # --- iter 59: OpenThoughts-Agent reproduction — released SFT blend +
+    # teacher panel on identical NL2Bash tasks (their training ablation:
+    # GLM-4.6 teacher ~2x downstream over GPT-family) ---
+    ("open-thoughts/OpenThoughts-Agent-v1-SFT", None, ["train"],
+     ser_conversations_auto, "openthoughts-agent-v1-sft"),
+    ("penfever/nl2bash-verified-GLM-4.6-traces-32ep-32k", None, ["train"],
+     ser_conversations_auto, "nl2bash-teacher-glm46"),
+    ("DCAgent/nl2bash_verified_gpt-5-nano-traces", None, ["train"],
+     ser_conversations_auto, "nl2bash-teacher-gpt5nano"),
+    ("DCAgent/nl2bash-Qwen3-Coder-480B-traces", None, ["train"],
+     ser_conversations_auto, "nl2bash-teacher-qwen3coder480b"),
+    ("penfever/nl2bash-tasks-cleaned-oracle-minimax-m27-131k-traces", None,
+     ["train"], ser_conversations_auto, "nl2bash-teacher-minimax-m27"),
     # --- loop iter 33: annotation-stripped action view (within-dataset ablation) ---
     ("xlangai/AgentNet", None, ["train"], ser_agentnet_actions, "agentnet-actions"),
     # --- loop iter 34: action-origin counter-test (planner-generated actions) ---
