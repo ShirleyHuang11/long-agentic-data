@@ -49,6 +49,7 @@
 | AgentNet (文本侧) | 桌面 computer-use 轨迹 | 大规模（采样 160） | 16.7 / 52,850 | **registry 首个桌面 GUI 条目**（OSWorld 家族；步级 observation/thought/action/reflection + pyautogui code 全文本，截图仅文件名可排除）；H∞=0 —— VLM 生成的标注层呈蒸馏签名 + 相邻步屏幕描述近重复（发现 3/8 双重机制，不可分） | 0.136 | 0.00 | [`xlangai/AgentNet`](https://huggingface.co/datasets/xlangai/AgentNet) |
 | AgentNet (action 视图) | 桌面 computer-use 轨迹 | 同上（采样 1500） | 16.6 / 906 | 同 episode 剥离 VLM 标注层（仅 instruction + pyautogui code）；**H∞ 0.00→1.43 —— 退化在标注层不在人类演示本体（发现 15）**；与 Mind2Web/WebLINX action 视图同在高密度带 | 0.423 | 1.43 | 同上 |
 | GUI-Odyssey (action 视图) | 移动 GUI 轨迹（**多模态**，文本通道评分） | 数千 eps（采样 1500） | 15.4 / 639 | 人类演示的跨 app 手机导航（Pixel 系设备，多 app 组合任务）；图像通道：每步 1 截图（行内 h×w 如 1344×2992，未评分仅记录）；**H∞=1.55 action 流第三高 —— 人类动作流 + 跨 app 多样性**（发现 15/17 多模态域再证） | 0.342 | 1.55 | [`OpenGVLab/GUI-Odyssey`](https://huggingface.co/datasets/OpenGVLab/GUI-Odyssey) |
+| AndroidControl (文本通道) | 移动 GUI 轨迹（**多模态**，人类演示） | 15k eps 级（采样 1500） | 5.5 / 615 | Google 人类演示 Android 任务（goal + 每步人写 instruction + 结构化 action；截图 b64 列已剥离未评分）；**H∞=1.25 健康，α=0.51 全场第二 —— 人类动作流第 5 个健康样本**（发现 15 多模态再证） | 0.505 | 1.25 | [`smolagents/android-control`](https://huggingface.co/datasets/smolagents/android-control) |
 | cua AgentNet-GIMP (文本通道) | 桌面 GUI 轨迹（**多模态**，单域） | 492 eps 全量 | 9.6 / 1,711 | mlfoundations cua-dev 的 GIMP 单域切片（模板化 prompt + 坐标点击；图像通道 ~10 PNG/ep 1920×1080 未评分）；**单 app 零多样性 → 动作流也 H∞=0**（发现 17 在 action-view 家族内成立） | 0.187 | 0.00 | [`mlfoundations-cua-dev/agentnet-gimp-trajectories`](https://huggingface.co/datasets/mlfoundations-cua-dev/agentnet-gimp-trajectories) |
 | WebLINX (全观测切片) | Web 轨迹（full-obs） | 同 WebLINX，116 eps 采样 | 29.1 / 72,353 | pruned DOM（~1.6–4.3KB/turn）全量 + action；**与 action 视图对照：H∞ 1.95→0.00** —— 相邻 turn 页面几乎不变，观测近乎纯冗余 | 0.203 | 0.00 | 同上 |
 
@@ -195,6 +196,8 @@
 | `jupyter-agent/kaggle-notebooks-edu-v0` | notebook 语料（非轨迹） | 实查：edu 过滤的人写 Kaggle notebook 语料（jupyter-agent 训练源），无 agent 交互结构 | ⚠️ 非轨迹剔除 (iter 36) |
 | `DCAgent2/swe-lancer` | SWE-Lancer traces | 实查：repo 无可加载数据文件 | ⚠️ 空壳剔除 (iter 36) |
 | `OpenGVLab/GUI-Odyssey` (24k 下载) | GUI 轨迹（多模态） | 文本通道已入 §II（iter 40，H∞=1.55）；图像通道评分协议（截图多样性度量）仍待设计 | ✅ 文本通道已收 (iter 40) |
+| `OS-Copilot/OS-Atlas-data` | GUI grounding 语料 | 实查 schema：仅单 `image` 列，无轨迹/动作文本 —— 单步 grounding 截图库非轨迹 | ⚠️ 非轨迹剔除 (iter 41) |
+| ShowUI web/desktop 系 | GUI grounding 语料 | 同 OS-Atlas 类（grounding 截图 + 单步标注），非长程轨迹 | ⚠️ 域外（未逐一探查，类别判定） |
 | AppWorld 完整 rollouts | 交互轨迹 | `satyakic/appworld-rollouts-*` 是 event-sourcing 日志（重建复杂），弃；`hamishivi/rlenv-appworld-train` 实测是 90 条任务 prompt 非 rollout，且 3-point 拟合 artifact（α=−0.17, H∞=9.9）→ 不入 registry | ⚠️ 官方轨迹 dump 未找到 |
 | tau-bench 官方/更大轨迹源 | 工具调用轨迹 | `sammshen/taubench-sonnet-traces` 实测整个 dump 是**单次 run 的代理日志**（聚合后仅 1 episode，29KB < 32KB oracle 块）→ oracle 不适用，不入 registry；`annon124816/tau_bench`（2.3k 下载）实测是 parquet 校验清单非数据 (iter 10)；jkazdan 50 条已入 §III，更大源仍缺 | ⚠️ 待更大轨迹源 |
 | `SWE-Gym/MoatlessTools-Sampled-Trajectories` / `ZeonLap/OpenHands-Trajectories` | SWE 轨迹 | 前者仅 eval 元数据无轨迹内容；后者是 webdataset tar 日志（首行 log 为空 bytes） | ⚠️ 均弃 (iter 10) |

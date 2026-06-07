@@ -156,6 +156,35 @@ def ser_gui_odyssey(row):
     return "\n\n".join(parts), len(steps)
 
 
+def ser_android_control(row):
+    # AndroidControl (multimodal): human demos; text channel = goal + per-step
+    # human instruction + structured action; screenshots_b64 dropped upstream.
+    parts = [f"[goal]\n{row.get('goal') or ''}"]
+    instrs = row.get("step_instructions") or []
+    acts = row.get("actions") or []
+    for i, a in enumerate(acts):
+        ins = instrs[i] if i < len(instrs) else ""
+        astr = " ".join(f"{k}={v}" for k, v in (a or {}).items() if v is not None)
+        parts.append(f"[instruction]\n{ins}\n[action]\n{astr}")
+    return "\n\n".join(parts), len(acts)
+
+
+def ser_opencua(row):
+    # OpenCUA (multimodal): messages is a JSON string with interleaved
+    # image-ref/text content items; keep the text items only.
+    msgs = json.loads(row["messages"])
+    parts = []
+    for m in msgs:
+        content = m.get("content")
+        if isinstance(content, list):
+            text = "\n".join(c.get("text") or "" for c in content
+                             if c.get("type") == "text")
+        else:
+            text = content or ""
+        parts.append(f"[{m.get('role', '?')}]\n{text}")
+    return "\n\n".join(parts), len(msgs)
+
+
 def ser_rebel_steps(row):
     # ReBel ALFWorld: `steps` is a JSON-encoded list of step dicts (idx + obs/
     # action/... fields); render each non-idx field as its own labelled line.
@@ -519,6 +548,11 @@ REGISTRY = [
      "gui-odyssey-actions"),
     ("mlfoundations-cua-dev/agentnet-gimp-trajectories", None, ["train"],
      ser_cua_gimp, "cua-agentnet-gimp-text", None, ["images"]),
+    # --- loop iter 41 ---
+    ("smolagents/android-control", None, ["train"],
+     ser_android_control, "android-control-text", None, ["screenshots_b64"]),
+    ("cua-lite/OpenCUA", None, ["train"],
+     ser_opencua, "opencua-text", None, ["images"]),
     # --- loop iter 33: annotation-stripped action view (within-dataset ablation) ---
     ("xlangai/AgentNet", None, ["train"], ser_agentnet_actions, "agentnet-actions"),
     # --- loop iter 34: action-origin counter-test (planner-generated actions) ---
