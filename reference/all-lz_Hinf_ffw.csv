@@ -1,4 +1,4 @@
-alpha,c_short,c_long,h_inf,dataset,subset_or_config,path,num_documents
+ialpha,c_short,c_long,h_inf,dataset,subset_or_config,path,num_documents
 0.5073646173612085,6.368541666666666,3.135634765625,2.929282543758581,FineFineWeb,optical_engineering,m-a-p/FineFineWeb,10000
 0.4461823447192012,6.112708333333333,2.9242936197916665,2.631017980780947,FineFineWeb,hydraulic_engineering,m-a-p/FineFineWeb,10000
 0.43832790378375674,6.4972916666666665,3.5723665364583335,3.290194948960298,FineFineWeb,artistic,m-a-p/FineFineWeb,10000

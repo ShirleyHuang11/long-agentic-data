@@ -1,0 +1,20 @@
+dataset,subset_or_config,beta,n_bytes
+BookCorpus (long-form literature),,1.13,8388608
+C4,en,1.3184,3356907
+Cosmopedia,stories,1.3561,4084755
+DCLM Baseline,,1.2662,7458528
+FineMath,finemath-3plus,-0.0583,8388608
+FineWeb,default,1.2877,5328412
+FineWeb-Edu,default,1.3519,7127291
+OpenWebText (noisy web),,1.3207,7494433
+Pile Uncopyrighted,,0.0463,7978972
+Proof Pile 2,algebraic-stack,0.5659,8388608
+Proof Pile 2,arxiv,0.522,8388608
+Proof Pile 2,open-web-math,0.7939,8388608
+Python Code (structured code),,0.736,8388608
+SmolLM Corpus,cosmopedia-v2,1.1086,5660381
+SmolLM Corpus,fineweb-edu-dedup,1.3651,7037727
+Stack Edu Python,,0.6358,4111454
+The Pile Deduplicated,,0.782,8388608
+TinyStories (minimal logic),,1.349,1305909
+WikiText-103 (high-quality wiki),wikitext-103-raw-v1,1.2236,748153
