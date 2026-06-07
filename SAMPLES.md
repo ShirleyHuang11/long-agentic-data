@@ -48,6 +48,8 @@
 | Mind2Web (全观测切片) | Web 轨迹（full-obs） | 同上，129 eps 采样 | 7.9 / 65,038 | 每步 `cleaned_html`（37–240KB/步）截断至 8KB；**与 action 视图对照：H∞ 1.70→0.30** —— HTML 观测样板主导长程冗余 | 0.427 | 0.30 | 同上 |
 | AgentNet (文本侧) | 桌面 computer-use 轨迹 | 大规模（采样 160） | 16.7 / 52,850 | **registry 首个桌面 GUI 条目**（OSWorld 家族；步级 observation/thought/action/reflection + pyautogui code 全文本，截图仅文件名可排除）；H∞=0 —— VLM 生成的标注层呈蒸馏签名 + 相邻步屏幕描述近重复（发现 3/8 双重机制，不可分） | 0.136 | 0.00 | [`xlangai/AgentNet`](https://huggingface.co/datasets/xlangai/AgentNet) |
 | AgentNet (action 视图) | 桌面 computer-use 轨迹 | 同上（采样 1500） | 16.6 / 906 | 同 episode 剥离 VLM 标注层（仅 instruction + pyautogui code）；**H∞ 0.00→1.43 —— 退化在标注层不在人类演示本体（发现 15）**；与 Mind2Web/WebLINX action 视图同在高密度带 | 0.423 | 1.43 | 同上 |
+| GUI-Odyssey (action 视图) | 移动 GUI 轨迹（**多模态**，文本通道评分） | 数千 eps（采样 1500） | 15.4 / 639 | 人类演示的跨 app 手机导航（Pixel 系设备，多 app 组合任务）；图像通道：每步 1 截图（行内 h×w 如 1344×2992，未评分仅记录）；**H∞=1.55 action 流第三高 —— 人类动作流 + 跨 app 多样性**（发现 15/17 多模态域再证） | 0.342 | 1.55 | [`OpenGVLab/GUI-Odyssey`](https://huggingface.co/datasets/OpenGVLab/GUI-Odyssey) |
+| cua AgentNet-GIMP (文本通道) | 桌面 GUI 轨迹（**多模态**，单域） | 492 eps 全量 | 9.6 / 1,711 | mlfoundations cua-dev 的 GIMP 单域切片（模板化 prompt + 坐标点击；图像通道 ~10 PNG/ep 1920×1080 未评分）；**单 app 零多样性 → 动作流也 H∞=0**（发现 17 在 action-view 家族内成立） | 0.187 | 0.00 | [`mlfoundations-cua-dev/agentnet-gimp-trajectories`](https://huggingface.co/datasets/mlfoundations-cua-dev/agentnet-gimp-trajectories) |
 | WebLINX (全观测切片) | Web 轨迹（full-obs） | 同 WebLINX，116 eps 采样 | 29.1 / 72,353 | pruned DOM（~1.6–4.3KB/turn）全量 + action；**与 action 视图对照：H∞ 1.95→0.00** —— 相邻 turn 页面几乎不变，观测近乎纯冗余 | 0.203 | 0.00 | 同上 |
 
 ## III. 多环境 / 工具使用轨迹
@@ -102,7 +104,7 @@
 
 ---
 
-## V. 总览速查（α × H∞ × horizon，迭代 38 收尾时点，n=72 有效（含 6 个同源再序列化视图条目）/ CSV 76 行含 4 项已剔除 / seed-σ 23 行）
+## V. 总览速查（α × H∞ × horizon，迭代 40 时点，n=74 有效（含 6 个同源再序列化视图条目 + 2 个多模态文本通道条目）/ CSV 78 行含 4 项已剔除 / seed-σ 23 行）
 
 ### Horizon 排行（bytes·ep⁻¹ 前五，仅 H∞>0.3 的健康轨迹；H∞≈0 的"空转膨胀"纪录（aider-polyglot 7B 322KB / R2EGym-32B 149.8 turns）见发现 12）
 
@@ -192,7 +194,7 @@
 | `aec-bench/release-model-rollouts` | 工程域评测 rollouts | 实查 rollouts config：纯 trial 元数据（无 >1KB 内容字段）；transcripts 或在 artifacts config（文件型，待探） | ⚠️ 元数据-only (iter 31) |
 | `jupyter-agent/kaggle-notebooks-edu-v0` | notebook 语料（非轨迹） | 实查：edu 过滤的人写 Kaggle notebook 语料（jupyter-agent 训练源），无 agent 交互结构 | ⚠️ 非轨迹剔除 (iter 36) |
 | `DCAgent2/swe-lancer` | SWE-Lancer traces | 实查：repo 无可加载数据文件 | ⚠️ 空壳剔除 (iter 36) |
-| `OpenGVLab/GUI-Odyssey` (24k 下载) | GUI 轨迹（多模态） | 跨 app 导航轨迹 | 多模态扩展 |
+| `OpenGVLab/GUI-Odyssey` (24k 下载) | GUI 轨迹（多模态） | 文本通道已入 §II（iter 40，H∞=1.55）；图像通道评分协议（截图多样性度量）仍待设计 | ✅ 文本通道已收 (iter 40) |
 | AppWorld 完整 rollouts | 交互轨迹 | `satyakic/appworld-rollouts-*` 是 event-sourcing 日志（重建复杂），弃；`hamishivi/rlenv-appworld-train` 实测是 90 条任务 prompt 非 rollout，且 3-point 拟合 artifact（α=−0.17, H∞=9.9）→ 不入 registry | ⚠️ 官方轨迹 dump 未找到 |
 | tau-bench 官方/更大轨迹源 | 工具调用轨迹 | `sammshen/taubench-sonnet-traces` 实测整个 dump 是**单次 run 的代理日志**（聚合后仅 1 episode，29KB < 32KB oracle 块）→ oracle 不适用，不入 registry；`annon124816/tau_bench`（2.3k 下载）实测是 parquet 校验清单非数据 (iter 10)；jkazdan 50 条已入 §III，更大源仍缺 | ⚠️ 待更大轨迹源 |
 | `SWE-Gym/MoatlessTools-Sampled-Trajectories` / `ZeonLap/OpenHands-Trajectories` | SWE 轨迹 | 前者仅 eval 元数据无轨迹内容；后者是 webdataset tar 日志（首行 log 为空 bytes） | ⚠️ 均弃 (iter 10) |
@@ -244,3 +246,4 @@
 | 37 | 2026-06-05 | **DTap 第 2 seed 校验轮（诚实修正）**：`score_dtap_direct.py` 增 `--offset` σ 模式；深位样本三家齐跌（Opus 0.25 / Sonnet **0.08** / Gemini 0.44）—— 重复场景族主导的深尾切片把 frontier rollout 也钉进模板带；**发现 17 落档：健康 H∞ = frontier 生成器 × 场景多样性，缺一不可**；集群表"充分条件"措辞改为"必要非充分" |
 | 38 | 2026-06-05 | **终轮收尾（iters 29–38：+9 条目 / 7 候选剔除 / 发现 14–17 / σ 协议落地）**：n=72 有效（含 6 个同源视图条目）/ CSV 76 行 / provenance·samples 76·76 三方一致 / seed-σ 23 行；本批主线 = **视图分解方法学**（标注剥离、assistant-only、action-only、深位 seed）把"什么承载/杀死长程密度"拆到了机制层；遗留：gated ×4、多模态协议（OSWorld 截图侧 / GUI-Odyssey）、DTap 均衡组合 σ（分组配额采样器）、Claude Code 会话类别待真正释出。**循环结束** |
 | 39 | 2026-06-06 | **统计扩展分析轮（loop 外，用户指示）**：读入 `reference_papers/` 四篇；γ-β 相图（fig7，`measure_beta.py`/`gamma_beta.csv`：agentic β≈0.2–0.5 ≪ 自然语言 0.9，α_D 预测 0.3–1.0；AgentNet 标注层 β=1.3 最差象限）；**Hurst 协议落地（fig8，`measure_hurst.py`/`hurst.csv`，发现 18：模板/空转 Hurst 与健康集同档，(H, H∞) 双轴分离 form/content）**；图表套件 figs 1–8；新增 §VI 研究 takeaway 与前瞻（α_D 训练验证 / 短而分形→长度泛化 / 可验证合成代码迁移三实验） |
+| 40 | 2026-06-06 | **多模态破冰轮（用户开放多模态范围）**：协议 = 文本通道评分 + 图像通道描述性记录；iter_docs 增 `drop_cols`（流式跳过截图解码）；+2 集 → §II：**GUI-Odyssey action 视图（人类跨 app 手机导航，H∞=1.55 action 流第三高）** vs cua AgentNet-GIMP（单 app 模板化，H∞=0）—— **发现 15/17 在多模态域同时再证：人类动作流 + 跨 app 多样性 vs 单域零多样性** |

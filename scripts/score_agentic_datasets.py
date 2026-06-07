@@ -134,6 +134,28 @@ def ser_gdpval(row):
             f"{row.get('occupation') or ''}\n\n[prompt]\n{row.get('prompt') or ''}"), 1
 
 
+def ser_cua_gimp(row):
+    # cua-dev AgentNet-GIMP (multimodal): text channel = instruction + turn
+    # messages + raw pyautogui actions; image channel (~10 PNG/ep, 1920x1080)
+    # is dropped via drop_cols and recorded descriptively in the registry row.
+    doc, n = _msgs_auto(row.get("messages") or [])
+    acts = "\n".join(row.get("raw_actions") or [])
+    return (f"[instruction]\n{row.get('instruction') or ''}\n\n{doc}\n\n"
+            f"[raw_actions]\n{acts}"), int(row.get("num_steps") or n)
+
+
+def ser_gui_odyssey(row):
+    # GUI-Odyssey (multimodal mobile GUI): steps is a Python-repr list of step
+    # dicts; screenshots are filename strings (excluded). Text channel =
+    # instruction + per-step action/info.
+    import ast
+    steps = ast.literal_eval(row["steps"])
+    parts = [f"[instruction]\n{row.get('instruction') or ''}"]
+    for s in steps:
+        parts.append(f"[{s.get('action', '?')}]\n{s.get('info', '')}")
+    return "\n\n".join(parts), len(steps)
+
+
 def ser_rebel_steps(row):
     # ReBel ALFWorld: `steps` is a JSON-encoded list of step dicts (idx + obs/
     # action/... fields); render each non-idx field as its own labelled line.
@@ -491,6 +513,12 @@ REGISTRY = [
      ser_nemotron_inj, "nemotron-rl-injection-v1"),
     # --- loop iter 32: first desktop computer-use entry (text side) ---
     ("xlangai/AgentNet", None, ["train"], ser_agentnet, "agentnet-text"),
+    # --- loop iter 40: multimodal in scope (text channel scored; image
+    # channel recorded descriptively) ---
+    ("OpenGVLab/GUI-Odyssey", None, ["all"], ser_gui_odyssey,
+     "gui-odyssey-actions"),
+    ("mlfoundations-cua-dev/agentnet-gimp-trajectories", None, ["train"],
+     ser_cua_gimp, "cua-agentnet-gimp-text", None, ["images"]),
     # --- loop iter 33: annotation-stripped action view (within-dataset ablation) ---
     ("xlangai/AgentNet", None, ["train"], ser_agentnet_actions, "agentnet-actions"),
     # --- loop iter 34: action-origin counter-test (planner-generated actions) ---
@@ -508,7 +536,7 @@ REGISTRY = [
 ]
 
 
-def iter_docs(path, cfg, splits, ser, group_key=None):
+def iter_docs(path, cfg, splits, ser, group_key=None, drop_cols=None):
     cfgs = cfg if isinstance(cfg, list) else [cfg]
     for c in cfgs:
         for split in splits:
@@ -521,6 +549,12 @@ def iter_docs(path, cfg, splits, ser, group_key=None):
                     split="train", streaming=True)
             else:
                 ds = load_dataset(path, c, split=split, streaming=True)
+            if drop_cols:
+                # Multimodal text-channel scoring: drop image columns BEFORE
+                # iteration so streaming never decodes the screenshots.
+                present = [col for col in drop_cols
+                           if col in (ds.column_names or drop_cols)]
+                ds = ds.remove_columns(present)
             if group_key is None:
                 for row in ds:
                     yield ser(row)
@@ -538,10 +572,12 @@ def iter_docs(path, cfg, splits, ser, group_key=None):
                     yield ser(buf)
 
 
-def score_entry(path, cfg, splits, ser, slug, seed_offset=0, group_key=None):
+def score_entry(path, cfg, splits, ser, slug, seed_offset=0, group_key=None,
+                drop_cols=None):
     docs, turn_counts = [], []
     size = 0
-    it = iter_docs(path, cfg, splits, ser, group_key=group_key)
+    it = iter_docs(path, cfg, splits, ser, group_key=group_key,
+                   drop_cols=drop_cols)
     if seed_offset:
         it = itertools.islice(it, seed_offset, None)
     for doc, n_turns in it:
@@ -611,11 +647,13 @@ def main():
     for entry in REGISTRY:
         path, cfg, splits, ser, slug = entry[:5]
         group_key = entry[5] if len(entry) > 5 else None
+        drop_cols = entry[6] if len(entry) > 6 else None
         if args.only and args.only not in (path, slug):
             continue
         print(f"-> scoring {path} ({slug}) ...", flush=True)
         try:
-            res = score_entry(path, cfg, splits, ser, slug, group_key=group_key)
+            res = score_entry(path, cfg, splits, ser, slug, group_key=group_key,
+                              drop_cols=drop_cols)
             rows.append({k: res.get(k, "") for k in fields})
             print(f"   alpha={res['alpha']:.3f} H_inf={res['h_inf']:.3f} "
                   f"episodes={res['n_episodes']} mean_turns={res['mean_turns']} "

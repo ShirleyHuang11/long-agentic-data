@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "OpenGVLab/GUI-Odyssey",
+  "hf_url": "https://huggingface.co/datasets/OpenGVLab/GUI-Odyssey",
+  "hf_revision_sha": "71e0e7e2d169c642e7a99c264d82ffecadf67889",
+  "config": "default",
+  "group_key": null,
+  "splits": [
+    "all"
+  ],
+  "serializer": "ser_gui_odyssey",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-07T01:57:33.390908+00:00",
+  "result": {
+    "alpha": 0.34241162856799956,
+    "h_inf": 1.550095246467675,
+    "bpc_128": 5.535309089699228,
+    "bpc_2048": 3.0923174307036247,
+    "bpc_32768": 2.1469137257543105,
+    "n_episodes": 1500,
+    "mean_turns": 15.4,
+    "mean_doc_bytes": 639,
+    "n_bytes": 961827
+  }
+}

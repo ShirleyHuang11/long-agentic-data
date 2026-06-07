@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "mlfoundations-cua-dev/agentnet-gimp-trajectories",
+  "hf_url": "https://huggingface.co/datasets/mlfoundations-cua-dev/agentnet-gimp-trajectories",
+  "hf_revision_sha": "c2fa0950bb907ae13fdce28941903ab19611701b",
+  "config": "default",
+  "group_key": null,
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_cua_gimp",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-07T02:01:32.852154+00:00",
+  "result": {
+    "alpha": 0.18731640995125104,
+    "h_inf": 0.0,
+    "bpc_128": 5.771149756986635,
+    "bpc_2048": 2.796979546836983,
+    "bpc_32768": 1.027626953125,
+    "n_episodes": 492,
+    "mean_turns": 9.6,
+    "mean_doc_bytes": 1711,
+    "n_bytes": 842837
+  }
+}
