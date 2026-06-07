@@ -8,7 +8,7 @@
 #SBATCH --gres=gpu:nvidia_a100-sxm4-80gb:1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=128G
-#SBATCH --time=12:00:00
+#SBATCH --time=04:00:00
 #SBATCH --output=/n/netscratch/chen_lab_seas/Lab/shirleyhuang/long-agentic-data/formchoice/logs/template_%j.out
 #SBATCH --error=/n/netscratch/chen_lab_seas/Lab/shirleyhuang/long-agentic-data/formchoice/logs/template_%j.err
 
