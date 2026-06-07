@@ -567,6 +567,9 @@ REGISTRY = [
     # direct-read, finding-10 pattern.
     ("hf-json:KermitCO/qwen3.5-9B-react-hotpotqa-traces", None,
      ["generated_traces_judged"], ser_messages_auto, "qwen35-9b-react-hotpot"),
+    # --- loop iter 54: RL-FT mid-size checkpoint on finance-terminal tasks ---
+    ("DCAgent3/financeagent_terminal_a3_rl_laion_exp_rpt_methods2test_large_v2_20260606_225633",
+     None, ["train"], ser_conversations_auto, "dcagent3-financeagent-a3rl"),
     # --- loop iter 33: annotation-stripped action view (within-dataset ablation) ---
     ("xlangai/AgentNet", None, ["train"], ser_agentnet_actions, "agentnet-actions"),
     # --- loop iter 34: action-origin counter-test (planner-generated actions) ---

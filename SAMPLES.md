@@ -34,6 +34,7 @@
 | aider-polyglot × R2EGym-32B | 代码练习轨迹（受控对照） | 44 条（dump 全量） | **149.8** / 196,427 | 同上 32B 切片；**turns·ep⁻¹ 全 registry 最多 —— 同为 H∞=0 的空转膨胀**；三家中型同任务全落模板带（发现 12） | 0.185 | 0.00 | [`DCAgent2/aider_polyglot_R2EGym_32B_Agent_...-traces`](https://huggingface.co/datasets/DCAgent2/aider_polyglot_R2EGym_32B_Agent_20260505_060450-traces) |
 | aider-polyglot × Qwen3-32B (ntc-1k SFT) | 代码练习轨迹（SFT 剂量对照） | 132 条 | 23.6 / 63,937 | terminus-2 跑 nemotron-terminal-corpus **1k** SFT 后的 Qwen3-32B；H∞=0 | 0.221 | 0.00 | [`DCAgent3/aider_polyglot_nemotron_terminal_corpus_unified_1000__Qwen3_32B_...`](https://huggingface.co/datasets/DCAgent3/aider_polyglot_nemotron_terminal_corpus_unified_1000__Qwen3_32B_20260520_085722) |
 | aider-polyglot × Qwen3-32B (ntc-100k SFT) | 代码练习轨迹（SFT 剂量对照） | 68 条 | 46.1 / 124,389 | 同上 **100k** SFT 版；**×100 SFT 剂量不改 H∞=0 签名，只拉长 episode（发现 13）** | 0.212 | 0.00 | [`DCAgent3/aider_polyglot_nemotron_terminal_corpus_unified_100000__Qwen3_32B_...`](https://huggingface.co/datasets/DCAgent3/aider_polyglot_nemotron_terminal_corpus_unified_100000__Qwen3_32B_20260520_100037) |
+| DCAgent3 finance-terminal × a3-RL | 终端轨迹（RL-FT 中型） | 数百条（采样 143） | 41.3 / 59,060 | terminus-2 跑 RL 微调中型 checkpoint（laion a3-rl）的 finance-terminal 任务；H∞=0 —— **中型塌缩第三域（code/search/finance-terminal）**，RL 微调与 SFT 剂量同样救不回（发现 12/13 再证） | 0.191 | 0.00 | [`DCAgent3/financeagent_terminal_a3_rl_...`](https://huggingface.co/datasets/DCAgent3/financeagent_terminal_a3_rl_laion_exp_rpt_methods2test_large_v2_20260606_225633) |
 | Nemotron-RL-SWE-Pivot | SWE RL（per-step） | 大规模（采样 534） | 90.0 / 15,749 | OpenHands 风格 per-*step* RL 数据（context messages + expected_action + pass_rate）；⚠️ 同 episode 多 step 行 → 前缀重叠 caveat | 0.207 | 0.59 | [`nvidia/Nemotron-RL-Agentic-SWE-Pivot-v1`](https://huggingface.co/datasets/nvidia/Nemotron-RL-Agentic-SWE-Pivot-v1) |
 | R2E-Gym SWE-agent-LM 轨迹 | SWE 轨迹（自回滚） | 数百条 | 30.4 / 70,847 | SWE-agent-LM-32B 在 R2E-Gym 上的 rollout（thought/action 步级 + reward，131k ctx 跑）；**H∞≈0.01 —— 32B 自产 rollout 呈模板退化签名，与 frontier-model OpenHands dump（H∞ 0.6–1.2）形成"生成器规模"对照** | 0.232 | 0.01 | [`AxT-dev/swe-agent-lm-32b-r2e-gym-trajectories`](https://huggingface.co/datasets/AxT-dev/swe-agent-lm-32b-r2e-gym-trajectories) |
 
@@ -109,7 +110,7 @@
 
 ---
 
-## V. 总览速查（α × H∞ × horizon，迭代 50 时点，n=79 有效（含 6 个同源再序列化视图条目 + 4 个多模态文本通道条目）/ CSV 85 行含 6 项已剔除 / seed-σ 23 行）
+## V. 总览速查（α × H∞ × horizon，迭代 54 时点，n=80 有效（含 6 个同源再序列化视图条目 + 4 个多模态文本通道条目）/ CSV 86 行含 6 项已剔除 / seed-σ 23 行）
 
 ### Horizon 排行（bytes·ep⁻¹ 前五，仅 H∞>0.3 的健康轨迹；H∞≈0 的"空转膨胀"纪录（aider-polyglot 7B 322KB / R2EGym-32B 149.8 turns）见发现 12）
 
@@ -264,3 +265,4 @@
 | 47 | 2026-06-07 | watch 轮（干）：PortBench-RawData 实查为 FRED 金融时间序列非轨迹、multiagent-entropy 为评测指标聚合 CSV —— 均剔除；recency 扫描无新候选 |
 | 48–49 | 2026-06-07 | **轮换查询破干 + CLI 会话类别首样本**：+2 集（TIGER BrowserAgent-sft → §II 模板带 H∞=0；**CLI agent sessions sampler → §I（Claude Code×4/Codex×3/pi×3 真实会话 raw 直读，H∞=1.49 健康带上沿 —— 等待两轮的"真实编码 CLI 会话"类别首探针**，⚠️ n=10 + 单 pi 会话占 80%）；saital MiniWoB pair ×2 拟合 artifact 剔除（重复 system prompt）；victor/coding-agent-sessions（仅 4 sessions）暂不入；新增 `score_cli_sessions.py` |
 | 50 | 2026-06-07 | +1 集：qwen3.5-9B ReAct hotpot → §III（hub loader CastError → JSONL 直读；**H∞=0 —— 中型生成器塌缩跨域成立**，搜索域 frontier 1.37–1.44 vs 9B 0，发现 12 谱系补全） |
+| 51–54 | 2026-06-07 | watch 轮 ×4（51–53 干；52 剔除 WithinUsAI 单轮指令三元组、RLVE 数学 rollouts 域外）；54 +1 集：DCAgent3 finance-terminal × a3-RL → §I（**中型塌缩第三域**，RL 微调同样救不回，H∞=0） |

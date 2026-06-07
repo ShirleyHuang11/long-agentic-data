@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "DCAgent3/financeagent_terminal_a3_rl_laion_exp_rpt_methods2test_large_v2_20260606_225633",
+  "hf_url": "https://huggingface.co/datasets/DCAgent3/financeagent_terminal_a3_rl_laion_exp_rpt_methods2test_large_v2_20260606_225633",
+  "hf_revision_sha": "93052872bb4dd20f4bc79fc0fea8de4268c1f103",
+  "config": "default",
+  "group_key": null,
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_conversations_auto",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-07T12:30:29.361172+00:00",
+  "result": {
+    "alpha": 0.19074546878596832,
+    "h_inf": 0.0,
+    "bpc_128": 6.601240158081055,
+    "bpc_2048": 3.670994758605957,
+    "bpc_32768": 1.9442682266235352,
+    "n_episodes": 143,
+    "mean_turns": 41.3,
+    "mean_doc_bytes": 59060,
+    "n_bytes": 8388608
+  }
+}

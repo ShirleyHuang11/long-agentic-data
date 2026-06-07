@@ -84,3 +84,4 @@ saital/browser-agent-phase1-sft-reasoning-action,,train,saital-browser-reasoning
 saital/browser-agent-phase1-sft-action-only,,train,saital-browser-action-only,-0.03987781051596271,29.719422120576596,6.240638959446439,3.4957652636650316,0.42999198999297755,1500,3,1945,2922778
 cfahlgren1/agent-sessions-list,sessions/*,raw,cli-agent-sessions-sampler,0.299952845110399,1.4904582651712355,5.902661266994504,3.411232277199074,2.326633029513889,10,98,86904,885096
 hf-json:KermitCO/qwen3.5-9B-react-hotpotqa-traces,,generated_traces_judged,qwen35-9b-react-hotpot,0.12743055892737068,0.0,6.241458748415142,3.9731638737922705,2.3800096142199614,995,13.6,4247,4240166
+DCAgent3/financeagent_terminal_a3_rl_laion_exp_rpt_methods2test_large_v2_20260606_225633,,train,dcagent3-financeagent-a3rl,0.19074546878596832,0.0,6.601240158081055,3.670994758605957,1.9442682266235352,143,41.3,59060,8388608
