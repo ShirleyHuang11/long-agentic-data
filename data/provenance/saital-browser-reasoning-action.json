@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "saital/browser-agent-phase1-sft-reasoning-action",
+  "hf_url": "https://huggingface.co/datasets/saital/browser-agent-phase1-sft-reasoning-action",
+  "hf_revision_sha": "744d92ae258f9052e85b5850872f435d70b73088",
+  "config": "default",
+  "group_key": null,
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_messages_auto",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-07T07:16:22.037282+00:00",
+  "result": {
+    "alpha": -0.08922941993006334,
+    "h_inf": 15.044449183941753,
+    "bpc_128": 6.240894115703693,
+    "bpc_2048": 3.769852563160987,
+    "bpc_32768": 0.6052223061615566,
+    "n_episodes": 1500,
+    "mean_turns": 3,
+    "mean_doc_bytes": 2320,
+    "n_bytes": 3487060
+  }
+}

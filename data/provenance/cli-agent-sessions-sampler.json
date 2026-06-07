@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "cfahlgren1/agent-sessions-list",
+  "hf_url": "https://huggingface.co/datasets/cfahlgren1/agent-sessions-list",
+  "hf_revision_sha": "978a1ef65814a13dc4162472c533c0ab04220bd3",
+  "config": "sessions/* (claude x4, codex x3, pi x3)",
+  "group_key": null,
+  "splits": [
+    "raw"
+  ],
+  "serializer": "score_cli_sessions.py collect_text (content/text values only)",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "all 10 session files",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-07T07:17:50.762511+00:00",
+  "result": {
+    "alpha": 0.299952845110399,
+    "h_inf": 1.4904582651712355,
+    "bpc_128": 5.902661266994504,
+    "bpc_2048": 3.411232277199074,
+    "bpc_32768": 2.326633029513889,
+    "n_episodes": 10,
+    "mean_turns": 98,
+    "mean_doc_bytes": 86904,
+    "n_bytes": 885096
+  }
+}

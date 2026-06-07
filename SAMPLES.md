@@ -25,6 +25,7 @@
 | OpenHands-SFT-Trajectories | SWE 轨迹 | 数百条（success.oss） | 39.0 / 62,786 | SWE-Gym 官方 SFT 轨迹（成功 episode 过滤）；H∞=1.11 健康 | 0.349 | 1.11 | [`SWE-Gym/OpenHands-SFT-Trajectories`](https://huggingface.co/datasets/SWE-Gym/OpenHands-SFT-Trajectories) |
 | OpenHands-Sampled-Trajectories | SWE 轨迹（未过滤） | 数千条（train.raw） | 28.3 / 32,300 | SFT 版的未过滤原始采样（含失败 episode）；**与 SFT 版对照：成功过滤对 α/H∞ 几乎无影响**（Δα=0.015, ΔH∞=0.01），但成功 episode 更长（39.0 vs 28.3 turns） | 0.334 | 1.10 | [`SWE-Gym/OpenHands-Sampled-Trajectories`](https://huggingface.co/datasets/SWE-Gym/OpenHands-Sampled-Trajectories) |
 | OpenHands-Verifier-Trajectories | 验证器 (judge) 轨迹 | 数千条（train.mixture） | 3 / 63,167 | judge 对轨迹的评估对话（验证器训练数据），非 agent rollout 本体 | 0.339 | 1.07 | [`SWE-Gym/OpenHands-Verifier-Trajectories`](https://huggingface.co/datasets/SWE-Gym/OpenHands-Verifier-Trajectories) |
+| CLI agent sessions (sampler) | 真实编码 CLI 会话（**新类别首样本**） | ⚠️ 仅 10 sessions | 98 / 86,904 | **Claude Code ×4 / Codex ×3 / pi ×3 真实会话 dump**（raw JSONL 直读，仅取 content/text 字段）；H∞=1.49 健康带上沿 —— 与 OpenHands-feedback 同为"野生"会话类；⚠️ n=10 + 单个 709KB pi 会话占语料 ~80%，仅作类别首探针 | 0.300 | 1.49 | [`cfahlgren1/agent-sessions-list`](https://huggingface.co/datasets/cfahlgren1/agent-sessions-list) |
 | SWE-agent-trajectories | SWE 轨迹 | 80k 条 | 56.2 / 58,315 | Nebius 用 SWE-agent 修真实 GitHub issue 的完整轨迹（含失败）；规模 × 长度乘积最大 | 0.153 | 0.00 | [`nebius/SWE-agent-trajectories`](https://huggingface.co/datasets/nebius/SWE-agent-trajectories) |
 | Kwai-Klear mini-swe-agent+ 轨迹 | SWE 轨迹 | 66k 条 | 54.2 / 61,450 | mini-swe-agent-plus 在 SWE-smith issue 上的端到端轨迹（Klear-AgentForge-8B SFT 语料，解题率随 log 数据量近线性升）；H∞=0.26 偏低 —— shell 观测 + SWE-smith 合成 issue 模板拉低语义密度 | 0.234 | 0.26 | [`Kwai-Klear/SWE-smith-mini_swe_agent_plus-trajectories-66k`](https://huggingface.co/datasets/Kwai-Klear/SWE-smith-mini_swe_agent_plus-trajectories-66k) |
 | SWE-ZERO-12M 轨迹 | SWE 轨迹（execution-free） | **12M 条 / 112B tokens**（采样 325） | 31.9 / 25,824 | 迄今最大 agentic-coding 轨迹释出（122K PRs / 3K repos / 16 语言，execution-free 管线绕开容器化天花板）；H∞=0.80 落健康集群 —— **无执行验证不必然模板退化** | 0.264 | 0.80 | [`AlienKevin/SWE-ZERO-12M-trajectories`](https://huggingface.co/datasets/AlienKevin/SWE-ZERO-12M-trajectories) |
@@ -40,6 +41,7 @@
 
 | 数据集 | 类别 | 规模 | 轨迹长度 (turns / bytes·ep⁻¹) | 特点 | α | H∞ | HF 镜像 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| TIGER BrowserAgent (sft) | 浏览器 QA SFT | 数千条（采样 860） | 3 / 9,761 | hotpot 系多跳问答的浏览器交互 SFT；H∞=0 蒸馏模板带（与 deep-research-sft 同签名） | 0.184 | 0.00 | [`TIGER-Lab/BrowserAgent-Data`](https://huggingface.co/datasets/TIGER-Lab/BrowserAgent-Data) |
 | AgentTrek | Web/GUI 轨迹 | 10k+ 条 | 3 / 25,167 | tutorial-引导合成的 web 轨迹（messages 含页面观测）；turns 少但单 turn 观测长 | 0.337 | 0.85 | [`xlangai/AgentTrek`](https://huggingface.co/datasets/xlangai/AgentTrek) |
 | NNetNav-WA | Web 轨迹（per-step） | 万级 step 样本 | 3 / 18,519 | 无监督探索（WebArena）；⚠️ 每行是 per-*step* SFT 样本（messages=该步上文），前缀重叠会抬高冗余 → H∞=0.46 偏低需照此解读 | 0.309 | 0.46 | [`stanfordnlp/nnetnav-wa`](https://huggingface.co/datasets/stanfordnlp/nnetnav-wa) |
 | NNetNav-live | Web 轨迹（per-step） | 万级 step 样本 | 3 / 31,732 | nnetnav-wa 的真实网站版；同 per-step 前缀重叠 caveat，但 H∞=1.37 远高于 WA 版 —— 真实网页观测多样性 ≫ WebArena 模拟站 | 0.426 | 1.37 | [`stanfordnlp/nnetnav-live`](https://huggingface.co/datasets/stanfordnlp/nnetnav-live) |
@@ -106,7 +108,7 @@
 
 ---
 
-## V. 总览速查（α × H∞ × horizon，迭代 41 时点，n=76 有效（含 6 个同源再序列化视图条目 + 4 个多模态文本通道条目）/ CSV 80 行含 4 项已剔除 / seed-σ 23 行）
+## V. 总览速查（α × H∞ × horizon，迭代 49 时点，n=78 有效（含 6 个同源再序列化视图条目 + 4 个多模态文本通道条目）/ CSV 84 行含 6 项已剔除 / seed-σ 23 行）
 
 ### Horizon 排行（bytes·ep⁻¹ 前五，仅 H∞>0.3 的健康轨迹；H∞≈0 的"空转膨胀"纪录（aider-polyglot 7B 322KB / R2EGym-32B 149.8 turns）见发现 12）
 
@@ -131,7 +133,7 @@
 | **中型生成器失败空转** | α 0.19–0.26, H∞ 0–0.08，episode 反而最长 | aider-polyglot 家族（7B/30B/32B、ntc-1k/100k）、R2E-Gym SWE-agent-LM-32B、Kwai-Klear-66k（0.26 边缘） | **失败重试循环膨胀 horizon**：turns/bytes 双纪录全在此集群；SFT 剂量 ×100 救不回（发现 12/13） |
 | **compact 高密度** | α 0.40–0.49, H∞ 1.7–1.95 | WebLINX/Mind2Web action 视图、FireAct | 人写/多样内容、observation 已剥离；短 episode 但语义密度全场最高 |
 | **观测/标注坍缩对照** | 同源 H∞ 1.7→0.3 / 1.95→0.0 / 1.43→0.0 | mind2web/weblinx full-obs vs action 视图；AgentNet 标注 vs action 视图（iter 33） | **观测或机器标注并入即 H∞ 坍缩** —— web HTML 观测与 VLM 标注层在长程上均近乎纯模板冗余；人类动作流本身高密度 |
-| **拟合 artifact（已剔除）** | α<0 或 H∞>8 | Nemotron-v1、rlenv-appworld、Aguvis 文本侧 | 近恒等文档集上 3-point 拟合失效；CSV 保留原始分，registry 不收 |
+| **拟合 artifact（已剔除）** | α<0 或 H∞>8 | Nemotron-v1、rlenv-appworld、Aguvis 文本侧、saital MiniWoB pair ×2（iter 49：巨型重复 system prompt + per-step 行） | 近恒等文档集上 3-point 拟合失效；CSV 保留原始分，registry 不收 |
 
 ### 累积发现
 
@@ -259,3 +261,4 @@
 | 45 | 2026-06-06 | **跨 app 图像对照轮（`image_channel_odyssey.py`，修复跨 shard 帧分组）**：GUI-Odyssey 25 eps 相邻截图变化 **26.9%/步 vs GIMP 2.6% —— 10× 差距与文本通道 H∞（1.55 vs 0）同向，发现 19 落档**：观测冗余跨模态一致；caveat：2 集试点、平台×范围混杂 |
 | 46 | 2026-06-07 | **FFW γ-β 对照轮（用户指示，`measure_beta_ffw.py` + fig9）**：对 `reference/all-lz_Hinf_ffw.csv` 的 **67 个 FineFineWeb 域**用同一 byte-level 协议测 β：**自然语言网页文本 β=0.88–1.44（均值 1.26）vs agentic 轨迹 0.20–0.52 —— 两相完全不相交**（同协议下首次 apples-to-apples）；域内梯度：news/politics 去相关最快（1.44）、physics/光学工程最慢（0.99）；论文 token-level 星点恰落 FFW 云下缘（方法学相互印证）；watch 轮无新候选（PortBench 留观） |
 | 47 | 2026-06-07 | watch 轮（干）：PortBench-RawData 实查为 FRED 金融时间序列非轨迹、multiagent-entropy 为评测指标聚合 CSV —— 均剔除；recency 扫描无新候选 |
+| 48–49 | 2026-06-07 | **轮换查询破干 + CLI 会话类别首样本**：+2 集（TIGER BrowserAgent-sft → §II 模板带 H∞=0；**CLI agent sessions sampler → §I（Claude Code×4/Codex×3/pi×3 真实会话 raw 直读，H∞=1.49 健康带上沿 —— 等待两轮的"真实编码 CLI 会话"类别首探针**，⚠️ n=10 + 单 pi 会话占 80%）；saital MiniWoB pair ×2 拟合 artifact 剔除（重复 system prompt）；victor/coding-agent-sessions（仅 4 sessions）暂不入；新增 `score_cli_sessions.py` |

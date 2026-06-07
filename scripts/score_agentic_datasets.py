@@ -553,6 +553,15 @@ REGISTRY = [
      ser_android_control, "android-control-text", None, ["screenshots_b64"]),
     ("cua-lite/OpenCUA", None, ["train"],
      ser_opencua, "opencua-text", None, ["images"]),
+    # --- loop iter 49 ---
+    ("TIGER-Lab/BrowserAgent-Data", "sft", ["train"],
+     ser_messages_auto, "tiger-browseragent-sft"),
+    # MiniWoB BrowserGym SFT pair: reasoning+action vs action-only — a
+    # ready-made annotation ablation (finding 15) on synthetic web tasks.
+    ("saital/browser-agent-phase1-sft-reasoning-action", None, ["train"],
+     ser_messages_auto, "saital-browser-reasoning-action"),
+    ("saital/browser-agent-phase1-sft-action-only", None, ["train"],
+     ser_messages_auto, "saital-browser-action-only"),
     # --- loop iter 33: annotation-stripped action view (within-dataset ablation) ---
     ("xlangai/AgentNet", None, ["train"], ser_agentnet_actions, "agentnet-actions"),
     # --- loop iter 34: action-origin counter-test (planner-generated actions) ---

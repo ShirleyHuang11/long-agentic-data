@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "TIGER-Lab/BrowserAgent-Data",
+  "hf_url": "https://huggingface.co/datasets/TIGER-Lab/BrowserAgent-Data",
+  "hf_revision_sha": "d0f8de507b362e4b0ece02cef4420f22fd882288",
+  "config": "sft",
+  "group_key": null,
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_messages_auto",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-07T07:16:18.006688+00:00",
+  "result": {
+    "alpha": 0.18385595147480674,
+    "h_inf": 0.0,
+    "bpc_128": 6.396609306335449,
+    "bpc_2048": 3.341245651245117,
+    "bpc_32768": 1.5060672760009766,
+    "n_episodes": 860,
+    "mean_turns": 3,
+    "mean_doc_bytes": 9761,
+    "n_bytes": 8388608
+  }
+}
