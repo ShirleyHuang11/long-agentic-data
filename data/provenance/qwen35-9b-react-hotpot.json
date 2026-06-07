@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "hf-json:KermitCO/qwen3.5-9B-react-hotpotqa-traces",
+  "hf_url": "https://huggingface.co/datasets/hf-json:KermitCO/qwen3.5-9B-react-hotpotqa-traces",
+  "hf_revision_sha": "05e8d291d847b8b6f9209fe3b6fe5bdcfc92c075",
+  "config": "default",
+  "group_key": null,
+  "splits": [
+    "generated_traces_judged"
+  ],
+  "serializer": "ser_messages_auto",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "streaming, first-N episodes per split (no shuffle)",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-07T08:23:08.390002+00:00",
+  "result": {
+    "alpha": 0.12743055892737068,
+    "h_inf": 0.0,
+    "bpc_128": 6.241458748415142,
+    "bpc_2048": 3.9731638737922705,
+    "bpc_32768": 2.3800096142199614,
+    "n_episodes": 995,
+    "mean_turns": 13.6,
+    "mean_doc_bytes": 4247,
+    "n_bytes": 4240166
+  }
+}

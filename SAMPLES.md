@@ -79,6 +79,7 @@
 | ReBel-ALFWorld SFT 轨迹 | 具身环境轨迹 | 数百条（采样 277） | 13.6 / 30,296 | ALFWorld 专项 SFT 轨迹（obs/action step 序列）；α=0.11+H∞=0 与 AgentInstruct/AgentTraj 多环境模板集群完全同签名 —— 具身模拟器观测模板主导 | 0.108 | 0.00 | [`Decix/ReBel-ALFWorld-SFT-Trajectories`](https://huggingface.co/datasets/Decix/ReBel-ALFWorld-SFT-Trajectories) |
 | ReBel-ALFWorld (action 视图) | 具身轨迹（action-only 对照） | 同上（426 条全量） | 12.7 / 286 | 同 episode 仅留 planner 动作流（ground_truth_action）；H∞ 0.00→0.43 部分恢复，**远低于人类动作流的 1.43（AgentNet）—— action 来源决定剥离后的密度上限**；α=0.52 全 registry 最高（微型动作语法长程结构极强）；⚠️ 语料仅 ~122KB，小语料 caveat | 0.516 | 0.43 | 同上 |
 | factory-agent task rollouts | 工厂运营 agent rollouts | ⚠️ 仅 70 条 | 24.7 / 7,714 | 韩语工厂运营 agent（GLM-4.x via openrouter，含 eval checks + 39 tool calls/ep）；JSONL 直读（hub loader CastError，发现 10 再证）；合成环境工具返回模板化 → H∞=0（与 Ko-Agent 同：**非英语 ≠ 例外，结构性重复照杀 H∞**） | 0.218 | 0.00 | [`SeongryongJung/factory-agent-rollouts`](https://huggingface.co/datasets/SeongryongJung/factory-agent-rollouts) |
+| qwen3.5-9B ReAct hotpot 轨迹 | 搜索轨迹（中型生成器） | 数千条（采样 995，JSONL 直读） | 13.6 / 4,247 | 9B 模型的 hotpotqa ReAct 搜索 rollout（含 GPT-5.4 judge 标注）；**H∞=0 —— 中型生成器塌缩跨域成立**（同域 frontier：smolagents-gaia 1.44 / Nemotron-search 1.37），发现 12 谱系补全搜索域 | 0.127 | 0.00 | [`KermitCO/qwen3.5-9B-react-hotpotqa-traces`](https://huggingface.co/datasets/KermitCO/qwen3.5-9B-react-hotpotqa-traces) |
 | FireAct (multitask-multimethod) | QA+搜索工具轨迹 | 2k+ 条 | 5.1 / 930 | ReAct/CoT/Reflexion 混合方法的 QA 搜索轨迹；episode 极短但 **H∞=1.80 全 registry 第二** —— 内容多样性高、模板低 | 0.397 | 1.80 | [`zwhe99/FireAct`](https://huggingface.co/datasets/zwhe99/FireAct) |
 | glaive-FC-v2 | 函数调用对话 | 113k 条 | 5.6 / 2,272 | 合成函数调用对话（raw text turns）；**短 FC 对话 H∞=1.05 反而高于 ToolLLaMA/APIGen 等轨迹型工具集（H∞=0）**—— 无重复环境观测 | 0.280 | 1.05 | [`glaiveai/glaive-function-calling-v2`](https://huggingface.co/datasets/glaiveai/glaive-function-calling-v2) |
 | Hermes-FC-v1 (func_calling) | 函数调用对话（多轮） | 数千条 | 4.6 / 6,788 | NousResearch XML-tools 风格多轮 FC；同上，H∞=0.78 健康区间 | 0.259 | 0.78 | [`NousResearch/hermes-function-calling-v1`](https://huggingface.co/datasets/NousResearch/hermes-function-calling-v1) |
@@ -108,7 +109,7 @@
 
 ---
 
-## V. 总览速查（α × H∞ × horizon，迭代 49 时点，n=78 有效（含 6 个同源再序列化视图条目 + 4 个多模态文本通道条目）/ CSV 84 行含 6 项已剔除 / seed-σ 23 行）
+## V. 总览速查（α × H∞ × horizon，迭代 50 时点，n=79 有效（含 6 个同源再序列化视图条目 + 4 个多模态文本通道条目）/ CSV 85 行含 6 项已剔除 / seed-σ 23 行）
 
 ### Horizon 排行（bytes·ep⁻¹ 前五，仅 H∞>0.3 的健康轨迹；H∞≈0 的"空转膨胀"纪录（aider-polyglot 7B 322KB / R2EGym-32B 149.8 turns）见发现 12）
 
@@ -262,3 +263,4 @@
 | 46 | 2026-06-07 | **FFW γ-β 对照轮（用户指示，`measure_beta_ffw.py` + fig9）**：对 `reference/all-lz_Hinf_ffw.csv` 的 **67 个 FineFineWeb 域**用同一 byte-level 协议测 β：**自然语言网页文本 β=0.88–1.44（均值 1.26）vs agentic 轨迹 0.20–0.52 —— 两相完全不相交**（同协议下首次 apples-to-apples）；域内梯度：news/politics 去相关最快（1.44）、physics/光学工程最慢（0.99）；论文 token-level 星点恰落 FFW 云下缘（方法学相互印证）；watch 轮无新候选（PortBench 留观） |
 | 47 | 2026-06-07 | watch 轮（干）：PortBench-RawData 实查为 FRED 金融时间序列非轨迹、multiagent-entropy 为评测指标聚合 CSV —— 均剔除；recency 扫描无新候选 |
 | 48–49 | 2026-06-07 | **轮换查询破干 + CLI 会话类别首样本**：+2 集（TIGER BrowserAgent-sft → §II 模板带 H∞=0；**CLI agent sessions sampler → §I（Claude Code×4/Codex×3/pi×3 真实会话 raw 直读，H∞=1.49 健康带上沿 —— 等待两轮的"真实编码 CLI 会话"类别首探针**，⚠️ n=10 + 单 pi 会话占 80%）；saital MiniWoB pair ×2 拟合 artifact 剔除（重复 system prompt）；victor/coding-agent-sessions（仅 4 sessions）暂不入；新增 `score_cli_sessions.py` |
+| 50 | 2026-06-07 | +1 集：qwen3.5-9B ReAct hotpot → §III（hub loader CastError → JSONL 直读；**H∞=0 —— 中型生成器塌缩跨域成立**，搜索域 frontier 1.37–1.44 vs 9B 0，发现 12 谱系补全） |

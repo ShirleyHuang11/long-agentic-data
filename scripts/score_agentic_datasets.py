@@ -562,6 +562,11 @@ REGISTRY = [
      ser_messages_auto, "saital-browser-reasoning-action"),
     ("saital/browser-agent-phase1-sft-action-only", None, ["train"],
      ser_messages_auto, "saital-browser-action-only"),
+    # --- loop iter 50: mid-size generator point in the search domain ---
+    # CastError on the hub loader (schema drift across shards) -> JSONL
+    # direct-read, finding-10 pattern.
+    ("hf-json:KermitCO/qwen3.5-9B-react-hotpotqa-traces", None,
+     ["generated_traces_judged"], ser_messages_auto, "qwen35-9b-react-hotpot"),
     # --- loop iter 33: annotation-stripped action view (within-dataset ablation) ---
     ("xlangai/AgentNet", None, ["train"], ser_agentnet_actions, "agentnet-actions"),
     # --- loop iter 34: action-origin counter-test (planner-generated actions) ---
