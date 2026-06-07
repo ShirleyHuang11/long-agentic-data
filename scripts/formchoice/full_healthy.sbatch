@@ -1,6 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=fc_healthy
-#SBATCH --partition=gpu
+#SBATCH --partition=gpu_requeue
+#SBATCH --requeue
 #SBATCH --account=chen_lab_seas
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
