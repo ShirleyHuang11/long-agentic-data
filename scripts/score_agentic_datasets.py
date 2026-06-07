@@ -357,6 +357,17 @@ def ser_nemotron_rl(row):
     return f"{doc}\n\n[expected_action]\n{row.get('expected_action')}", n + 1
 
 
+def ser_inferredbugs_task(row):
+    # Clean Microsoft InferredBugs task corpus (real C#/.NET bugs): the
+    # task-level text content = bug metadata + buggy method + fixed method.
+    # `*_template` fields are abstracted (identifiers replaced by Class_n /
+    # variable_n) — excluded so the document reflects real source content.
+    return (f"[bug_type]\n{row.get('bug_type') or ''}\n\n"
+            f"[bug_reason]\n{row.get('bug_reason') or ''}\n\n"
+            f"[method_before]\n{row.get('method_before') or ''}\n\n"
+            f"[method_after]\n{row.get('method_after') or ''}"), 1
+
+
 def ser_mind2web(row):
     # Compact action-trajectory view: task + per-step action representations.
     # (Raw `actions[*].cleaned_html` observations are ~MB-scale per step and
@@ -583,6 +594,40 @@ REGISTRY = [
      ser_conversations_auto, "nl2bash-teacher-qwen3coder480b"),
     ("penfever/nl2bash-tasks-cleaned-oracle-minimax-m27-131k-traces", None,
      ["train"], ser_conversations_auto, "nl2bash-teacher-minimax-m27"),
+    # --- iter 60: InferredBugs teacher panel — the SECOND winning OpenThoughts-
+    # Agent SFT source (real Microsoft C#/.NET bugs, less templated than NL2Bash).
+    # All per-teacher dumps share the terminus-2 schema (conversations list of
+    # {role,content} + `model` field) -> ser_conversations_auto. Open question:
+    # do teachers separate under compression on the real-bug source (vs the
+    # NL2Bash ties, finding 19/iter-59)? `model` field per dump in provenance. ---
+    # GLM-4.6 (QuantTrio/GLM-4.6-AWQ) — OpenThoughts-Agent's winning teacher.
+    ("penfever/inferredbugs-GLM-4.6-32ep-65k", None, ["train"],
+     ser_conversations_auto, "inferredbugs-teacher-glm46"),
+    # GLM-4.6, longer-context 131k no-summarization chunk (same teacher, format var).
+    ("DCAgent2/inferredbugs-GLM-4.6-32ep-131k-nosumm-traces-chunk002", None,
+     ["train"], ser_conversations_auto, "inferredbugs-teacher-glm46-131k"),
+    # GLM-4.7 (vLLM-hosted) — next-gen GLM teacher.
+    ("DCAgent2/GLM-4.7-inferredbugs-sandboxes-maxeps-131k", None, ["train"],
+     ser_conversations_auto, "inferredbugs-teacher-glm47"),
+    # MiniMax-M2.7 (vLLM-hosted) — the third NL2Bash-panel teacher, on real bugs.
+    ("penfever/inferredbugs-sandboxes-verifier-minimax-m27-131k-traces", None,
+     ["train"], ser_conversations_auto, "inferredbugs-teacher-minimax-m27"),
+    # Qwen3.5-122B (vLLM-hosted).
+    ("penfever/inferredbugs-sandboxes-verifier-qwen3.5-122b-32k-traces", None,
+     ["train"], ser_conversations_auto, "inferredbugs-teacher-qwen35-122b"),
+    # Kimi-2.5 (vLLM-hosted).
+    ("DCAgent2/Kimi-2.5-inferredbugs-sandboxes-maxeps-32k", None, ["train"],
+     ser_conversations_auto, "inferredbugs-teacher-kimi25"),
+    # terminus-2 canonical (mlfoundations-dev) — teacher is gpt-5-nano, i.e. the
+    # GPT-family teacher that lost the downstream ablation ~2x to GLM-4.6.
+    ("mlfoundations-dev/inferredbugs-sandboxes-traces-terminus-2", None,
+     ["train"], ser_conversations_auto, "inferredbugs-teacher-gpt5nano"),
+    # InferredBugs TASK corpus (real Microsoft bugs) for a task-level H_inf
+    # reference — the sandbox dumps store gzipped tarballs, so use the clean
+    # text export (bug metadata + buggy/fixed methods; abstracted templates
+    # excluded).
+    ("ypguo/Clean_Microsoft_InferredBugs", None, ["train"],
+     ser_inferredbugs_task, "inferredbugs-tasks-clean"),
     # --- loop iter 33: annotation-stripped action view (within-dataset ablation) ---
     ("xlangai/AgentNet", None, ["train"], ser_agentnet_actions, "agentnet-actions"),
     # --- loop iter 34: action-origin counter-test (planner-generated actions) ---

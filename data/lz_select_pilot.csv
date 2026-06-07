@@ -1,0 +1,5 @@
+slug,stage,n_episodes_in,n_episodes_corpus,alpha,h_inf,bpc_128,bpc_2048,bpc_32768,n_bytes,mean_doc_bytes
+kwai-klear-mini-swe-66k,raw,300,300,0.2337,0.2615,5.8699,3.1957,1.7966,8388608,57180
+kwai-klear-mini-swe-66k,strip,300,300,0.2558,0.355,5.7649,3.0168,1.6647,8388608,48404
+kwai-klear-mini-swe-66k,select,300,177,0.2432,0.4064,5.8605,3.1851,1.8221,8388608,60589
+kwai-klear-mini-swe-66k,strip+select,300,176,0.2639,0.5046,5.7467,3.0266,1.718,8388608,50873

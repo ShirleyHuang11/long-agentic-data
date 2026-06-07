@@ -1,0 +1,75 @@
+{
+  "experiment": "formchoice (finding 20): form vs choices SFT discriminator",
+  "built_at_utc": "2026-06-07T19:00:19.087720+00:00",
+  "format": "{\"messages\": [{\"role\",\"content\"}, ...]} per line",
+  "token_estimate_rule": "bytes/4 over UTF-8 content of all messages",
+  "target_tokens_per_corpus": 30000000,
+  "match_tolerance": 0.02,
+  "truncation": {
+    "applied_to": null,
+    "target_bytes": null
+  },
+  "template": {
+    "path": "/n/netscratch/chen_lab_seas/Lab/shirleyhuang/long-agentic-data/formchoice/template.jsonl",
+    "h_inf_band": "0.0 (template)",
+    "episodes": 7787,
+    "bytes": 120033398,
+    "tokens_est": 30008349,
+    "sources": [
+      {
+        "slug": "openthoughts-agent-v1-sft",
+        "hf_dataset": "open-thoughts/OpenThoughts-Agent-v1-SFT",
+        "field": "conversations",
+        "hf_revision_sha": "c5dc896981f4e3b7c5382669b1d1be0bc4b6a1a6",
+        "episodes": 7787,
+        "bytes": 120033398,
+        "tokens_est": 30008349,
+        "turns": 97844,
+        "byte_budget": 120000000
+      }
+    ]
+  },
+  "healthy": {
+    "path": "/n/netscratch/chen_lab_seas/Lab/shirleyhuang/long-agentic-data/formchoice/healthy.jsonl",
+    "h_inf_band": "0.80-1.63 (healthy)",
+    "episodes": 2685,
+    "bytes": 120069638,
+    "tokens_est": 30017409,
+    "sources": [
+      {
+        "slug": "dcagent-glm47-terminus2",
+        "hf_dataset": "DCAgent/neulab-swe-gym-openhands-sampled-trajectories-sandboxes_glm_4.7_traces_jupiter",
+        "field": "conversations",
+        "hf_revision_sha": null,
+        "episodes": 634,
+        "bytes": 40049608,
+        "tokens_est": 10012402,
+        "turns": 23750,
+        "byte_budget": 40000000
+      },
+      {
+        "slug": "jetbrains-swe-test-minus-verified",
+        "hf_dataset": "JetBrains-Research/agent-trajectories-swe-bench-test-minus-verified",
+        "field": "messages",
+        "hf_revision_sha": "dd79e2540cab4c0cc2c5bab6ea71ddd7ac6c1775",
+        "episodes": 712,
+        "bytes": 40001893,
+        "tokens_est": 10000473,
+        "turns": 20030,
+        "byte_budget": 40000000
+      },
+      {
+        "slug": "swe-zero-12m-traj",
+        "hf_dataset": "AlienKevin/SWE-ZERO-12M-trajectories",
+        "field": "messages",
+        "hf_revision_sha": "44e028077c55e7255c328516c8bd76080fbb3840",
+        "episodes": 1339,
+        "bytes": 40018137,
+        "tokens_est": 10004534,
+        "turns": 42731,
+        "byte_budget": 40000000
+      }
+    ]
+  },
+  "token_match_diff_pct": 0.03
+}
