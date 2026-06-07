@@ -258,3 +258,4 @@
 | 44 | 2026-06-06 | **图像通道试点轮（`image_channel_pilot.py`）**：AgentNet-GIMP 40 eps 实测 **相邻截图平均像素变化仅 2.6%**（64×36 灰度，median 2.0%；帧堆 zstd 比 0.20）—— **发现 3 的视觉版：GUI 图像通道以近重复帧为主**；多模态训练建议 delta 编码/关键帧抽取；caveat：单 app 试点（GIMP 静态性偏高），跨 app（Odyssey）对照待做 |
 | 45 | 2026-06-06 | **跨 app 图像对照轮（`image_channel_odyssey.py`，修复跨 shard 帧分组）**：GUI-Odyssey 25 eps 相邻截图变化 **26.9%/步 vs GIMP 2.6% —— 10× 差距与文本通道 H∞（1.55 vs 0）同向，发现 19 落档**：观测冗余跨模态一致；caveat：2 集试点、平台×范围混杂 |
 | 46 | 2026-06-07 | **FFW γ-β 对照轮（用户指示，`measure_beta_ffw.py` + fig9）**：对 `reference/all-lz_Hinf_ffw.csv` 的 **67 个 FineFineWeb 域**用同一 byte-level 协议测 β：**自然语言网页文本 β=0.88–1.44（均值 1.26）vs agentic 轨迹 0.20–0.52 —— 两相完全不相交**（同协议下首次 apples-to-apples）；域内梯度：news/politics 去相关最快（1.44）、physics/光学工程最慢（0.99）；论文 token-level 星点恰落 FFW 云下缘（方法学相互印证）；watch 轮无新候选（PortBench 留观） |
+| 47 | 2026-06-07 | watch 轮（干）：PortBench-RawData 实查为 FRED 金融时间序列非轨迹、multiagent-entropy 为评测指标聚合 CSV —— 均剔除；recency 扫描无新候选 |
