@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "armand0e/claude-opus-4.8-pi-traces",
+  "hf_url": "https://huggingface.co/datasets/armand0e/claude-opus-4.8-pi-traces",
+  "hf_revision_sha": "dd1f3e164086a360f40aff8e0630d069e63eb339",
+  "config": "root *.jsonl (pi CLI, Claude Opus 4.8, 4 sessions)",
+  "group_key": null,
+  "splits": [
+    "raw"
+  ],
+  "serializer": "score_cli_sessions.py collect_text (content/text values only)",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "all 10 session files",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-07T14:36:03.291637+00:00",
+  "result": {
+    "alpha": 0.29942647040266646,
+    "h_inf": 1.7299857878454479,
+    "bpc_128": 6.125644329896907,
+    "bpc_2048": 3.6463522086466167,
+    "bpc_32768": 2.565460205078125,
+    "n_episodes": 4,
+    "mean_turns": 95.8,
+    "mean_doc_bytes": 68140,
+    "n_bytes": 273273
+  }
+}

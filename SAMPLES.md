@@ -26,6 +26,7 @@
 | OpenHands-Sampled-Trajectories | SWE 轨迹（未过滤） | 数千条（train.raw） | 28.3 / 32,300 | SFT 版的未过滤原始采样（含失败 episode）；**与 SFT 版对照：成功过滤对 α/H∞ 几乎无影响**（Δα=0.015, ΔH∞=0.01），但成功 episode 更长（39.0 vs 28.3 turns） | 0.334 | 1.10 | [`SWE-Gym/OpenHands-Sampled-Trajectories`](https://huggingface.co/datasets/SWE-Gym/OpenHands-Sampled-Trajectories) |
 | OpenHands-Verifier-Trajectories | 验证器 (judge) 轨迹 | 数千条（train.mixture） | 3 / 63,167 | judge 对轨迹的评估对话（验证器训练数据），非 agent rollout 本体 | 0.339 | 1.07 | [`SWE-Gym/OpenHands-Verifier-Trajectories`](https://huggingface.co/datasets/SWE-Gym/OpenHands-Verifier-Trajectories) |
 | CLI agent sessions (sampler) | 真实编码 CLI 会话（**新类别首样本**） | ⚠️ 仅 10 sessions | 98 / 86,904 | **Claude Code ×4 / Codex ×3 / pi ×3 真实会话 dump**（raw JSONL 直读，仅取 content/text 字段）；H∞=1.49 健康带上沿 —— 与 OpenHands-feedback 同为"野生"会话类；⚠️ n=10 + 单个 709KB pi 会话占语料 ~80%，仅作类别首探针 | 0.300 | 1.49 | [`cfahlgren1/agent-sessions-list`](https://huggingface.co/datasets/cfahlgren1/agent-sessions-list) |
+| Claude Opus 4.8 pi 会话 | 真实编码 CLI 会话 | ⚠️ 仅 4 sessions | 95.8 / 68,140 | pi CLI 跑 **Opus 4.8**（最新 frontier）的真实会话 raw 直读；**H∞=1.73 名义上全轨迹类最高** —— 但 n=4 + ~272KB 小语料 + 单用户，仅作探针不入排行；与 CLI sampler（1.49）/JetBrains（1.63）同向：真实 frontier 会话 = 健康带顶部 | 0.299 | 1.73 | [`armand0e/claude-opus-4.8-pi-traces`](https://huggingface.co/datasets/armand0e/claude-opus-4.8-pi-traces) |
 | SWE-agent-trajectories | SWE 轨迹 | 80k 条 | 56.2 / 58,315 | Nebius 用 SWE-agent 修真实 GitHub issue 的完整轨迹（含失败）；规模 × 长度乘积最大 | 0.153 | 0.00 | [`nebius/SWE-agent-trajectories`](https://huggingface.co/datasets/nebius/SWE-agent-trajectories) |
 | Kwai-Klear mini-swe-agent+ 轨迹 | SWE 轨迹 | 66k 条 | 54.2 / 61,450 | mini-swe-agent-plus 在 SWE-smith issue 上的端到端轨迹（Klear-AgentForge-8B SFT 语料，解题率随 log 数据量近线性升）；H∞=0.26 偏低 —— shell 观测 + SWE-smith 合成 issue 模板拉低语义密度 | 0.234 | 0.26 | [`Kwai-Klear/SWE-smith-mini_swe_agent_plus-trajectories-66k`](https://huggingface.co/datasets/Kwai-Klear/SWE-smith-mini_swe_agent_plus-trajectories-66k) |
 | SWE-ZERO-12M 轨迹 | SWE 轨迹（execution-free） | **12M 条 / 112B tokens**（采样 325） | 31.9 / 25,824 | 迄今最大 agentic-coding 轨迹释出（122K PRs / 3K repos / 16 语言，execution-free 管线绕开容器化天花板）；H∞=0.80 落健康集群 —— **无执行验证不必然模板退化** | 0.264 | 0.80 | [`AlienKevin/SWE-ZERO-12M-trajectories`](https://huggingface.co/datasets/AlienKevin/SWE-ZERO-12M-trajectories) |
@@ -110,7 +111,7 @@
 
 ---
 
-## V. 总览速查（α × H∞ × horizon，迭代 54 时点，n=80 有效（含 6 个同源再序列化视图条目 + 4 个多模态文本通道条目）/ CSV 86 行含 6 项已剔除 / seed-σ 23 行）
+## V. 总览速查（α × H∞ × horizon，迭代 56 时点，n=81 有效（含 6 个同源再序列化视图条目 + 4 个多模态文本通道条目）/ CSV 87 行含 6 项已剔除 / seed-σ 23 行）
 
 ### Horizon 排行（bytes·ep⁻¹ 前五，仅 H∞>0.3 的健康轨迹；H∞≈0 的"空转膨胀"纪录（aider-polyglot 7B 322KB / R2EGym-32B 149.8 turns）见发现 12）
 
@@ -266,3 +267,4 @@
 | 48–49 | 2026-06-07 | **轮换查询破干 + CLI 会话类别首样本**：+2 集（TIGER BrowserAgent-sft → §II 模板带 H∞=0；**CLI agent sessions sampler → §I（Claude Code×4/Codex×3/pi×3 真实会话 raw 直读，H∞=1.49 健康带上沿 —— 等待两轮的"真实编码 CLI 会话"类别首探针**，⚠️ n=10 + 单 pi 会话占 80%）；saital MiniWoB pair ×2 拟合 artifact 剔除（重复 system prompt）；victor/coding-agent-sessions（仅 4 sessions）暂不入；新增 `score_cli_sessions.py` |
 | 50 | 2026-06-07 | +1 集：qwen3.5-9B ReAct hotpot → §III（hub loader CastError → JSONL 直读；**H∞=0 —— 中型生成器塌缩跨域成立**，搜索域 frontier 1.37–1.44 vs 9B 0，发现 12 谱系补全） |
 | 51–54 | 2026-06-07 | watch 轮 ×4（51–53 干；52 剔除 WithinUsAI 单轮指令三元组、RLVE 数学 rollouts 域外）；54 +1 集：DCAgent3 finance-terminal × a3-RL → §I（**中型塌缩第三域**，RL 微调同样救不回，H∞=0） |
+| 55–56 | 2026-06-07 | watch 轮（55 干，空壳剔除）；56 +1 集：**Claude Opus 4.8 pi 会话 → §I（H∞=1.73 名义全轨迹类最高，n=4/272KB/单用户仅探针）** —— 真实 frontier CLI 会话三连顶（sampler 1.49 / JetBrains 1.63 / Opus-4.8 1.73）；`score_cli_sessions.py` 增 --repo/--slug 参数化 |

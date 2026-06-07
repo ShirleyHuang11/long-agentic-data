@@ -20,8 +20,15 @@ sys.path.insert(0, os.path.dirname(__file__))
 import lz_oracle
 from huggingface_hub import HfApi, hf_hub_download
 
-REPO = "cfahlgren1/agent-sessions-list"
-SLUG = "cli-agent-sessions-sampler"
+import argparse
+
+_ap = argparse.ArgumentParser()
+_ap.add_argument("--repo", default="cfahlgren1/agent-sessions-list")
+_ap.add_argument("--slug", default="cli-agent-sessions-sampler")
+_ap.add_argument("--config-note", default="sessions/* (claude x4, codex x3, pi x3)")
+_args = _ap.parse_args()
+REPO = _args.repo
+SLUG = _args.slug
 
 
 def collect_text(x, out):
@@ -39,8 +46,7 @@ def collect_text(x, out):
 def main():
     api = HfApi()
     files = sorted(s.rfilename for s in api.dataset_info(REPO).siblings
-                   if s.rfilename.startswith("sessions/")
-                   and s.rfilename.endswith(".jsonl"))
+                   if s.rfilename.endswith(".jsonl"))
     docs, turns = [], []
     for f in files:
         p = hf_hub_download(REPO, f, repo_type="dataset")
@@ -79,7 +85,7 @@ def main():
         "hf_dataset": REPO,
         "hf_url": f"https://huggingface.co/datasets/{REPO}",
         "hf_revision_sha": api.dataset_info(REPO).sha,
-        "config": "sessions/* (claude x4, codex x3, pi x3)",
+        "config": _args.config_note,
         "group_key": None, "splits": ["raw"],
         "serializer": "score_cli_sessions.py collect_text (content/text values only)",
         "serializer_doc": "",
