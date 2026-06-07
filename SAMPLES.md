@@ -50,6 +50,7 @@
 | AgentNet (action 视图) | 桌面 computer-use 轨迹 | 同上（采样 1500） | 16.6 / 906 | 同 episode 剥离 VLM 标注层（仅 instruction + pyautogui code）；**H∞ 0.00→1.43 —— 退化在标注层不在人类演示本体（发现 15）**；与 Mind2Web/WebLINX action 视图同在高密度带 | 0.423 | 1.43 | 同上 |
 | GUI-Odyssey (action 视图) | 移动 GUI 轨迹（**多模态**，文本通道评分） | 数千 eps（采样 1500） | 15.4 / 639 | 人类演示的跨 app 手机导航（Pixel 系设备，多 app 组合任务）；图像通道：每步 1 截图（行内 h×w 如 1344×2992，未评分仅记录）；**H∞=1.55 action 流第三高 —— 人类动作流 + 跨 app 多样性**（发现 15/17 多模态域再证） | 0.342 | 1.55 | [`OpenGVLab/GUI-Odyssey`](https://huggingface.co/datasets/OpenGVLab/GUI-Odyssey) |
 | AndroidControl (文本通道) | 移动 GUI 轨迹（**多模态**，人类演示） | 15k eps 级（采样 1500） | 5.5 / 615 | Google 人类演示 Android 任务（goal + 每步人写 instruction + 结构化 action；截图 b64 列已剥离未评分）；**H∞=1.25 健康，α=0.51 全场第二 —— 人类动作流第 5 个健康样本**（发现 15 多模态再证） | 0.505 | 1.25 | [`smolagents/android-control`](https://huggingface.co/datasets/smolagents/android-control) |
+| OpenCUA (文本通道) | 桌面/跨平台 computer-use 轨迹（**多模态**） | 大规模（采样 1500） | 33.2 / 575 | cua-lite 重打包的 OpenCUA 语料（desktop navigation 等任务；截图列已剥离，文本通道为截图间穿插的简短 thought/action —— 极致紧凑）；H∞=1.01 健康；**parquet 内嵌截图 → 流式评分慢 ~20min（多模态成本记录）** | 0.467 | 1.01 | [`cua-lite/OpenCUA`](https://huggingface.co/datasets/cua-lite/OpenCUA) |
 | cua AgentNet-GIMP (文本通道) | 桌面 GUI 轨迹（**多模态**，单域） | 492 eps 全量 | 9.6 / 1,711 | mlfoundations cua-dev 的 GIMP 单域切片（模板化 prompt + 坐标点击；图像通道 ~10 PNG/ep 1920×1080 未评分）；**单 app 零多样性 → 动作流也 H∞=0**（发现 17 在 action-view 家族内成立） | 0.187 | 0.00 | [`mlfoundations-cua-dev/agentnet-gimp-trajectories`](https://huggingface.co/datasets/mlfoundations-cua-dev/agentnet-gimp-trajectories) |
 | WebLINX (全观测切片) | Web 轨迹（full-obs） | 同 WebLINX，116 eps 采样 | 29.1 / 72,353 | pruned DOM（~1.6–4.3KB/turn）全量 + action；**与 action 视图对照：H∞ 1.95→0.00** —— 相邻 turn 页面几乎不变，观测近乎纯冗余 | 0.203 | 0.00 | 同上 |
 
@@ -105,7 +106,7 @@
 
 ---
 
-## V. 总览速查（α × H∞ × horizon，迭代 40 时点，n=74 有效（含 6 个同源再序列化视图条目 + 2 个多模态文本通道条目）/ CSV 78 行含 4 项已剔除 / seed-σ 23 行）
+## V. 总览速查（α × H∞ × horizon，迭代 41 时点，n=76 有效（含 6 个同源再序列化视图条目 + 4 个多模态文本通道条目）/ CSV 80 行含 4 项已剔除 / seed-σ 23 行）
 
 ### Horizon 排行（bytes·ep⁻¹ 前五，仅 H∞>0.3 的健康轨迹；H∞≈0 的"空转膨胀"纪录（aider-polyglot 7B 322KB / R2EGym-32B 149.8 turns）见发现 12）
 
@@ -250,3 +251,4 @@
 | 38 | 2026-06-05 | **终轮收尾（iters 29–38：+9 条目 / 7 候选剔除 / 发现 14–17 / σ 协议落地）**：n=72 有效（含 6 个同源视图条目）/ CSV 76 行 / provenance·samples 76·76 三方一致 / seed-σ 23 行；本批主线 = **视图分解方法学**（标注剥离、assistant-only、action-only、深位 seed）把"什么承载/杀死长程密度"拆到了机制层；遗留：gated ×4、多模态协议（OSWorld 截图侧 / GUI-Odyssey）、DTap 均衡组合 σ（分组配额采样器）、Claude Code 会话类别待真正释出。**循环结束** |
 | 39 | 2026-06-06 | **统计扩展分析轮（loop 外，用户指示）**：读入 `reference_papers/` 四篇；γ-β 相图（fig7，`measure_beta.py`/`gamma_beta.csv`：agentic β≈0.2–0.5 ≪ 自然语言 0.9，α_D 预测 0.3–1.0；AgentNet 标注层 β=1.3 最差象限）；**Hurst 协议落地（fig8，`measure_hurst.py`/`hurst.csv`，发现 18：模板/空转 Hurst 与健康集同档，(H, H∞) 双轴分离 form/content）**；图表套件 figs 1–8；新增 §VI 研究 takeaway 与前瞻（α_D 训练验证 / 短而分形→长度泛化 / 可验证合成代码迁移三实验） |
 | 40 | 2026-06-06 | **多模态破冰轮（用户开放多模态范围）**：协议 = 文本通道评分 + 图像通道描述性记录；iter_docs 增 `drop_cols`（流式跳过截图解码）；+2 集 → §II：**GUI-Odyssey action 视图（人类跨 app 手机导航，H∞=1.55 action 流第三高）** vs cua AgentNet-GIMP（单 app 模板化，H∞=0）—— **发现 15/17 在多模态域同时再证：人类动作流 + 跨 app 多样性 vs 单域零多样性** |
+| 41 | 2026-06-06 | +2 集 → §II：**AndroidControl（人类手机演示，H∞=1.25/α=0.51 全场第二）**、OpenCUA（跨平台 computer-use，H∞=1.01，截图内嵌 parquet 流式慢 ~20min 为多模态成本）；OS-Atlas/ShowUI 系实查为单步 grounding 语料剔除；CLAUDE.md 入库采纳（HF 缓存迁出 $HOME 至 $HF_HOME）；人类动作流健康样本增至 5 个（WebLINX/Mind2Web/Odyssey/AgentNet-act/AndroidControl，H∞ 1.25–1.95） |
