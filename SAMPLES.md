@@ -254,3 +254,4 @@
 | 41 | 2026-06-06 | +2 集 → §II：**AndroidControl（人类手机演示，H∞=1.25/α=0.51 全场第二）**、OpenCUA（跨平台 computer-use，H∞=1.01，截图内嵌 parquet 流式慢 ~20min 为多模态成本）；OS-Atlas/ShowUI 系实查为单步 grounding 语料剔除；CLAUDE.md 入库采纳（HF 缓存迁出 $HOME 至 $HF_HOME）；人类动作流健康样本增至 5 个（WebLINX/Mind2Web/Odyssey/AgentNet-act/AndroidControl，H∞ 1.25–1.95） |
 | 42 | 2026-06-06 | **干涸轮（多模态文本通道源接近穷尽）**：Mobile3M（首分片纯图像无轨迹文本）、ai-habitat/partnr_episodes（torchscript 模拟器资产 + 场景图非轨迹）、embodied/video 扫描无果 —— 均剔除/无候选；剩余阻塞：gated ×4、图像通道评分协议、DTap 均衡配额采样器（下轮做） |
 | 43 | 2026-06-06 | **多样性剂量实验轮（`dtap_diversity_dose.py`）**：均衡配额下域组数 g∈{1..24} 对 H∞ **无单调剂量效应**（0.48–0.93，组成 σ 内；g=1 head 采样仍 0.58）—— **发现 17 细化：杀 H∞ 的是场景实例级重复（深尾同族变体 → 0.08），不是域宽**；"控重复 > 控域宽"落档 |
+| 44 | 2026-06-06 | **图像通道试点轮（`image_channel_pilot.py`）**：AgentNet-GIMP 40 eps 实测 **相邻截图平均像素变化仅 2.6%**（64×36 灰度，median 2.0%；帧堆 zstd 比 0.20）—— **发现 3 的视觉版：GUI 图像通道以近重复帧为主**；多模态训练建议 delta 编码/关键帧抽取；caveat：单 app 试点（GIMP 静态性偏高），跨 app（Odyssey）对照待做 |
