@@ -132,6 +132,8 @@
 
 ### 签名集群（α × H∞ 象限，对照 `data_format.md` §XIII）
 
+> ⚠️ **本表 H∞ 值为已弃用的钳零外推（见累积发现顶部更正块）。集群的定性结构（健康 vs 模板 vs 失败空转）经直测 BPC@32K 复核仍成立，但"H∞=0"应读作"低 BPC@32K / 多点法 resolved=False"，绝对边界更模糊。BPC@32K 版分群见 `figures/fig_signature_map.png`、`fig_content_ranking.png`；多点法真实 floor（resolved 子集）见 `data/agentic_hinf_v3.csv`。**
+
 | 集群 | 签名 | 成员 | 解读 |
 | :--- | :--- | :--- | :--- |
 | **健康长轨迹（frontier 生成器）** | α 0.26–0.38, H∞ 0.57–1.63 | OpenHands 全家（rebench/Hero/Zero/SFT/Sampled/feedback）、SWE-smith、SWE-ZERO-12M、**JetBrains GPT-5.2（1.63 上界）**、DCAgent GLM-4.7、DTap 三家（Opus/Sonnet/Gemini 0.71–0.81）、Toucan（Kimi-K2/Qwen3）、MiroVerse、smolagents-gaia、II-Agent GAIA、Nemotron-search | 长程结构 + 真实语义密度并存；**长 context 训练首选**；frontier 生成器 + 真实环境响应**必要而非充分 —— 还需任务/场景多样性**（发现 6/9/11/17） |
@@ -165,11 +167,11 @@
 1. **成功过滤不改变压缩结构**（iter 3）：OpenHands Sampled（含失败）vs SFT（成功过滤）Δα=0.015、ΔH∞=0.01 —— 但成功 episode 平均更长（39.0 vs 28.3 turns）。
 2. **真实 > 模拟**（iter 3）：NNetNav real-web H∞=1.37 vs WebArena 版 0.46 —— 真实网页观测多样性约 3×。
 3. **观测主导长程冗余**（iter 6）：full-obs 切片 H∞ 坍缩（1.70→0.30、1.95→0.00）；compact/full-obs 不可直接比较。
-4. **蒸馏 SFT 混合有统一签名**（iter 1–8）：所有"多环境 GPT-4 蒸馏轨迹混合"落在 α≈0.1–0.2、H∞=0 —— 与 OpenHands 真实 rollout（H∞ 0.6–1.2）一刀切开；H∞ 可做"真实 rollout vs 蒸馏模板"零成本探针。
+4. **蒸馏 SFT 混合有统一签名**（iter 1–8；iter 64 度量更正）：所有"多环境 GPT-4 蒸馏轨迹混合"落在 α≈0.1–0.2、~~H∞=0~~ → **低 BPC@32K（多点法多为 resolved=False）**—— 与 OpenHands 真实 rollout（多点法 resolved，floor 0.55–0.88）分开；探针仍可零成本区分"真实 rollout vs 蒸馏模板"，但用 BPC@32K/resolved 标志而非钳零 H∞。
 5. **per-step 释出格式抬高冗余**（iter 2/7）：NNetNav、Nemotron-RL-Pivot 类 per-step 行共享前缀，α/H∞ 与 episode 级 dump 不可混排。
 6. **生成器规模信号**（iter 10）：32B 自产 rollout（R2E-Gym SWE-agent-LM，H∞≈0.01）落入模板退化集群，frontier-model OpenHands dump 为 H∞ 0.6–1.2 —— 与 math 综述实验 14"高模板 = 机器生成探针"同向。
 7. **合成 issue 语义密度折扣**（iter 11）：R2E-Gym 合成 problem_statement H∞=0.89 < 人写 SWE-bench-Verified 1.57。
-8. **观测重复才是 H∞=0 的根因**（iter 12）：短 FC 对话（glaive 1.05 / hermes 0.78）H∞ 反而高于轨迹型工具集（ToolLLaMA/APIGen=0）—— 杀死 H∞ 的不是"工具调用"本身，而是逐 turn 重复的环境观测/模板。
+8. **观测重复才是低内容的根因**（iter 12；iter 64 度量更正）：短 FC 对话（glaive 1.05 / hermes 0.78）内容反而高于轨迹型工具集（ToolLLaMA/APIGen ~钳零 → 直测 BPC@32K APIGen 1.45 mixed）—— 压低内容的不是"工具调用"本身，而是逐 turn 重复的环境观测/模板（跨 episode 还被池化进一步压低）。定性结论稳健；"=0"改读"低内容/不收敛"。
 9. **同域不同签名**（iter 15–17）：同为"深度研究/搜索"域，蒸馏报告型 SFT（deep-research-sft / Fractal）H∞=0，而真实多跳搜索轨迹（II-Agent GAIA 1.25、Nemotron-v2 search 1.37）H∞ 健康 —— 域不决定签名，生成管线决定。
 10. **加载失败 ≠ 数据损坏**（iter 17）：Nemotron-v2 两 split 的 CastError/JSON 错全是 `datasets` schema 推断问题，raw JSONL 直读 bad_lines=0 全量可用 —— 弃用判定前先试绕过加载器。
 11. **H∞ 探针的生成器分辨率有限**（iter 21）：DTap 同任务受控对照下，Opus-4.6 / Sonnet-4.5 / Gemini-3-Pro 三家 frontier 的 H∞ 紧聚 0.71–0.81（α 0.28–0.30）—— H∞ 一刀切开 frontier（0.7–1.6）vs 小模型自产 rollout（≈0，发现 6），但 **frontier 内部排名不可分**（无 σ 时 0.1 差异不可解读）。
@@ -178,7 +180,7 @@
 14. **seed-σ 量化：跨集群结论稳健，带内排名不可做**（iter 30）：5 个不相交切片重复评分（4 个代表集 ×5 seed，`data/seed_sigma.csv`）：同质管线 H∞ 极稳（Toucan-Kimi 1.346±0.041、glaive 1.034±0.034）；**异质 repo-scale 集 σ 大一个量级**（SWE-ZERO-12M 0.820±0.244 —— 切片组成主导，单切片 H∞ 0.60–1.23）；模板带在 0 处精确钉死（APP1 五 seed 全 0.000）；α 普遍比 H∞ 稳（σ 0.003–0.022）。**推论：集群级发现（0 vs 0.6–1.6）≫ σ 全部站得住；异质集内 <0.3 的 H∞ 差异不可解读 —— 发现 11 的"frontier 内部不可分"获定量背书**；offset-0 复跑与 registry 数字逐位一致（确定性验证 ✓）。
 15. **退化在标注层，不在演示本体；剥离后的上限由动作流来源决定**（iters 33–34）：AgentNet 同 episode 两视图对照 —— 含 VLM 生成 observation/thought/reflection 的全文本视图 H∞=0.00，剥离后仅留人类演示动作流 H∞=1.43。**机器生成的标注文本即使"内容丰富"也呈模板签名；人类行为流本身高密度**。反向对照（iter 34）：对 planner 生成动作流的 ReBel-ALFWorld 做同样剥离仅恢复至 0.43（α=0.52 全场最高，小语料 caveat）—— **剥离观测总能抬 H∞，但天花板分级：人类 1.43 ≫ planner 0.43 ≫ 并入观测后 0.00**。对 GUI/具身数据的训练含义：标注层提供监督信号但稀释长程密度，配比需权衡。
 16. **观测的密度角色随域反转**（iter 35）：对 frontier SWE rollout 做 assistant-only 剥离，H∞ 不升反降（JetBrains 1.63→0.72）或持平（swe-rebench-OH 0.67→0.66）—— **SWE 域观测是真实代码库内容（文件体/diff/测试输出），承载而非稀释密度；web/GUI 域观测是渲染样板，稀释密度**（对照发现 3/15）。"剥观测能提密度"仅对样板型环境成立；数据清洗策略必须分域。
-17. **frontier 生成器必要非充分 —— 场景多样性是另一条腿**（iter 37）：DTap 三切片各取第 2 个不相交样本（深位 offset，轮询序耗尽小组后由 600-episode 级恶意场景族主导）：Opus 0.71→0.25、Sonnet 0.81→**0.08**、Gemini 0.74→0.44 —— **同一 frontier 模型在重复场景族上照样落入模板带**。发现 8（结构性重复杀 H∞）与发现 11（frontier vs 中型一刀切）统一为：**健康 H∞ = frontier 生成器 × 任务/场景多样性，两者缺一不可**；iter-21 的 0.71–0.81 紧聚是"均衡头部组合"上的受控对照，绝对值随组成大幅漂移（发现 14 异质 σ 的极端情形）。**iter-43 剂量实验细化：多样性的有效成分是"场景实例级不重复"而非"域数量"** —— 均衡配额下 g=1~24 个 domain×label 组的 H∞ 非单调（0.48–0.93，落在组成 σ 内；单组 head 采样也有 0.58），而深尾采样（同场景族 ×N 变体）才触发塌缩至 0.08 —— 控重复比控域宽更重要（`data/dtap_diversity_dose.csv`）。
+17. **frontier 生成器必要非充分 —— 场景多样性是另一条腿**（iter 37）：DTap 三切片各取第 2 个不相交样本（深位 offset，轮询序耗尽小组后由 600-episode 级恶意场景族主导）：Opus 0.71→0.25、Sonnet 0.81→**0.08**、Gemini 0.74→0.44 —— **同一 frontier 模型在重复场景族上照样落入模板带**。发现 8（结构性重复杀 H∞）与发现 11（frontier vs 中型一刀切）统一为：**健康 H∞ = frontier 生成器 × 任务/场景多样性，两者缺一不可**；iter-21 的 0.71–0.81 紧聚是"均衡头部组合"上的受控对照，绝对值随组成大幅漂移（发现 14 异质 σ 的极端情形）。**iter-43 剂量实验细化：多样性的有效成分是"场景实例级不重复"而非"域数量"** —— 均衡配额下 g=1~24 个 domain×label 组的 H∞ 非单调（0.48–0.93，落在组成 σ 内；单组 head 采样也有 0.58），而深尾采样（同场景族 ×N 变体）才触发塌缩至 0.08 —— 控重复比控域宽更重要（`data/dtap_diversity_dose.csv`）。**（iter 64 注：DTap 绝对 H∞ 值受钳零/池化影响，但"深尾重复塌缩 vs 头部健康"的相对落差与机制不依赖外推，结论稳健。）**
 18. **Hurst 单独不能给 agentic 数据打分 —— (H, H∞) 双轴才能分离 form 与 content**（iter 39）：按 Alabdulmohsin et al. (2402.01825) 协议（R/S on surprisal increments，此处用 order-3 byte n-gram surprisal 代理）测 9 个代表集：**模板/空转集的 Hurst 与健康集同档**（APIGen 0.80、Ko-Agent 0.83、aider-flail 0.77 vs JetBrains 0.78、Toucan 0.90、SWE-ZERO 0.93）—— **重复本身就是长程依赖**，Hurst 把 form-LRD 和 content-LRD 混在一起；且 Hurst 与 H∞ 在 agentic 域近正交（content 最高的 WebLINX-actions 1.95 反而 Hurst 最低 0.67，与零内容的 AgentNet 标注层并列）。⚠️ 原论文的"Hurst 预测下游精度"是**固定数据、跨模型**的结论；跨数据集选数据时 Hurst 必须配 H∞ 用：H 量组织度（fig8 x 轴），H∞ 量内容底（y 轴），四象限见 `figures/fig8_hurst_vs_hinf.png`。
 19. **图像通道与文本通道一致（试点）**（iters 44–45）：相邻截图像素变化率 —— AgentNet-GIMP（文本 H∞=0）仅 **2.6%**/步 vs GUI-Odyssey（文本 H∞=1.55）**26.9%**/步，**10× 差距与文本通道判定同向** —— 观测冗余是轨迹生成过程的属性，跨模态可见；多模态训练建议对 GUI 截图做 delta 编码/关键帧抽取。⚠️ 仅 2 数据集试点（n=40/25 eps），且桌面 vs 手机平台与单/跨 app 范围混杂（`data/image_channel_pilot.csv`）。
 20. **数据价值是学生相对的 —— H∞ 探针分两用**（iter 59，OT-Agent 重现）：OpenThoughts-Agent 的获胜 SFT 配方（TB-2.0 同体量最强）实测 **H∞=0 模板带**；同任务 4-teacher 面板压缩统计完全打平，但他们的训练消融中 teacher 差 2× downstream。解读：轨迹 = form（低 β 回声骨架）+ choices（H∞ 新颖性）；**小模型缺 form → 模板带数据是最便宜的 form 课程（他们的结果）；frontier 缺 choices → 只有健康带数据有用（我们的发现 6/11/12）**；他们的 SFT+RL 两阶段恰是该分解的训练实现（RL 买 choices，+1–2%，预算仅 700 verified tasks）。**探针边界训练验证：选 regime 用压缩统计，regime 内选配方仍需 proxy 训练**。详见 `reports/openthoughts_agent_analysis.md`。

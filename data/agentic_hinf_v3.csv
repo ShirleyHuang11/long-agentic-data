@@ -30,3 +30,14 @@ weblinx-fullobs,0.0708,0.2187,False,0.2837,1.1108,7,8388608
 nemotron-sft-v2-interactive,0.6919,0.1282,True,0.1852,2.646,7,8388608
 nemotron-agentic-v1,0.0,1.49,False,0.2257,1.4141,7,8388608
 nemotron-rl-swe-pivot,0.0,1.1702,False,0.1982,2.327,7,8388608
+nemotron-rl-conv-tool-pivot,0.0,0.8871,False,0.1769,2.302,7,8388608
+apigen-mt-5k,0.0,0.2652,False,0.2497,1.4517,7,8388608
+agent-flan-all,0.0,0.4011,False,0.2634,1.2281,7,5525114
+scienceworld-expert-traj,0.0,0.1767,False,0.3185,0.8869,7,5035383
+fireact-multitask,1.609,0.1785,False,0.3506,2.2741,6,1399305
+r2e-gym-swe-agent-lm-traj,0.5667,0.1069,True,0.2802,1.5929,7,8388608
+r2e-gym-lite-tasks,0.6729,0.1042,True,0.3481,1.4329,7,8388608
+glaive-fc-v2,0.9911,0.1486,True,0.2734,2.0769,6,3410818
+hermes-fc-multiturn,0.9341,0.0619,True,0.2722,2.0319,7,8388608
+aguvis-s2-androidctl-text,0.0,0.8451,False,0.3216,0.4625,7,6817808
+ii-agent-gaia-traj,1.2696,0.6236,False,0.1903,3.05,6,3464877
