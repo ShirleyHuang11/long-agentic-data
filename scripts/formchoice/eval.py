@@ -36,24 +36,40 @@ def gen(model, tok, msgs):
     return tok.decode(out[0, ids.shape[1]:], skip_special_tokens=True)
 
 
-# ---- FORM checks (deterministic) on a held-out emission ----
+# ---- FORM checks (terminus-2 JSON-aware) on a held-out emission ----
+def _extract_json(text):
+    # find first balanced {...} object in the emission
+    s = text.find("{")
+    if s < 0:
+        return None
+    depth = 0
+    for i in range(s, len(text)):
+        if text[i] == "{": depth += 1
+        elif text[i] == "}":
+            depth -= 1
+            if depth == 0:
+                try:
+                    return json.loads(text[s:i+1])
+                except Exception:
+                    return None
+    return None
+
 def form_checks(text):
     c = {}
-    # has a code/action block
-    blocks = re.findall(r"```", text)
-    c["has_action_block"] = len(blocks) >= 2
-    c["single_action"] = len(blocks) == 2
-    # extract first fenced body, bash -n syntactic validity (best-effort: balanced)
-    m = re.search(r"```(?:\w+)?\n(.*?)```", text, re.S)
-    body = m.group(1) if m else ""
-    # crude shell syntactic sanity: no unmatched quotes
-    c["cmd_syntax_ok"] = bool(body) and body.count('"') % 2 == 0 and body.count("'") % 2 == 0
+    obj = _extract_json(text)
+    c["valid_json"] = obj is not None
+    c["has_commands"] = isinstance(obj, dict) and isinstance(obj.get("commands"), list)
+    c["has_analysis_plan"] = isinstance(obj, dict) and ("analysis" in obj and "plan" in obj)
+    # well-formed keystrokes in command batch
+    ok_ks = False
+    if isinstance(obj, dict) and isinstance(obj.get("commands"), list) and obj["commands"]:
+        ok_ks = all(isinstance(cmd, dict) and "keystrokes" in cmd for cmd in obj["commands"])
+    c["wellformed_keystrokes"] = ok_ks
     # non-degenerate: <30% 4-gram repetition
     toks = text.split()
     if len(toks) >= 8:
         grams = [" ".join(toks[i:i+4]) for i in range(len(toks)-3)]
-        rep = 1 - len(set(grams))/len(grams)
-        c["non_degenerate"] = rep < 0.30
+        c["non_degenerate"] = (1 - len(set(grams))/len(grams)) < 0.30
     else:
         c["non_degenerate"] = True
     return c
