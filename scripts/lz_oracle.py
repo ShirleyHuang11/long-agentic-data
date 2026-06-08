@@ -61,25 +61,30 @@ def build_corpus(docs) -> bytes:
 
 
 def score(docs):
-    """Return dict with alpha, H_inf, the three BPC points, and corpus stats."""
+    """REFERENCE-EXACT (α, H∞): 3-point analytic LZ oracle, identical to the
+    formal-math survey protocol in data_format.md (`compute-free/hurst/
+    lempel-ziv.py`), which validated it against true LLM oracles (LZ↔neural
+    H∞ Spearman 0.97). H∞ is FLOORED at 0 — H∞≈0 is the reference's *valid*
+    "template-degenerate / spam" signal (e.g. TPTP H∞≈0, Coq-QA 0.23), not a
+    bug. Keep this method exactly for comparability with the 358-dataset
+    formal-math registry and the cross-domain table (NL 2.6, code 2.63,
+    formal-math 1.57). The unclamped raw value is also returned (h_inf_raw)
+    for transparency; supplementary diagnostics (score_v2/v3, bpc_32k) live
+    below and are NOT the canonical metric."""
     corpus = build_corpus(docs)
     n_docs = corpus.count(b"\n\n") + 1 if corpus else 0
     b1, b2, b3 = (_bpc_at(corpus, n) for n in N_POINTS)
     d12, d23 = b1 - b2, b2 - b3
     if d12 <= 0 or d23 <= 0:
-        alpha, h_inf = float("nan"), b3  # degenerate / non-monotone corpus
+        alpha, h_raw = float("nan"), b3  # degenerate / non-monotone corpus
     else:
         alpha = math.log(d12 / d23) / math.log(R)
-        # NO CLAMP (fixed 2026-06-07): report the raw extrapolated floor.
-        # A negative value is an honest signal that the BPC curve has not
-        # flattened within the 32 KB window, so the n->inf floor is
-        # unresolved by 3-point extrapolation — do NOT hide it behind max(.,0).
-        # For a robust, directly-measured content metric use bpc_32768.
-        h_inf = b3 - d23 / (R**alpha - 1)
+        h_raw = b3 - d23 / (R**alpha - 1)
+    h_inf = max(h_raw, 0.0) if h_raw == h_raw else h_raw  # reference floor at 0
     return {
         "alpha": alpha,
-        "h_inf": h_inf,            # raw, unclamped (may be negative = unresolved)
-        "bpc_32k": b3,             # directly-measured content metric (no fit)
+        "h_inf": h_inf,            # reference-exact (clamped >= 0)
+        "h_inf_raw": h_raw,        # unclamped, for transparency only
         "bpc_128": b1,
         "bpc_2048": b2,
         "bpc_32768": b3,
@@ -123,7 +128,13 @@ def _fit_floor(ns, bpcs):
 
 
 def score_v3(docs):
-    """Correct H_inf: bounded nonlinear least-squares fit of
+    """SUPPLEMENTARY DIAGNOSTIC — NOT the canonical metric (that is score(),
+    the reference-exact 3-point clamped oracle from data_format.md). score_v3
+    is a multi-point sensitivity check used to flag where the 3-point method
+    strains on heavily-pooled agentic corpora; do not substitute it for the
+    reference H_inf when comparing to the formal-math registry.
+
+    Bounded nonlinear least-squares fit of
     BPC(n) = H_inf + c * n^(-alpha) over up to 7 directly-measured context
     points (to 524 KB), with H_inf in [0, min(BPC)], c>0, alpha in (0,2).
 
