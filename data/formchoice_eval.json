@@ -1,0 +1,41 @@
+{
+  "base": {
+    "form": 0.7833,
+    "decision": 0.0333,
+    "form_breakdown": {
+      "valid_json": 0.767,
+      "has_commands": 0.733,
+      "has_analysis_plan": 0.75,
+      "wellformed_keystrokes": 0.667,
+      "non_degenerate": 1.0
+    }
+  },
+  "template": {
+    "form": 0.9867,
+    "decision": 0.025,
+    "form_breakdown": {
+      "valid_json": 0.983,
+      "has_commands": 0.983,
+      "has_analysis_plan": 0.983,
+      "wellformed_keystrokes": 0.983,
+      "non_degenerate": 1.0
+    }
+  },
+  "healthy": {
+    "form": 0.96,
+    "decision": 0.0167,
+    "form_breakdown": {
+      "valid_json": 0.95,
+      "has_commands": 0.95,
+      "has_analysis_plan": 0.95,
+      "wellformed_keystrokes": 0.95,
+      "non_degenerate": 1.0
+    }
+  },
+  "_deltas": {
+    "d_form_healthy_minus_template": -0.0267,
+    "d_decision_healthy_minus_template": -0.0083,
+    "n_form": 60,
+    "n_decision": 120
+  }
+}

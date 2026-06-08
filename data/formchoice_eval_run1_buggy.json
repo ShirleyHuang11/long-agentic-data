@@ -1,0 +1,38 @@
+{
+  "base": {
+    "form": 0.2875,
+    "decision": 0.0333,
+    "form_breakdown": {
+      "has_action_block": 0.067,
+      "single_action": 0.05,
+      "cmd_syntax_ok": 0.033,
+      "non_degenerate": 1.0
+    }
+  },
+  "template": {
+    "form": 0.25,
+    "decision": 0.025,
+    "form_breakdown": {
+      "has_action_block": 0.0,
+      "single_action": 0.0,
+      "cmd_syntax_ok": 0.0,
+      "non_degenerate": 1.0
+    }
+  },
+  "healthy": {
+    "form": 0.275,
+    "decision": 0.0167,
+    "form_breakdown": {
+      "has_action_block": 0.033,
+      "single_action": 0.033,
+      "cmd_syntax_ok": 0.033,
+      "non_degenerate": 1.0
+    }
+  },
+  "_deltas": {
+    "d_form_healthy_minus_template": 0.025,
+    "d_decision_healthy_minus_template": -0.0083,
+    "n_form": 60,
+    "n_decision": 120
+  }
+}
