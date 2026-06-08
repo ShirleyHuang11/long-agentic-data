@@ -1,0 +1,13 @@
+slug,h_inf_v3,h_inf_stderr,resolved,alpha_v3,bpc_32k,n_points,n_bytes
+nebius-swe-agent-traj,0.0,0.3775,False,0.2592,1.3221,7,8388608
+swe-smith-traj-xml,0.5769,0.0303,True,0.289,1.6171,7,8388608
+agentinstruct-all,0.0,0.4634,False,0.2599,1.2442,7,4939441
+agentgym-agenttraj-l,0.0,0.4207,False,0.3195,0.6681,7,4758682
+swe-bench-verified,1.5554,0.0082,True,0.3331,2.2178,6,3115539
+mind2web-actions,1.6773,0.0314,True,0.4129,2.1229,5,429581
+swe-gym-tasks,1.1726,0.0191,True,0.3847,1.7033,7,8388608
+swe-rebench-test,1.1272,0.0968,True,0.3369,1.813,7,8388608
+code-act-codeact,0.0371,0.3083,False,0.2127,1.7295,7,7221425
+swe-rebench-oh-traj,0.5471,0.0753,True,0.2759,1.3622,7,8388608
+swe-gym-oh-sft-traj,0.8306,0.1104,True,0.3134,1.7601,7,8388608
+swe-zero-oh-traj,0.8807,0.1227,True,0.2772,1.997,7,8388608

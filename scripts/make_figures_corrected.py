@@ -80,3 +80,46 @@ ax.set_title("Content ranking (CORRECTED, directly measured):\n"
              "note OpenThoughts/GLM sit MID, not at zero — the clamp had hidden this")
 fig.tight_layout(); fig.savefig(f"{OUT}/fig4c_content_bpc32k.png",dpi=160)
 print("wrote fig4c_content_bpc32k.png")
+
+# ---- fig8c: Hurst vs BPC@32K (replaces hurst-vs-Hinf) ----
+import csv as _csv
+hu={r["slug"]:float(r["hurst"]) for r in _csv.DictReader(open("data/hurst.csv"))}
+P={"toucan-15m-kimi-k2":("Toucan Kimi-K2","#2ca02c"),
+   "jetbrains-swe-test-minus-verified":("JetBrains GPT-5.2","#1f77b4"),
+   "swe-zero-12m-traj":("SWE-ZERO-12M","#1f77b4"),"glaive-fc-v2":("glaive-FC","#2ca02c"),
+   "weblinx-actions":("WebLINX (human)","#9467bd"),"apigen-mt-5k":("APIGen","#7f7f7f"),
+   "ko-agent-traj-train":("Ko-Agent","#7f7f7f"),"aider-polyglot-r2egym32b":("aider-32B flail","#d62728"),
+   "agentnet-text":("AgentNet annot.","#8c564b")}
+fig,ax=plt.subplots(figsize=(9,6.5))
+for slug,(lab,col) in P.items():
+    if slug not in rows or slug not in hu: continue
+    x=float(rows[slug]["bpc_32768"]); y=hu[slug]
+    ax.scatter([x],[y],c=col,s=150,edgecolors="k",zorder=3)
+    ax.annotate(lab,(x,y),fontsize=8.5,xytext=(6,5),textcoords="offset points")
+ax.axvline(1.5,color="k",lw=0.7,ls="--",alpha=0.5)
+ax.set_xlabel("BPC@32K (content density — directly measured)")
+ax.set_ylabel("Hurst exponent H (long-range organization)")
+ax.set_title("Finding 18 (CORRECTED axis): Hurst vs directly-measured content\n"
+             "templates (low BPC) and healthy data span similar Hurst — H alone can't rate data")
+fig.tight_layout(); fig.savefig(f"{OUT}/fig8c_hurst_bpc32k.png",dpi=160); print("wrote fig8c_hurst_bpc32k.png")
+
+# ---- fig9c: gamma-beta plane, colored by BPC@32K ----
+gb={r["slug"]:float(r["beta"]) for r in _csv.DictReader(open("data/gamma_beta.csv"))}
+fig,ax=plt.subplots(figsize=(9.5,7))
+import numpy as _np
+bb=_np.linspace(0.05,1.6,200); gg=_np.linspace(0,0.6,200); B,G=_np.meshgrid(bb,gg)
+cs=ax.contour(B,G,G/(2*B),levels=[0.05,0.1,0.14,0.19,0.3,0.5,0.8],colors="gray",linewidths=0.8,alpha=0.6)
+ax.clabel(cs,fmt=lambda v:f"$\\alpha_D$={v:g}",fontsize=7)
+L={"toucan-15m-kimi-k2":"Toucan","jetbrains-swe-test-minus-verified":"JetBrains",
+   "apigen-mt-5k":"APIGen","swe-zero-12m-traj":"SWE-ZERO","weblinx-actions":"WebLINX",
+   "agentnet-text":"AgentNet annot.","glaive-fc-v2":"glaive-FC"}
+xs=[gb[s] for s in L if s in gb]; ys=[float(rows[s]["alpha"]) for s in L if s in gb]
+cc=[float(rows[s]["bpc_32768"]) for s in L if s in gb]
+sc=ax.scatter(xs,ys,c=cc,cmap="viridis",s=160,vmin=0,vmax=3,marker="D",edgecolors="k")
+for s in L:
+    if s in gb: ax.annotate(L[s],(gb[s],float(rows[s]["alpha"])),fontsize=8,xytext=(6,5),textcoords="offset points")
+fig.colorbar(sc,ax=ax,shrink=0.8,label="BPC@32K (content density)")
+ax.set_xlabel(r"$\beta$ (byte-corr decay)"); ax.set_ylabel(r"$\gamma$ (LZ-oracle $\alpha$)")
+ax.set_title("Fig 9 (CORRECTED color): gamma-beta plane, color = directly-measured BPC@32K\n"
+             "(replaces clamped H_inf coloring)")
+fig.tight_layout(); fig.savefig(f"{OUT}/fig9c_gamma_beta_bpc32k.png",dpi=160); print("wrote fig9c_gamma_beta_bpc32k.png")
