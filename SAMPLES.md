@@ -143,6 +143,16 @@
 
 ### 累积发现
 
+> ⚠️ **方法学重大更正（iter 64，2026-06-07）—— H∞ 列不可靠，改用直测 BPC@32K**
+> 用户质疑"OpenThoughts 不该得 0"促成深查，发现 **H∞ 外推法对本类数据系统性失效**，三重 bug 叠加：
+> 1. **负值钳零**：3-point 解析式 `H∞=max(fit,0)`；高可压数据的 BPC 曲线在 32KB（原协议最大上下文）仍陡降 → 外推到负值被钳成假 0。**全部 37 个"H∞=0"行无一是真实测零，全是负钳**（原始外推值 −0.04 ~ −17）。
+> 2. **曲线不收敛**：扩到 524KB，swe-zero 等 BPC 仍在降（5.68→…→0.54 不见渐近线）—— **n→∞ floor 在可测窗口内根本不存在**，任何外推（含我加的 score_v2 最小二乘扫描）都在拟合看不见的渐近线，score_v2 反把健康集 swe-zero 钉到扫描下界 −1.0（新 artifact）。
+> 3. **跨 episode 池化混淆**：协议把数百 episode 拼成一条语料压缩；大 context 块跨多 episode，**共享的巨型 system-prompt/JSON 脚手架被 zstd 跨 episode 压没** → 池化 floor 测的是"数据集级样板密度"而非"per-episode 内容"。OpenThoughts 池化≈0，**剥脚手架后 H∞=0.75（健康带！）—— 内容一直在，是池化把它抹平了**。
+> **合成对照验证**：random→BPC@32K=2.47（高✓）、template→0.02（低✓）、scaffold+content→1.40（中✓）；而剥行法在纯 template 上 **0.02→8.0 反转**（删光共享行后残片不可压）—— **剥行法不可作正式度量**。
+> **结论与修正**：弃用外推 H∞ 与剥行法；**采用直测 `BPC@32768`（已存在于 CSV，无拟合/无钳/无池化外推问题，过三项合成对照）作内容密度度量**。直测排序合理（模板/空转最低 0.5–0.7，真实内容最高 2.3–3.05）。**5 个原报 H∞=0 的数据集实为高内容**（nemotron-tool 2.54、deep-research 2.45、qwen35-react 2.38、nemotron-conv 2.30、fractal 2.29）—— 之前的"模板带=H∞=0"部分是度量假象。
+> **受影响的结论需软化**：发现 4/8/17/20 的"H∞=0 模板带"应重述为"低 BPC@32K"且边界更模糊；**finding 20 尤其**——OpenThoughts 含真实内容（descaffold 0.75），"模板配方=纯 form/空"的前提被削弱，正在跑的 form-vs-choices 实验对照因此变浑（两臂都含内容）。详见 `reports/hinf_clamp_fix.md`。**教训：任何被钳/外推/池化的"恰好 0"都要对着直测量和合成对照证伪后才能下结论。**
+
+
 1. **成功过滤不改变压缩结构**（iter 3）：OpenHands Sampled（含失败）vs SFT（成功过滤）Δα=0.015、ΔH∞=0.01 —— 但成功 episode 平均更长（39.0 vs 28.3 turns）。
 2. **真实 > 模拟**（iter 3）：NNetNav real-web H∞=1.37 vs WebArena 版 0.46 —— 真实网页观测多样性约 3×。
 3. **观测主导长程冗余**（iter 6）：full-obs 切片 H∞ 坍缩（1.70→0.30、1.95→0.00）；compact/full-obs 不可直接比较。
@@ -278,3 +288,4 @@
 | 61 | 2026-06-07 | **LZ-Select 全管线轮（子代理 A，`scripts/lz_select.py` + `reports/lz_select_results.md`）**：STRIP（模态首块剥离 + >50% 共享行剥离）→ SELECT（template/loop-gain 四分位）→ GATE 三阶段 CLI；Kwai-Klear 300 eps：**raw 0.262 → strip 0.355 → select 0.406 → strip+select 0.505（近翻倍，两阶段近可加；176 eps 截断复跑数字不变 —— 增益是真 per-episode 质量）**；⚠️ 预测 ≥0.6 未达（差 0.10，诚实记录）；单数据集/SWE-smith 样板偏重为 STRIP 增益上限 caveat |
 | 62 | 2026-06-07 | **form-vs-choices 实验就绪（子代理 C，发现 20 判别实验）**：template（OT-v1-SFT，30.01M tok）vs healthy（GLM-4.7+JetBrains+SWE-ZERO 各三分之一，30.02M tok，差 0.03%）双语料 → `$SCRATCH/.../formchoice/`，manifest `data/formchoice_manifest.json`；训练栈 Qwen2.5-1.5B-Instruct + TRL（torch 2.5.1 需 pin transformers 4.51.3/trl 0.15.2）；评测 12 form-bound + 12 decision-bound（零模板重叠；判别式：Δdecision>0 ∧ Δform≈0 ⇒ 发现 20 成立）`reports/formchoice_eval_design.md`；⚠️ **基础设施修正：本账户无 kempner 权限（CLAUDE.md 假设失效），smoke→gpu_requeue、全量→gpu 分区** |
 | 63 | 2026-06-07 | **smoke 通过 → 全量 SFT 提交**：smoke 19849486 COMPLETED（4m42s，loss 0.77→0.52，token-acc 0.82→0.87，ckpt 落盘 "SMOKE OK" —— 训练栈端到端验证）；**全量双跑提交：template=19854315 / healthy=19854316（gpu 分区，3-day walltime，PENDING）**；完成后跑 12+12 评测出发现 20 的判别结果 |
+| 64 | 2026-06-07 | **H∞ 度量重大更正（用户质疑"OpenThoughts 不该得 0"驱动）**：查实 H∞ 外推三重失效（负钳 / 曲线不收敛 / 跨 episode 池化），全部 37 个"H∞=0"为假；合成对照验证 **直测 BPC@32768 为稳健内容度量**（弃外推 H∞ + 弃剥行法——剥行在纯模板上 0.02→8.0 反转）；OpenThoughts descaffold H∞=0.75（健康，非空）；5 个原报零实为高内容；新增 `lz_oracle.score_v2`（已知不稳，仅诊断用）、`scripts/diag_hinf_context.py`、`reports/hinf_clamp_fix.md`；发现 4/8/17/20 待按 BPC@32K 软化；**教训写入累积发现顶部** |
