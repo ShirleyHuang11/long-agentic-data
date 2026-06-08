@@ -12,3 +12,4 @@ figures are archived in `deprecated_hinf/`.
 - **fig5_hurst_vs_content** — Hurst vs content: Hurst alone can't rate data
 - **fig6_gamma_beta** — γ–β phase plane, colored by content density
 - **fig10_openthoughts** — OpenThoughts reproduction (3-panel; note: H∞ panel pre-correction)
+- **fig7_formchoice_result** — form-vs-choices training result (finding 21): FORM confirmed, DECISION inconclusive
