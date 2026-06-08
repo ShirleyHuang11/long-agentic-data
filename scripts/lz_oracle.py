@@ -80,3 +80,67 @@ def score(docs):
         "n_docs": n_docs,
         "n_bytes": len(corpus),
     }
+
+
+# --- v2: multi-point floor fit (added 2026-06-07) -------------------------
+# The 3-point analytic score() caps context at 32768 B. For highly compressible
+# agentic data the BPC curve is still falling steeply there, so the power-law
+# floor extrapolates negative and gets clamped to 0 — collapsing a real spread
+# of floors (genuinely ~0 vs ~0.4+) into a single artifactual zero. score_v2
+# measures more (and larger) context points and fits H_inf by least squares,
+# resolving the floor where score() clamped. See reports/hinf_clamp_fix.md.
+N_POINTS_V2 = (128, 512, 2048, 8192, 32768, 131072, 524288)
+MIN_CHUNKS = 8  # require >= this many chunks at a context size to trust its BPC
+
+
+def _fit_floor(ns, bpcs):
+    """Fit BPC(n) = H_inf + c * n^(-alpha) by scanning H_inf, linear in log-log.
+    Returns (h_inf, alpha, r2). H_inf is NOT clamped — negative means the curve
+    has not flattened within the measured window (floor unresolved/<=0)."""
+    import numpy as np
+    ns = np.asarray(ns, float)
+    b = np.asarray(bpcs, float)
+    x = np.log(ns)
+    lo, hi = -1.0, float(b.min()) - 1e-3
+    best = (-1e9, 0.0, 0.0)  # (r2, h_inf, alpha)
+    for hf in np.linspace(lo, hi, 600):
+        y = np.log(b - hf)
+        A = np.vstack([x, np.ones_like(x)]).T
+        sol, *_ = np.linalg.lstsq(A, y, rcond=None)
+        resid = y - A @ sol
+        ss = ((y - y.mean()) ** 2).sum()
+        r2 = 1 - (resid ** 2).sum() / ss if ss > 0 else 0.0
+        if r2 > best[0]:
+            best = (r2, hf, -sol[0])
+    r2, hf, alpha = best
+    return hf, alpha, r2
+
+
+def score_v2(docs):
+    """Robust floor measurement: 7 context points to 524 KB + least-squares fit.
+    Returns h_inf_resolved (unclamped real floor; <=0 => unresolved/fully
+    compressible), h_inf (clamped >=0 for ranking), alpha, fit_r2, the BPC curve,
+    and corpus stats."""
+    corpus = build_corpus(docs)
+    n_docs = corpus.count(b"\n\n") + 1 if corpus else 0
+    ns, bpcs = [], []
+    for n in N_POINTS_V2:
+        if len(corpus) // n < MIN_CHUNKS:
+            break
+        ns.append(n)
+        bpcs.append(_bpc_at(corpus, n))
+    if len(ns) >= 4 and all(bpcs[i] > bpcs[i + 1] for i in range(len(bpcs) - 1)):
+        h_res, alpha, r2 = _fit_floor(ns, bpcs)
+    else:  # too few points or non-monotone — fall back to 3-point analytic
+        s = score(docs)
+        h_res, alpha, r2 = s["h_inf"], s["alpha"], float("nan")
+    return {
+        "h_inf_resolved": h_res,
+        "h_inf": max(h_res, 0.0),
+        "alpha": alpha,
+        "fit_r2": r2,
+        "bpc_curve": dict(zip(ns, bpcs)),
+        "n_points": len(ns),
+        "n_docs": n_docs,
+        "n_bytes": len(corpus),
+    }
