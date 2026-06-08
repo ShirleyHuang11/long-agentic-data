@@ -70,10 +70,16 @@ def score(docs):
         alpha, h_inf = float("nan"), b3  # degenerate / non-monotone corpus
     else:
         alpha = math.log(d12 / d23) / math.log(R)
-        h_inf = max(b3 - d23 / (R**alpha - 1), 0.0)
+        # NO CLAMP (fixed 2026-06-07): report the raw extrapolated floor.
+        # A negative value is an honest signal that the BPC curve has not
+        # flattened within the 32 KB window, so the n->inf floor is
+        # unresolved by 3-point extrapolation — do NOT hide it behind max(.,0).
+        # For a robust, directly-measured content metric use bpc_32768.
+        h_inf = b3 - d23 / (R**alpha - 1)
     return {
         "alpha": alpha,
-        "h_inf": h_inf,
+        "h_inf": h_inf,            # raw, unclamped (may be negative = unresolved)
+        "bpc_32k": b3,             # directly-measured content metric (no fit)
         "bpc_128": b1,
         "bpc_2048": b2,
         "bpc_32768": b3,
@@ -136,7 +142,7 @@ def score_v2(docs):
         h_res, alpha, r2 = s["h_inf"], s["alpha"], float("nan")
     return {
         "h_inf_resolved": h_res,
-        "h_inf": max(h_res, 0.0),
+        "h_inf": h_res,            # raw, unclamped (negative = unresolved floor)
         "alpha": alpha,
         "fit_r2": r2,
         "bpc_curve": dict(zip(ns, bpcs)),
