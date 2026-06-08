@@ -132,7 +132,9 @@
 
 ### 签名集群（α × H∞ 象限，对照 `data_format.md` §XIII）
 
-> ⚠️ **本表 H∞ 值为已弃用的钳零外推（见累积发现顶部更正块）。集群的定性结构（健康 vs 模板 vs 失败空转）经直测 BPC@32K 复核仍成立，但"H∞=0"应读作"低 BPC@32K / 多点法 resolved=False"，绝对边界更模糊。BPC@32K 版分群见 `figures/fig1_signature_map.png`、`fig2_content_ranking.png`；多点法真实 floor（resolved 子集）见 `data/agentic_hinf_v3.csv`。**
+> ⚠️ **本表 H∞ 值为已弃用的钳零外推（见累积发现顶部更正块）。集群的定性结构（健康 vs 模板 vs 失败空转）经直测 BPC@32K 复核仍成立，但"H∞=0"应读作"低 BPC@32K / 多点法 resolved=False"，绝对边界更模糊。BPC@32K 版分群见 `figures/fig1_signature_map.png`、`fig2_content_ranking.png`。**
+>
+> **多点法 score_v3 全 registry 重评完成（92 行；`h_inf_v3 / h_inf_stderr / resolved` 已并入 `data/agentic_alpha_hinf.csv`）：39 resolved / 53 unresolved。** resolved 子集得**真实正 floor 且误差紧**（weblinx-actions 1.86±0.04、mind2web 1.68、swe-bench-verified 1.56±0.01、AgentNet-actions 1.40、smolagents-gaia 1.33、Toucan 1.25、任务集 swe-gym 1.17/swe-rebench 1.13、健康 OpenHands 轨迹 0.74–1.06、glaive 0.99、GLM-4.7 0.77）—— **健康/任务/人类动作流大多 resolved**；unresolved 集中在真模板带与重池化大集（曲线不收敛→退回 BPC@32K）。**"resolved=False" 本身即模板/重复信号**。
 
 | 集群 | 签名 | 成员 | 解读 |
 | :--- | :--- | :--- | :--- |
