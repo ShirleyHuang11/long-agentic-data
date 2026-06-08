@@ -122,6 +122,59 @@ def _fit_floor(ns, bpcs):
     return hf, alpha, r2
 
 
+def score_v3(docs):
+    """Correct H_inf: bounded nonlinear least-squares fit of
+    BPC(n) = H_inf + c * n^(-alpha) over up to 7 directly-measured context
+    points (to 524 KB), with H_inf in [0, min(BPC)], c>0, alpha in (0,2).
+
+    Proper LM least-squares on the BPC values (not the log-space R^2 scan of
+    score_v2, which pegged at its bound; not the 3-point analytic of score(),
+    which clamped negatives to a fake 0). Where the curve flattens, H_inf is
+    well determined (small stderr). Where it has not flattened, H_inf tends to
+    its lower bound with LARGE stderr — the honest 'unresolved' signal, instead
+    of a hidden clamp or a scan peg. Also returns bpc_32k (directly measured,
+    robust, no fit) as the recommended content metric. See reports/hinf_clamp_fix.md.
+    """
+    import numpy as np
+    from scipy.optimize import curve_fit
+    corpus = build_corpus(docs)
+    n_docs = corpus.count(b"\n\n") + 1 if corpus else 0
+    ns, bpcs = [], []
+    for n in N_POINTS_V2:
+        if len(corpus) // n < MIN_CHUNKS:
+            break
+        ns.append(n)
+        bpcs.append(_bpc_at(corpus, n))
+    b32 = _bpc_at(corpus, 32768)
+    res = {"bpc_32k": b32, "bpc_curve": dict(zip(ns, bpcs)),
+           "n_points": len(ns), "n_docs": n_docs, "n_bytes": len(corpus)}
+    if len(ns) < 4 or not all(bpcs[i] > bpcs[i + 1] for i in range(len(bpcs) - 1)):
+        res.update(h_inf=float("nan"), h_inf_stderr=float("nan"),
+                   alpha=float("nan"), resolved=False)
+        return res
+    x = np.asarray(ns, float); y = np.asarray(bpcs, float)
+    f = lambda n, H, c, a: H + c * np.power(n, -a)
+    try:
+        p0 = [max(min(y) - 0.1, 0.0), y[0], 0.3]
+        popt, pcov = curve_fit(
+            f, x, y, p0=p0,
+            bounds=([0.0, 1e-6, 1e-3], [float(min(y)), 1e3, 2.0]),
+            maxfev=20000)
+        H, c, a = popt
+        stderr = float(np.sqrt(np.diag(pcov))[0])
+        yhat = f(x, *popt)
+        ss = ((y - y.mean()) ** 2).sum()
+        r2 = 1 - ((y - yhat) ** 2).sum() / ss if ss > 0 else 0.0
+        # "resolved" = curve has begun to flatten AND H_inf is pinned tightly
+        resolved = bool(stderr < 0.15 and (y[-2] - y[-1]) < 0.6)
+        res.update(h_inf=float(H), h_inf_stderr=stderr, alpha=float(a),
+                   fit_r2=float(r2), resolved=resolved)
+    except Exception as e:
+        res.update(h_inf=float("nan"), h_inf_stderr=float("nan"),
+                   alpha=float("nan"), resolved=False, err=str(e)[:80])
+    return res
+
+
 def score_v2(docs):
     """Robust floor measurement: 7 context points to 524 KB + least-squares fit.
     Returns h_inf_resolved (unclamped real floor; <=0 => unresolved/fully
