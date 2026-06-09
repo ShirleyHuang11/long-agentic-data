@@ -206,6 +206,21 @@ The binding decision is to **keep the reference paper's method exactly**. The re
 
 Other limitations: β and Hurst are byte-level proxies (not the token/model-level definitions of [1, 2]); several `source` groups are small (human task n = 5, synth task n = 2); and the train/eval `role` label is editorial for the straddling human-demo benchmarks.
 
+### 8.1 Practical guidance: which statistic to trust
+
+The survey reduces to a short decision procedure for anyone applying the probe to agentic data:
+
+| You have… | Trust | Because |
+| :-- | :-- | :-- |
+| a training corpus (mixed sources) | reference-exact **H∞** | validated (Spearman 0.97) and cross-domain comparable; many sources ⇒ no single shared prompt to pool away |
+| a benchmark **eval rollout** (one harness) | **BPC@32K + turn-count** | H∞ is harness-confounded — a heavy shared system prompt pools it to 0 regardless of generator (§5.3) |
+| to compare **generators under a fixed harness** | **BPC@32K + turn-count** | orders by capability/success even when H∞ is flat at the floor (terminus-2 ladder, §5.3) |
+| to rank **teachers within the healthy band** | a **proxy training run** | the probe is a regime selector, not a recipe selector; within-band gaps sit inside seed-σ (§5.4) |
+| to assess **long-range organization** | **Hurst, paired with H∞** | Hurst alone conflates repetition with content (ρ ≈ 0 vs H∞; §4) |
+| to predict **data-limited learnability** | **β** (→ α_D = γ/2β) | the one statistic with a learning-curve theory behind it [1] |
+
+The single most important rule: **a clamped/extrapolated/pooled "0" is a hypothesis, not a finding** — falsify it against a directly measured quantity (BPC@32K), the turn-count, and synthetic controls before reporting it.
+
 ---
 
 ## 9. Forward Experiments
