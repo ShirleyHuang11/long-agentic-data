@@ -35,6 +35,10 @@ AG_LABEL = {
     "weblinx-actions": "WebLINX actions",
     "agentnet-text": "AgentNet annotated",
     "glaive-fc-v2": "glaive-FC",
+    "smolagents-gaia-traces": "smolagents GAIA",  # frontier search, healthy
+    "mind2web-actions": "Mind2Web actions",        # human web demo (high beta)
+    # NB: openhands-feedback beta=0.005 is a fit artifact (flat correlation
+    # curve, like FineMath/Pile) -- excluded, not plotted.
 }
 
 # iters 69-73: benchmark eval rollouts (distinct marker) — show they also fall
