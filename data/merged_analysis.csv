@@ -103,3 +103,4 @@ terminal-bench2-qwen3-32b,DCAgent3/terminal_bench_2_Qwen3_32B_47000_46_20260609_
 gaia127-r2egym-32b-eval,DCAgent2/gaia_127_R2EGym_32B_Agent_20260505_060909,EVAL_TRAJ,search,mid,0.1629601022809737,0.0,1.3030939102172852,,25,199.7,353873,
 terminal-bench2-gpt5,DCAgent/GPT-5-terminal-bench-2,EVAL_TRAJ,terminal,frontier,0.1938617816332237,0.0,1.7669966264204546,,82,10.4,44046,
 terminal-bench2-claude-sonnet45,DCAgent/claude-sonnet-4-5-terminal-bench-2,EVAL_TRAJ,terminal,frontier,0.23072825135356045,0.15657993487132082,1.7465518043154762,,86,27.6,40067,
+swebench-verified-claude-sonnet45-eval,livesweagent/claude-sonnet-4-5_swebench_verified_traj,EVAL_TRAJ,swe,frontier,0.1887237835524238,0.0,1.6006040573120117,,64,106.2,131238,

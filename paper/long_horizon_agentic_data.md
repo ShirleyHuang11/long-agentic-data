@@ -1,7 +1,7 @@
 # A Compression-Oracle Survey of Long-Horizon Agentic Data: Merging Training and Evaluation Corpora by Pattern and Content
 
 *Analysis paper, long-agentic-data project. Built from the `SAMPLES.md` registry
-(98 active datasets / 104 scored rows, iters 1–70) and the metrics validated in
+(99 active datasets / 105 scored rows, iters 1–71) and the metrics validated in
 `reports/`. Figures in `figures/`; per-row merged table in
 `data/merged_analysis.csv` (`scripts/build_merged_table.py`).*
 
@@ -9,7 +9,7 @@
 
 ## Abstract
 
-We survey **98 long-horizon agentic corpora** — spanning model-trained SFT/RL
+We survey **99 long-horizon agentic corpora** — spanning model-trained SFT/RL
 trajectories, human-written benchmark tasks, human demonstrations, and agent
 rollouts collected on benchmarks — with a single cheap, tokenizer-free
 compression oracle. For every corpus we measure a **pattern** axis (the
@@ -71,8 +71,8 @@ recent literature (β, Hurst, seed-σ).
 
 ## 2. The merged corpus
 
-The registry holds **104 scored rows**; 6 are 3-point fit artifacts (α<0 or
-H∞≫1, plus one single-episode dump) and are dropped, leaving **98 active
+The registry holds **105 scored rows**; 6 are 3-point fit artifacts (α<0 or
+H∞≫1, plus one single-episode dump) and are dropped, leaving **99 active
 corpora**. We classify each along three axes (`scripts/build_merged_table.py`,
 output `data/merged_analysis.csv`):
 
@@ -82,7 +82,7 @@ output `data/merged_analysis.csv`):
 | **domain** | swe · web · gui · tool · search · terminal · safety · embodied · mixed |
 | **source** | `human_task` · `human_demo` · `synth_task` · `frontier` (frontier-model rollout) · `mid` (mid-size-model rollout) · `distill` (GPT-4-class distillation/SFT mixture) |
 
-Counts: **TRAIN 69, EVAL_TASK 13, EVAL_TRAJ 16**; by source, frontier 44,
+Counts: **TRAIN 69, EVAL_TASK 13, EVAL_TRAJ 17**; by source, frontier 45,
 distill 24, mid 13, human_demo 10, human_task 5, synth_task 2. The merge is
 deliberate: human-demonstration datasets (Mind2Web, WebLINX, GUI-Odyssey,
 AndroidControl, AgentNet, OpenCUA) straddle the train/eval line — they ship test
@@ -177,7 +177,7 @@ This is the paper's central result (`figures/fig_merge_content_source.png`).
 | :-- | --: | --: | --: | --: |
 | human task (written problems) | 5 | **1.22** | 1.06 | 4/5 |
 | human demo (action streams) | 10 | **1.13** | 0.92 | 6/10 |
-| frontier-model rollout | 44 | **0.79** | 0.78 | 31/44 |
+| frontier-model rollout | 45 | **0.78** | 0.76 | 31/45 |
 | synthetic task | 2 | 0.45 | 0.45 | 1/2 |
 | mid-size-model rollout | 13 | **0.00** | 0.13 | 2/13 |
 | distilled SFT mixture | 24 | **0.00** | 0.08 | 3/24 |
@@ -188,7 +188,7 @@ This is the paper's central result (`figures/fig_merge_content_source.png`).
 | :-- | --: | --: | :-- |
 | EVAL_TASK | 13 | **1.22** | human-authored tasks/demos → content-dense |
 | TRAIN | 69 | **0.26** | bimodal: healthy frontier minority + collapsed majority |
-| EVAL_TRAJ | 16 | **0.04** | model rollouts span the full range; mid-model runs collapse |
+| EVAL_TRAJ | 17 | **0.00** | model rollouts span the full range; H∞ also harness-confounded (below) |
 
 Three things follow.
 
@@ -207,8 +207,9 @@ GAIA-127 (H∞ 0.00, 200 turns), and CoderForge-32B on SWE-bench-Verified
 (H∞ 0.83, 136 turns). The first two **collapse to the template floor with the
 longest failure loops in their domains** — and the GAIA-127 result sits directly
 against the *frontier* GAIA rollout already in the registry (ii-agent, H∞ 1.25):
-**same benchmark, frontier 1.25 vs mid 0.00**, a clean generator contrast on
-identical eval tasks. The SWE rollout stays healthy at 0.83 — not because the
+**same benchmark, frontier 1.25 vs mid 0.00** — though the harnesses also
+differ (ii-agent vs OpenHands), a confound the iter-71 exhibit below makes
+explicit. The SWE rollout stays healthy at 0.83 — not because the
 32B generator is strong, but because **repository observations are content**
 (finding 16, §6): on SWE the environment injects real code regardless of the
 agent. So eval rollouts inherit the *generator's* content signature, *modulated
@@ -230,6 +231,38 @@ content-bearing domains (SWE, search) H∞ separates generators cleanly, but on
 scaffold-heavy domains it saturates at the floor and the companions do the
 separating. The thesis is unchanged — generator dominates, role does not — but
 *which statistic reveals it* is domain-dependent.
+
+Consolidating the benchmark eval-rollout batch (iters 69–71) into one exhibit
+makes the operational lesson explicit:
+
+| benchmark | rollout generator | source | agent harness | H∞ | BPC@32K | turns |
+| :-- | :-- | :-- | :-- | --: | --: | --: |
+| SWE-bench-Verified | CoderForge-32B | mid | OpenHands | **0.83** | 1.73 | 136 |
+| SWE-bench-Verified | Claude-Sonnet-4.5 | frontier | mini-swe-agent | **0.00** | 1.60 | 106 |
+| GAIA-127 | ii-agent | frontier | ii-agent | **1.25** | 3.05 | 47 |
+| GAIA-127 | R2EGym-32B | mid | OpenHands | **0.00** | 1.30 | 200 |
+| Terminal-Bench-2 | GPT-5 | frontier | terminus-2 | 0.00 | 1.77 | 10 |
+| Terminal-Bench-2 | Claude-Sonnet-4.5 | frontier | terminus-2 | 0.16 | 1.75 | 28 |
+| Terminal-Bench-2 | Qwen3-32B | mid | terminus-2 | 0.00 | 0.97 | 172 |
+
+Read this carefully and a cautionary result emerges. **Within a fixed harness**
+(the three Terminal-Bench-2 rows, all `terminus-2`), BPC@32K orders the
+generators correctly — frontier 1.77 / 1.75 above mid 0.97 — and turn-count
+separates them sharply (10–28 vs 172), while H∞ is flat at the floor for all.
+**Across harnesses, H∞ entangles the agent scaffold with the generator**: the
+*same* frontier model, Claude-Sonnet-4.5, reads H∞ 0.16 under `terminus-2` but
+**0.00** under `mini-swe-agent` on SWE-bench-Verified, and a *mid* model under
+OpenHands (CoderForge 0.83) outscores it — because `mini-swe-agent`'s large
+fixed system prompt pools to zero across episodes (the §8 effect, and finding 60
+"the harness format is a confound" at benchmark scale). The clean-looking
+GAIA-127 contrast inherits the same caveat (ii-agent vs OpenHands). **The two
+statistics that survive the harness are BPC@32K and turn-count** — frontier
+agents are denser per byte and finish in fewer turns; mid agents inflate horizon
+with failure loops. The operational rule for *eval rollouts* is therefore:
+prefer BPC@32K + turn-count over the 3-point H∞, which on single-harness-pooled
+rollouts measures the scaffold as much as the generator. (This does not bear on
+the §5 train-data result, where corpora mix many sources and are not pooled
+under one giant shared system prompt.)
 
 **(ii) The content gap.** The benchmark *tasks* we measure agents against are
 human-written and dense (median H∞ 1.22); the training data we feed agents is

@@ -1,0 +1,31 @@
+{
+  "hf_dataset": "livesweagent/claude-sonnet-4-5_swebench_verified_traj",
+  "hf_url": "https://huggingface.co/datasets/livesweagent/claude-sonnet-4-5_swebench_verified_traj",
+  "hf_revision_sha": "5d0526ad86289af86996d5d1712ea5b43ca5c060",
+  "splits": [
+    "validation"
+  ],
+  "serializer": "messages_rc",
+  "sampling": {
+    "mode": "streaming first-N",
+    "max_docs": 1500,
+    "max_bytes": 8388608
+  },
+  "oracle": {
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-09T15:46:02.825232+00:00",
+  "result": {
+    "alpha": 0.1887237835524238,
+    "h_inf": 0.0,
+    "bpc_32768": 1.6006040573120117,
+    "n_episodes": 64,
+    "mean_turns": 106.2,
+    "n_bytes": 8388608
+  }
+}
