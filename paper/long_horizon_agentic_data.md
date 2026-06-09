@@ -249,6 +249,7 @@ The survey reduces to a short decision procedure for anyone applying the probe t
 | a training corpus (mixed sources) | reference-exact **H∞** | validated (Spearman 0.97) and cross-domain comparable; many sources ⇒ no single shared prompt to pool away |
 | a benchmark **eval rollout** (one harness) | **BPC@32K + turn-count** | H∞ is harness-confounded — a heavy shared system prompt pools it to 0 regardless of generator (§5.3) |
 | to compare **generators under a fixed harness** | **BPC@32K + turn-count** | orders by capability/success even when H∞ is flat at the floor (terminus-2 ladder, §5.3) |
+| a **packaged/curated SFT mixture** (one wrapper prompt) | **score the components separately** | a uniform system prompt pools even content-rich sources to 0 (ToolAce 0.90 → 0.00 once bundled into Hermes; §5.1) |
 | to rank **teachers within the healthy band** | a **proxy training run** | the probe is a regime selector, not a recipe selector; within-band gaps sit inside seed-σ (§5.4) |
 | to assess **long-range organization** | **Hurst, paired with H∞** | Hurst alone conflates repetition with content (ρ ≈ 0 vs H∞; §4) |
 | to predict **data-limited learnability** | **β** (→ α_D = γ/2β) | the one statistic with a learning-curve theory behind it [1] |
