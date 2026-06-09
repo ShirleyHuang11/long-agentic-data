@@ -98,3 +98,6 @@ inferredbugs-teacher-qwen35-122b,penfever/inferredbugs-sandboxes-verifier-qwen3.
 inferredbugs-teacher-kimi25,DCAgent2/Kimi-2.5-inferredbugs-sandboxes-maxeps-32k,TRAIN,swe,frontier,0.25779812955903,0.2787176141614056,1.5506057739257812,,164,18.8,51486,True
 inferredbugs-teacher-gpt5nano,mlfoundations-dev/inferredbugs-sandboxes-traces-terminus-2,TRAIN,swe,frontier,0.23222701115262892,0.0,1.5314207077026367,,157,15.4,53452,True
 inferredbugs-tasks-clean,ypguo/Clean_Microsoft_InferredBugs,EVAL_TASK,swe,human_task,0.23647458891531836,0.0,0.8427959469193262,,1500,1,3072,False
+coderforge-32b-swebench-verified-eval,togethercomputer/CoderForge-Preview-32B-SWE-Bench-Verified-Evaluation-trajectories,EVAL_TRAJ,swe,mid,0.2841811552869114,0.8315627803322722,1.728074073791504,,58,135.6,146877,
+terminal-bench2-qwen3-32b,DCAgent3/terminal_bench_2_Qwen3_32B_47000_46_20260609_022622,EVAL_TRAJ,terminal,mid,0.28224510792909174,0.0,0.9733800888061523,,84,171.9,100705,
+gaia127-r2egym-32b-eval,DCAgent2/gaia_127_R2EGym_32B_Agent_20260505_060909,EVAL_TRAJ,search,mid,0.1629601022809737,0.0,1.3030939102172852,,25,199.7,353873,

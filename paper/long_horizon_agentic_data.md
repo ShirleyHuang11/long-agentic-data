@@ -1,7 +1,7 @@
 # A Compression-Oracle Survey of Long-Horizon Agentic Data: Merging Training and Evaluation Corpora by Pattern and Content
 
 *Analysis paper, long-agentic-data project. Built from the `SAMPLES.md` registry
-(93 active datasets / 99 scored rows, iters 1–68) and the metrics validated in
+(96 active datasets / 102 scored rows, iters 1–69) and the metrics validated in
 `reports/`. Figures in `figures/`; per-row merged table in
 `data/merged_analysis.csv` (`scripts/build_merged_table.py`).*
 
@@ -9,7 +9,7 @@
 
 ## Abstract
 
-We survey **93 long-horizon agentic corpora** — spanning model-trained SFT/RL
+We survey **96 long-horizon agentic corpora** — spanning model-trained SFT/RL
 trajectories, human-written benchmark tasks, human demonstrations, and agent
 rollouts collected on benchmarks — with a single cheap, tokenizer-free
 compression oracle. For every corpus we measure a **pattern** axis (the
@@ -71,8 +71,8 @@ recent literature (β, Hurst, seed-σ).
 
 ## 2. The merged corpus
 
-The registry holds **99 scored rows**; 6 are 3-point fit artifacts (α<0 or
-H∞≫1, plus one single-episode dump) and are dropped, leaving **93 active
+The registry holds **102 scored rows**; 6 are 3-point fit artifacts (α<0 or
+H∞≫1, plus one single-episode dump) and are dropped, leaving **96 active
 corpora**. We classify each along three axes (`scripts/build_merged_table.py`,
 output `data/merged_analysis.csv`):
 
@@ -82,8 +82,8 @@ output `data/merged_analysis.csv`):
 | **domain** | swe · web · gui · tool · search · terminal · safety · embodied · mixed |
 | **source** | `human_task` · `human_demo` · `synth_task` · `frontier` (frontier-model rollout) · `mid` (mid-size-model rollout) · `distill` (GPT-4-class distillation/SFT mixture) |
 
-Counts: **TRAIN 69, EVAL_TASK 13, EVAL_TRAJ 11**; by source, frontier 42,
-distill 24, mid 10, human_demo 10, human_task 5, synth_task 2. The merge is
+Counts: **TRAIN 69, EVAL_TASK 13, EVAL_TRAJ 14**; by source, frontier 42,
+distill 24, mid 13, human_demo 10, human_task 5, synth_task 2. The merge is
 deliberate: human-demonstration datasets (Mind2Web, WebLINX, GUI-Odyssey,
 AndroidControl, AgentNet, OpenCUA) straddle the train/eval line — they ship test
 splits *and* are used as demonstration training data — so `source` is the axis
@@ -179,7 +179,7 @@ This is the paper's central result (`figures/fig_merge_content_source.png`).
 | human demo (action streams) | 10 | **1.13** | 0.92 | 6/10 |
 | frontier-model rollout | 42 | **0.80** | 0.81 | 31/42 |
 | synthetic task | 2 | 0.45 | 0.45 | 1/2 |
-| mid-size-model rollout | 10 | **0.00** | 0.08 | 1/10 |
+| mid-size-model rollout | 13 | **0.00** | 0.13 | 2/13 |
 | distilled SFT mixture | 24 | **0.00** | 0.08 | 3/24 |
 
 **By role, the same numbers re-sort to expose the gap:**
@@ -188,7 +188,7 @@ This is the paper's central result (`figures/fig_merge_content_source.png`).
 | :-- | --: | --: | :-- |
 | EVAL_TASK | 13 | **1.22** | human-authored tasks/demos → content-dense |
 | TRAIN | 69 | **0.26** | bimodal: healthy frontier minority + collapsed majority |
-| EVAL_TRAJ | 11 | **0.08** | model rollouts span the full range; mid-model runs collapse |
+| EVAL_TRAJ | 14 | **0.04** | model rollouts span the full range; mid-model runs collapse |
 
 Three things follow.
 
@@ -199,6 +199,21 @@ both train and eval. An eval rollout produced by a 7B–32B model on the
 aider-polyglot benchmark (`EVAL_TRAJ`, source `mid`, H∞ ≈ 0) is statistically
 indistinguishable from a distilled training mixture (`TRAIN`, source `distill`,
 H∞ ≈ 0) — same template floor, same failure-loop length inflation (§6).
+
+A controlled benchmark-rollout batch (iter 69) makes this concrete and adds a
+domain modulation. We scored three mid-size (≈32B) eval rollouts on three named
+benchmarks: Qwen3-32B on Terminal-Bench-2 (H∞ 0.00, 172 turns), R2EGym-32B on
+GAIA-127 (H∞ 0.00, 200 turns), and CoderForge-32B on SWE-bench-Verified
+(H∞ 0.83, 136 turns). The first two **collapse to the template floor with the
+longest failure loops in their domains** — and the GAIA-127 result sits directly
+against the *frontier* GAIA rollout already in the registry (ii-agent, H∞ 1.25):
+**same benchmark, frontier 1.25 vs mid 0.00**, a clean generator contrast on
+identical eval tasks. The SWE rollout stays healthy at 0.83 — not because the
+32B generator is strong, but because **repository observations are content**
+(finding 16, §6): on SWE the environment injects real code regardless of the
+agent. So eval rollouts inherit the *generator's* content signature, *modulated
+by whether the domain's observations are content (SWE) or boilerplate
+(terminal/search)* — never by the train/eval label.
 
 **(ii) The content gap.** The benchmark *tasks* we measure agents against are
 human-written and dense (median H∞ 1.22); the training data we feed agents is

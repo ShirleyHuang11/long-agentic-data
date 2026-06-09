@@ -46,6 +46,10 @@ CLASS = {
     "aider-polyglot-qwen32b-ntc1k": ("EVAL_TRAJ", "swe", "mid"),
     "aider-polyglot-qwen32b-ntc100k":("EVAL_TRAJ","swe", "mid"),
     "taubench-traces-jkazdan": ("EVAL_TRAJ", "tool",   "distill"),
+    # iter 69: benchmark eval rollouts (mid-size generators)
+    "coderforge-32b-swebench-verified-eval": ("EVAL_TRAJ", "swe",      "mid"),
+    "terminal-bench2-qwen3-32b":             ("EVAL_TRAJ", "terminal", "mid"),
+    "gaia127-r2egym-32b-eval":               ("EVAL_TRAJ", "search",   "mid"),
     # --- human-demonstration datasets (benchmarks w/ test splits + demos) ---
     "mind2web-actions":        ("EVAL_TASK", "web",    "human_demo"),
     "mind2web-fullobs":        ("EVAL_TASK", "web",    "human_demo"),

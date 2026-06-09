@@ -74,7 +74,7 @@ axB.legend(handles=src_handles, loc="upper left", fontsize=8.5, framealpha=0.9,
            title="generator source", title_fontsize=9)
 axB.set_ylim(-0.1, 2.1)
 
-fig.suptitle("Merged long-horizon agentic data (n=93): training + evaluation/benchmark corpora",
+fig.suptitle(f"Merged long-horizon agentic data (n={len(rows)}): training + evaluation/benchmark corpora",
              fontsize=13.5, weight="bold", y=1.00)
 fig.tight_layout(rect=[0, 0, 1, 0.97])
 out = ROOT / "figures" / "fig_merge_content_source.png"

@@ -1,0 +1,33 @@
+{
+  "hf_dataset": "togethercomputer/CoderForge-Preview-32B-SWE-Bench-Verified-Evaluation-trajectories",
+  "hf_url": "https://huggingface.co/datasets/togethercomputer/CoderForge-Preview-32B-SWE-Bench-Verified-Evaluation-trajectories",
+  "hf_revision_sha": "753f050488d4ec332491dbebedaafca79baac3aa",
+  "config": "default",
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_msgs_jsonstr",
+  "sampling": {
+    "mode": "streaming first-N",
+    "max_docs": 1500,
+    "max_bytes": 8388608
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-09T15:22:14.268782+00:00",
+  "result": {
+    "alpha": 0.2841811552869114,
+    "h_inf": 0.8315627803322722,
+    "bpc_32768": 1.728074073791504,
+    "n_episodes": 58,
+    "mean_turns": 135.6,
+    "n_bytes": 8388608
+  }
+}

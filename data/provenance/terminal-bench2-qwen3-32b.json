@@ -1,0 +1,33 @@
+{
+  "hf_dataset": "DCAgent3/terminal_bench_2_Qwen3_32B_47000_46_20260609_022622",
+  "hf_url": "https://huggingface.co/datasets/DCAgent3/terminal_bench_2_Qwen3_32B_47000_46_20260609_022622",
+  "hf_revision_sha": "37ce323e8e770c61c24c05589878ad1b69dc939a",
+  "config": "default",
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_conversations_rc",
+  "sampling": {
+    "mode": "streaming first-N",
+    "max_docs": 1500,
+    "max_bytes": 8388608
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-09T15:22:21.576760+00:00",
+  "result": {
+    "alpha": 0.28224510792909174,
+    "h_inf": 0.0,
+    "bpc_32768": 0.9733800888061523,
+    "n_episodes": 84,
+    "mean_turns": 171.9,
+    "n_bytes": 8388608
+  }
+}

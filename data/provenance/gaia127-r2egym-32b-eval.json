@@ -1,0 +1,33 @@
+{
+  "hf_dataset": "DCAgent2/gaia_127_R2EGym_32B_Agent_20260505_060909",
+  "hf_url": "https://huggingface.co/datasets/DCAgent2/gaia_127_R2EGym_32B_Agent_20260505_060909",
+  "hf_revision_sha": "56693aad04a2a1cca4dc277443a71677a2145c5c",
+  "config": "default",
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_conversations_rc",
+  "sampling": {
+    "mode": "streaming first-N",
+    "max_docs": 1500,
+    "max_bytes": 8388608
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-09T15:22:29.560471+00:00",
+  "result": {
+    "alpha": 0.1629601022809737,
+    "h_inf": 0.0,
+    "bpc_32768": 1.3030939102172852,
+    "n_episodes": 25,
+    "mean_turns": 199.7,
+    "n_bytes": 8388608
+  }
+}
