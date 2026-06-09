@@ -1,0 +1,20 @@
+{
+  "hf_dataset": "Simia-Agent/Simia-OfficeBench-SFT-30k",
+  "serializer": "conversations_fv+system",
+  "oracle": {
+    "compressor": "zstd 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "result": {
+    "alpha": 0.06543880708858898,
+    "h_inf": 0.0,
+    "bpc_32768": 1.0131101608276367,
+    "n_episodes": 761,
+    "mean_turns": 18.8,
+    "n_bytes": 8388608
+  }
+}
