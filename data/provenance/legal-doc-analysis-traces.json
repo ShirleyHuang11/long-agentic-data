@@ -1,0 +1,22 @@
+{
+  "hf_dataset": "juliensimon/agent-traces-legal-document-analysis",
+  "hf_revision_sha": "5ca323d75babdb252d46819e3d24182cfd6223d1",
+  "serializer": "event-sourcing: group by run_id, order by sequence_number, concat prompt+completion per event",
+  "note": "n=50 runs (small); synthetic deviation-injected legal-doc-analysis agent traces",
+  "oracle": {
+    "compressor": "zstd 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "result": {
+    "alpha": 0.16501780077002692,
+    "h_inf": 0.0,
+    "bpc_32768": 1.2876953125,
+    "n_episodes": 50,
+    "mean_turns": 9.4,
+    "n_bytes": 675794
+  }
+}

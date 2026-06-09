@@ -121,3 +121,4 @@ tau2-airline-gpt51codex-eval,snorkelai/Tau2-Bench-Verified-Airline-With-Code-Age
 tau2-retail-qwen35-9b-eval,KermitCO/qwen3.5-9B-tau2bench-retail-traces,EVAL_TRAJ,tool,mid,0.20931575604285466,0.0,1.6697006225585938,,666,26.8,12596,
 officebench-sft-traj,Simia-Agent/Simia-OfficeBench-SFT-30k,TRAIN,office,distill,0.06543880708858898,0.0,1.0131101608276367,,761,18.8,11035,
 scienceagentbench-tasks,osunlp/ScienceAgentBench,EVAL_TASK,science,human_task,0.22321434137022758,1.003449130400904,2.226527622767857,,102,1,2540,
+legal-doc-analysis-traces,juliensimon/agent-traces-legal-document-analysis,TRAIN,legal,distill,0.16501780077002692,0.0,1.2876953125,,50,9.4,13511,

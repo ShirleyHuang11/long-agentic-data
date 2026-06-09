@@ -149,6 +149,7 @@ CLASS = {
     "nebius-swe-agent-traj":   ("TRAIN", "swe", "distill"),
     "openthoughts-agent-v1-sft": ("TRAIN", "terminal", "distill"),
     "officebench-sft-traj":    ("TRAIN", "office", "distill"),  # iter 114: new office domain
+    "legal-doc-analysis-traces":("TRAIN", "legal", "distill"),  # iter 116: new legal domain (synthetic, n=50)
     "nl2bash-teacher-glm46":   ("TRAIN", "terminal", "frontier"),
     "nl2bash-teacher-qwen3coder480b": ("TRAIN", "terminal", "frontier"),
     "nl2bash-teacher-minimax-m27":    ("TRAIN", "terminal", "frontier"),
