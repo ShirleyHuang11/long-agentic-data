@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "armand0e/qwen3.7-max-pi-traces",
+  "hf_url": "https://huggingface.co/datasets/armand0e/qwen3.7-max-pi-traces",
+  "hf_revision_sha": "bae934b1c4285b6d2ac720b9c2a127dad9c1c39a",
+  "config": "frontier CLI agent sessions",
+  "group_key": null,
+  "splits": [
+    "raw"
+  ],
+  "serializer": "score_cli_sessions.py collect_text (content/text values only)",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "all 10 session files",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-09T21:31:57.049341+00:00",
+  "result": {
+    "alpha": 0.3482627489403533,
+    "h_inf": 1.2872709996327893,
+    "bpc_128": 5.8833188093381645,
+    "bpc_2048": 3.0372563073394496,
+    "bpc_32768": 1.9535931755514706,
+    "n_episodes": 47,
+    "mean_turns": 59.3,
+    "mean_doc_bytes": 117518,
+    "n_bytes": 5581624
+  }
+}

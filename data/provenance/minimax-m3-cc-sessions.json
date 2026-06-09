@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "armand0e/minimax-m3-claude-code-traces",
+  "hf_url": "https://huggingface.co/datasets/armand0e/minimax-m3-claude-code-traces",
+  "hf_revision_sha": "964cab9e833256be31f5a549378721a5a4b755b0",
+  "config": "frontier CLI agent sessions",
+  "group_key": null,
+  "splits": [
+    "raw"
+  ],
+  "serializer": "score_cli_sessions.py collect_text (content/text values only)",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "all 10 session files",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-09T21:32:30.651831+00:00",
+  "result": {
+    "alpha": 0.20706754957813742,
+    "h_inf": 0.0,
+    "bpc_128": 5.96822307558038,
+    "bpc_2048": 3.181354748603352,
+    "bpc_32768": 1.6117790153434686,
+    "n_episodes": 31,
+    "mean_turns": 167,
+    "mean_doc_bytes": 117680,
+    "n_bytes": 3666602
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "armand0e/kimi-k2.6-agent",
+  "hf_url": "https://huggingface.co/datasets/armand0e/kimi-k2.6-agent",
+  "hf_revision_sha": "3804d5489b928019b0706b706f4e13d2df551400",
+  "config": "frontier CLI agent sessions",
+  "group_key": null,
+  "splits": [
+    "raw"
+  ],
+  "serializer": "score_cli_sessions.py collect_text (content/text values only)",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "all 10 session files",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-09T21:32:22.096219+00:00",
+  "result": {
+    "alpha": 0.2670096067075617,
+    "h_inf": 0.9802366854655937,
+    "bpc_128": 6.117743825491257,
+    "bpc_2048": 3.430658417630058,
+    "bpc_32768": 2.1490071614583335,
+    "n_episodes": 14,
+    "mean_turns": 99.6,
+    "mean_doc_bytes": 50533,
+    "n_bytes": 710107
+  }
+}

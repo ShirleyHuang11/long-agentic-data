@@ -111,6 +111,11 @@ CLASS = {
     "cli-agent-sessions-sampler": ("TRAIN", "terminal", "frontier"),
     "opus48-pi-traces":        ("TRAIN", "terminal", "frontier"),
     "minimax-m27-agent-sessions":("TRAIN", "terminal", "frontier"),  # iter 118: new frontier CLI generator
+    # iter 119: armand0e frontier CLI-session generators
+    "qwen37-max-pi-sessions":  ("TRAIN", "terminal", "frontier"),
+    "gpt55-agent-sessions":    ("TRAIN", "terminal", "frontier"),
+    "kimi-k26-agent-sessions": ("TRAIN", "terminal", "frontier"),
+    "minimax-m3-cc-sessions":  ("TRAIN", "terminal", "frontier"),  # claude-code format, harness-pooled H∞=0
     "glaive-fc-v2":            ("TRAIN", "tool", "frontier"),
     "hermes-fc-multiturn":     ("TRAIN", "tool", "frontier"),
     "fireact-multitask":       ("TRAIN", "tool", "frontier"),

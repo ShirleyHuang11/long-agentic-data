@@ -102,9 +102,11 @@ def main():
     with open(f"data/provenance/{SLUG}.json", "w", encoding="utf-8") as f:
         json.dump(prov, f, indent=2, ensure_ascii=False)
 
-    fields = ["dataset", "config", "splits", "slug", "alpha", "h_inf",
+    # 17-column schema matching the registry CSV header (h_inf_raw + v3 cols)
+    fields = ["dataset", "config", "splits", "slug", "alpha", "h_inf", "h_inf_raw",
               "bpc_128", "bpc_2048", "bpc_32768",
-              "n_episodes", "mean_turns", "mean_doc_bytes", "n_bytes"]
+              "n_episodes", "mean_turns", "mean_doc_bytes", "n_bytes",
+              "h_inf_v3", "h_inf_stderr", "resolved"]
     with open("data/agentic_alpha_hinf.csv", "a", newline="", encoding="utf-8") as f:
         csv.DictWriter(f, fieldnames=fields).writerow(
             {k: res.get(k, "") for k in fields})
