@@ -1,0 +1,21 @@
+{
+  "hf_dataset": "osunlp/ScienceAgentBench",
+  "hf_revision_sha": "9c6e96c9e74572e979b0930ee735041cef528cb7",
+  "serializer": "task_inst+domain_knowledge+data_preview",
+  "oracle": {
+    "compressor": "zstd 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "result": {
+    "alpha": 0.22321434137022758,
+    "h_inf": 1.003449130400904,
+    "bpc_32768": 2.226527622767857,
+    "n_episodes": 102,
+    "mean_turns": 1,
+    "n_bytes": 259540
+  }
+}

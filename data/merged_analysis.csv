@@ -120,3 +120,4 @@ swebench-multiling-minimax-m25-eval,AlienKevin/SWE-bench-multilingual-minimax-m2
 tau2-airline-gpt51codex-eval,snorkelai/Tau2-Bench-Verified-Airline-With-Code-Agents,EVAL_TRAJ,tool,frontier,0.35709577406637755,1.001923728226855,1.6997547149658203,,711,39.3,11830,
 tau2-retail-qwen35-9b-eval,KermitCO/qwen3.5-9B-tau2bench-retail-traces,EVAL_TRAJ,tool,mid,0.20931575604285466,0.0,1.6697006225585938,,666,26.8,12596,
 officebench-sft-traj,Simia-Agent/Simia-OfficeBench-SFT-30k,TRAIN,office,distill,0.06543880708858898,0.0,1.0131101608276367,,761,18.8,11035,
+scienceagentbench-tasks,osunlp/ScienceAgentBench,EVAL_TASK,science,human_task,0.22321434137022758,1.003449130400904,2.226527622767857,,102,1,2540,
