@@ -7,14 +7,14 @@
 
 ## Headline result
 
-Merging training and evaluation corpora (106 active / 112 scored rows) dissociates
+Merging training and evaluation corpora (133 active / 139 scored rows) dissociates
 two axes:
 - **Pattern** (α, β, Hurst) is the agentic-*format* genre signature — role-invariant
-  α (median 0.23–0.34), a distinct low-β phase (0.2–0.5 vs prose 1.1–1.4, code/math
+  α (median 0.25–0.34), a distinct low-β phase (0.2–0.5 vs prose 1.1–1.4, code/math
   bridge 0.5–0.8).
 - **Content** (reference-exact H∞) tracks the **generator source, not the train/eval
   role** — η² 0.33 vs 0.09, robust in 100% of 2000 bootstraps — exposing a
-  within-domain **content gap** (human-authored eval-task 1.22 vs model-generated
+  within-domain **content gap** (human-authored eval-task 1.11 vs model-generated
   training 0.26).
 - **Caveat (validated):** on single-harness eval rollouts H∞ measures the agent
   scaffold (pooling), not the generator; use BPC@32K + turn-count there. Demonstrated

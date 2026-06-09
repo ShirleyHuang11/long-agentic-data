@@ -7,7 +7,7 @@
 ## 1. What the project is
 
 A measurement study of **long-horizon agentic data** on HuggingFace —
-**106 active datasets/views** (CSV 112 rows) spanning training trajectories,
+**133 active datasets/views** (CSV 139 rows) spanning training trajectories,
 benchmark task corpora, human demonstrations, and benchmark eval rollouts,
 scored with a cheap, tokenizer-free compression oracle plus supplementary
 statistics (β correlation-decay, Hurst, seed-σ, image-channel). The training and
@@ -119,22 +119,22 @@ arm (verified low BPC@32K *and* `resolved≈0`) vs a high-content arm. The harne
 
 ## 7. The merged train+eval analysis (`paper/long_horizon_agentic_data.md`)
 
-Merging the training and evaluation corpora into one table (106 active) gives the
+Merging the training and evaluation corpora into one table (133 active) gives the
 project's headline result, dissociating two axes the literature usually conflates:
 
-- **Pattern is the agentic *format* signature.** α is role-invariant (median 0.23–0.34
+- **Pattern is the agentic *format* signature.** α is role-invariant (median 0.25–0.34
   across train / eval-task / eval-traj), and agentic data is a distinct
   correlation-decay phase (β ≈ 0.2–0.5) vs prose (1.1–1.4), with code/math the
   bridge (0.5–0.8). β tracks the *model-generated* bulk; human demos decorrelate
   faster (Mind2Web β 0.77).
 - **Content is set by the generator, not the train/eval role.** Median H∞ falls
-  monotonically with source — human task 1.22 / human demo 1.13 / frontier 0.78 /
+  monotonically with source — human task 1.11 / human demo 1.13 / frontier 0.78 /
   synthetic 0.45 / mid 0.00 / distilled 0.00 — and a variance decomposition makes
-  it quantitative: **source η² = 0.33 ≫ role 0.09 ≈ domain 0.09** (source explains
+  it quantitative: **source η² = 0.33 ≫ role 0.09 ≈ domain 0.07** (source explains
   ~3× more). α and H∞ co-vary (ρ +0.79, both depressed by templating); Hurst is
   the one statistic orthogonal to content (ρ −0.02).
 - **The content gap.** Benchmark *tasks* are human-authored and dense (median H∞
-  1.22); training data is mostly boilerplate (0.26). We test on human richness and
+  1.11); training data is mostly boilerplate (0.27). We test on human richness and
   train on machine repetition.
 - **A measurement caveat (the sharpest contribution).** On benchmark eval rollouts,
   H∞ measures the *agent harness* as much as the generator: SWE-bench-Verified reads

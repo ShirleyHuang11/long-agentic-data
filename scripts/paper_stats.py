@@ -105,11 +105,15 @@ if "--check-paper" in sys.argv:
     # regex ALL-occurrences check: every corpus-count / scored-rows mention must
     # match the live value, across any phrasing (catches drift in low-traffic spots
     # the per-iteration header edits miss; presence-checks above can't catch this).
-    import re
+    import re, os
+    # also scan the user-facing digests (README, CONCLUSIONS) — they drift independently
+    alltxt=txt
+    for f in ("paper/README.md","CONCLUSIONS.md"):
+        if os.path.exists(f): alltxt+="\n"+open(f).read()
     for pat,want,lbl in [
-        (r"(\d+) (?:active corpora|long-horizon agentic corpora|active datasets)", len(rows), "corpus-count"),
+        (r"(\d+) (?:active corpora|long-horizon agentic corpora|active datasets/views|active datasets|active\b|active\))", len(rows), "corpus-count"),
         (r"(\d+) scored rows", csv_rows, "scored-rows")]:
-        hits=[int(m.group(1)) for m in re.finditer(pat, txt)]
+        hits=[int(m.group(1)) for m in re.finditer(pat, alltxt)]
         wrong=[h for h in hits if h!=want]
         ok=not wrong
         bad+=not ok
