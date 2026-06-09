@@ -37,6 +37,15 @@ AG_LABEL = {
     "glaive-fc-v2": "glaive-FC",
 }
 
+# iters 69-73: benchmark eval rollouts (distinct marker) — show they also fall
+# in the agentic beta phase. beta from measure_beta_new.py.
+EVAL_LABEL = {
+    "terminal-bench2-gpt5": "GPT-5 / Term-Bench-2",
+    "terminal-bench2-qwen3-32b": "Qwen3-32B / Term-Bench-2",
+    "taubench-deepseek-r1-eval": "DeepSeek-R1 / tau-bench",
+    "coderforge-32b-swebench-verified-eval": "CoderForge / SWE-bench-V",
+}
+
 fig, ax = plt.subplots(figsize=(10.5, 7.5))
 bb = np.linspace(0.05, 1.6, 300)
 gg = np.linspace(0.0, 0.65, 300)
@@ -75,12 +84,22 @@ for key, b in beta.items():
         ax.annotate(short, (b, g), fontsize=7, xytext=(4, 4),
                     textcoords="offset points", alpha=0.85)
 
-# agentic diamonds
+# agentic diamonds (training-derived anchors)
 for s, lab in AG_LABEL.items():
     b, g, h = ag_beta[s], float(reg[s]["alpha"]), float(reg[s]["h_inf"])
     ax.scatter([b], [g], c=[h], cmap="viridis", vmin=0, vmax=3, marker="D",
                s=170, edgecolors="k", linewidths=1.2)
     ax.annotate(lab, (b, g), fontsize=8, xytext=(6, 6), textcoords="offset points")
+
+# benchmark eval rollouts (iters 69-73) — distinct marker; also in agentic phase
+for s, lab in EVAL_LABEL.items():
+    if s not in ag_beta or s not in reg:
+        continue
+    b, g, h = ag_beta[s], float(reg[s]["alpha"]), float(reg[s]["h_inf"])
+    ax.scatter([b], [g], c=[h], cmap="viridis", vmin=0, vmax=3, marker="P",
+               s=180, edgecolors="darkred", linewidths=1.4)
+    ax.annotate(lab, (b, g), fontsize=7.5, xytext=(6, -10),
+                textcoords="offset points", color="darkred")
 
 cb = fig.colorbar(sc, ax=ax, shrink=0.8)
 cb.set_label("H$_\\infty$ (content floor, BPC)")
@@ -103,6 +122,8 @@ for grp, st in groups.items():
                edgecolors="k", label=grp)
 ax.scatter([], [], marker="D", s=170, c="gray", edgecolors="k",
            label="agentic trajectories")
+ax.scatter([], [], marker="P", s=180, c="gray", edgecolors="darkred",
+           label="benchmark eval rollouts (iters 69-73)")
 ax.legend(fontsize=8.5, loc="lower right")
 
 ax.set_xlabel(r"$\beta$  (byte-level correlation decay, $\|C(n)\|_{op}\propto n^{-\beta}$)")

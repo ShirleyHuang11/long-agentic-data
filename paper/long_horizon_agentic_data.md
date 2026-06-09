@@ -80,7 +80,7 @@ $$\mathrm{BPC}(n) = H_\infty + c\,n^{-\alpha}.$$
 
 **α is nearly invariant to role.** Median α is 0.24 (TRAIN), 0.34 (EVAL_TASK), 0.26 (EVAL_TRAJ) — a ±0.05 band (Figure 1b). Whatever long-range structure the LZ probe sees is a property of the multi-turn agentic *serialization* (JSON scaffolds, repeated system prompts, turn templates) and is present whether the corpus is a training mixture or a benchmark. Pattern, in this sense, is the genre signature; it does not tell training from evaluation apart.
 
-**Agentic data occupies a distinct correlation-decay phase.** Measuring β with the same byte-level protocol across 19 reference corpora plus the FineFineWeb domains (`data/gamma_beta_all.csv`; Figure 3) gives three non-overlapping bands:
+**Agentic data occupies a distinct correlation-decay phase.** Measuring β with the same byte-level protocol across 19 reference corpora plus the FineFineWeb domains (`data/gamma_beta_all.csv`; Figure 3, with the detailed γ–β phase plane in Figure 7) gives three non-overlapping bands:
 
 | phase | β | examples |
 | :-- | :-- | :-- |
@@ -88,7 +88,7 @@ $$\mathrm{BPC}(n) = H_\infty + c\,n^{-\alpha}.$$
 | **code / math (bridge)** | 0.52–0.79 | Python code 0.74, Proof-Pile arxiv 0.52, open-web-math 0.79, The Pile 0.78 |
 | **natural-language prose** | 1.1–1.37 | C4 1.32, FineWeb-Edu 1.35, WikiText 1.22, TinyStories 1.35 |
 
-Through α_D = γ/2β [1], the low agentic β predicts an unusually high data-limited learning exponent (α_D ≈ 0.3–1.0): agentic data should be sample-efficient to fit — consistent with the observation that SFT drives trajectory *form* to ceiling almost immediately (§7), and a hypothesis still awaiting a from-scratch training test (§9).
+Through α_D = γ/2β [1], the low agentic β predicts an unusually high data-limited learning exponent (α_D ≈ 0.3–1.0): agentic data should be sample-efficient to fit — consistent with the observation that SFT drives trajectory *form* to ceiling almost immediately (§7), and a hypothesis still awaiting a from-scratch training test (§9). The phase is a property of the agentic *format*, training and evaluation alike: benchmark eval rollouts (iters 69–73) fall in the same band (GPT-5/Terminal-Bench β = 0.45, DeepSeek-R1/tau-bench 0.34, Qwen3-32B/Terminal-Bench 0.33, CoderForge/SWE-bench 0.15; Figure 7), reinforcing the §5 dissociation from the pattern side.
 
 **Hurst alone cannot grade agentic data.** Across 9 representative corpora (`data/hurst.csv`; Figure 4), template/spin corpora sit in the *same* Hurst band as healthy ones (APIGen 0.80, Ko-Agent 0.83 vs JetBrains 0.78, Toucan 0.90, SWE-ZERO 0.93) — because repetition itself is long-range dependence. Hurst conflates form-LRD with content-LRD and is nearly orthogonal to H∞ here (the highest-content corpus, WebLINX-actions H∞ 1.95, has the *lowest* Hurst 0.67). The (H, H∞) pair separates them; H∞ alone does not.
 
@@ -232,6 +232,8 @@ Merging training and evaluation corpora into one compression-oracle table separa
 **Figure 5.** View decomposition (`figures/fig3_view_decomposition.png`): stripping observations recovers content on web/GUI but removes it on SWE.
 
 **Figure 6.** Form-vs-choices training result (`figures/fig7_formchoice_result.png`): FORM confirmed (base 0.78 → 0.96–0.99), DECISION inconclusive (all ~2–3%).
+
+**Figure 7.** γ–β phase plane (`figures/fig9_gamma_beta_all.png`): agentic trajectories (diamonds), benchmark eval rollouts (✚, iters 69–73), and reference code/math/prose corpora under one byte-level protocol, colored by reference-exact H∞; contours are α_D = γ/2β. Agentic train and eval data share the low-β phase; code/math is the bridge to prose.
 
 ---
 

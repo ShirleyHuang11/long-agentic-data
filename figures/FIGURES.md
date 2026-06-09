@@ -13,5 +13,6 @@ figures are archived in `deprecated_hinf/`.
 - **fig4_horizon_vs_content** — bytes/episode vs content: long ≠ rich
 - **fig5_hurst_vs_content** — Hurst vs content: Hurst alone can't rate data
 - **fig6_gamma_beta** — γ–β phase plane, colored by content density
+- **fig9_gamma_beta_all** — *(canonical, reference-exact H∞; paper Figure 7; `scripts/make_phase_all.py`)* detailed γ–β phase plane: agentic trajectories (◆) + benchmark eval rollouts (✚, iters 69–73) + reference code/math/prose corpora under one byte-level protocol; contours α_D=γ/2β. **Regenerate every loop iteration** as new samples gain β (`scripts/measure_beta_new.py` → `data/gamma_beta.csv`). Old BPC@32K-era copies archived in `deprecated_hinf/`.
 - **fig10_openthoughts** — OpenThoughts reproduction (3-panel; note: H∞ panel pre-correction)
 - **fig7_formchoice_result** — form-vs-choices training result (finding 21): FORM confirmed, DECISION inconclusive
