@@ -59,10 +59,11 @@ ax.legend(loc="upper right",framealpha=.95); fig.tight_layout(); fig.savefig(f"{
 # fig2ref: content ranking by reference H_inf
 GEN=[("II-Agent GAIA","ii-agent-gaia-traj"),("WebLINX actions","weblinx-actions"),
      ("FireAct","fireact-multitask"),("SWE-bench-V","swe-bench-verified"),
-     ("GDPval","gdpval-tasks"),("Nemotron-search","nemotron-sft-v2-search"),
+     ("Crypto safe-FC (synth)","crypto-agent-safe-fc"),("GDPval","gdpval-tasks"),
+     ("ToolAce (synth)","toolace-tooluse"),("Nemotron-search","nemotron-sft-v2-search"),
      ("Toucan Kimi-K2","toucan-15m-kimi-k2"),("SWE-ZERO-OH","swe-zero-oh-traj"),
      ("GLM-4.7 terminus","dcagent-glm47-terminus2"),("OpenThoughts SFT","openthoughts-agent-v1-sft"),
-     ("APIGen","apigen-mt-5k"),("AgentInstruct","agentinstruct-all")]
+     ("APIGen (synth)","apigen-mt-5k"),("AgentInstruct (synth)","agentinstruct-all")]
 GEN=[(l,s) for l,s in GEN if s in R]; GEN.sort(key=lambda t:float(R[t[1]]["h_inf"]))
 fig,ax=plt.subplots(figsize=(13,8)); y=range(len(GEN))
 for yi,(l,s) in zip(y,GEN):
@@ -71,7 +72,7 @@ for yi,(l,s) in zip(y,GEN):
     ax.text(max(v,0)+.02,yi,f"{v:.2f}",va="center",fontweight="bold",fontsize=13)
 ax.set_yticks(list(y)); ax.set_yticklabels([l for l,_ in GEN]); ax.set_xlim(0,2.6)
 ax.set_xlabel("H∞ (reference-exact, BPC) — content floor")
-ax.set_title("Fig 2 (reference metric) · Content ranking by H∞\nOpenThoughts/APIGen at 0 = template-degenerate (reference signal)",loc="left")
+ax.set_title("Fig 2 (reference metric) · Content ranking by H∞\nsynthetic data spans the full range — ToolAce/crypto content-rich vs APIGen/AgentInstruct at 0: diversity, not the label, decides",loc="left")
 ax.legend(handles=[plt.Rectangle((0,0),1,1,color=c) for c in ["#2ca02c","#ff7f0e","#9e9e9e"]],
           labels=["content-rich (≥1.0)","mixed (0–1.0)","H∞=0 template-degenerate"],loc="lower right")
 ax.grid(axis="y",visible=False); fig.tight_layout(); fig.savefig(f"{OUT}/fig2_ranking_refhinf.png"); plt.close()
