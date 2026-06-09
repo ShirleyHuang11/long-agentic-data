@@ -1,0 +1,26 @@
+{
+  "hf_dataset": "SWE-Router/swebench-verified-gpt-5.2",
+  "hf_url": "https://huggingface.co/datasets/SWE-Router/swebench-verified-gpt-5.2",
+  "hf_revision_sha": "a49786ae215457a110183d3b3498a9792be2e13e",
+  "splits": [
+    "test"
+  ],
+  "serializer": "messages_rc",
+  "oracle": {
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-09T17:39:48.190384+00:00",
+  "result": {
+    "alpha": 0.26651424765835097,
+    "h_inf": 1.012840402123325,
+    "bpc_32768": 2.1073408126831055,
+    "n_episodes": 171,
+    "mean_turns": 32.2,
+    "n_bytes": 8388608
+  }
+}

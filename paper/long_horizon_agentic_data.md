@@ -1,13 +1,13 @@
 # A Compression-Oracle Survey of Long-Horizon Agentic Data: Merging Training and Evaluation by Pattern and Content
 
 **long-agentic-data project**
-*Built from the `SAMPLES.md` registry (102 active datasets / 108 scored rows, iters 1–73). Per-row table: `data/merged_analysis.csv` (`scripts/build_merged_table.py`). Figures: `figures/`. Supporting reports: `reports/`.*
+*Built from the `SAMPLES.md` registry (104 active datasets / 110 scored rows, iters 1–75). Per-row table: `data/merged_analysis.csv` (`scripts/build_merged_table.py`). Figures: `figures/`. Supporting reports: `reports/`.*
 
 ---
 
 ## Abstract
 
-We survey **102 long-horizon agentic corpora** — spanning model-trained SFT/RL trajectories, human-written benchmark tasks, human demonstrations, and agent rollouts collected on benchmarks — with a single cheap, tokenizer-free compression oracle, and merge training and evaluation data into one measurement table. For every corpus we measure a *pattern* axis (the context-scaling exponent α, the token-correlation decay β, and the Hurst exponent H) and a *content* axis (the reference-exact incompressible floor H∞, validated against true neural oracles at Spearman 0.97, with a directly measured companion BPC@32K). We report two dissociated findings. First, **pattern is a property of the agentic *format***: α is nearly constant across train/eval roles (median 0.24–0.34), and agentic data occupies a distinct correlation-decay phase (β ≈ 0.2–0.5) that does not overlap natural-language prose (β ≈ 1.1–1.4), with code/math as the bridge (β ≈ 0.5–0.8). Second, **content is set by who authored the token stream, not by whether the data is for training or testing**: median H∞ falls monotonically with generator source (human task 1.22, human demo 1.13, frontier rollout 0.76, synthetic task 0.45, mid-size rollout 0.00, distilled SFT 0.00), and this ordering cuts across the train/eval boundary — mid-size eval rollouts collapse to the template floor exactly as distilled training mixtures do. The consequence is a measurable **content gap**: the benchmark tasks we score agents against are human-authored and dense (median H∞ 1.22) while the training data we feed agents is content-sparse (median 0.26). We connect these statistics to a learning-curve theory (α_D = γ/2β) and to a training experiment that confirms SFT teaches trajectory *form*, and we surface one method caveat that survived audit: on single-harness-pooled eval rollouts the 3-point H∞ measures the agent scaffold as much as the generator, so BPC@32K and turn-count are the robust separators there. We keep the reference 3-point clamped H∞ as canonical for cross-domain comparability.
+We survey **104 long-horizon agentic corpora** — spanning model-trained SFT/RL trajectories, human-written benchmark tasks, human demonstrations, and agent rollouts collected on benchmarks — with a single cheap, tokenizer-free compression oracle, and merge training and evaluation data into one measurement table. For every corpus we measure a *pattern* axis (the context-scaling exponent α, the token-correlation decay β, and the Hurst exponent H) and a *content* axis (the reference-exact incompressible floor H∞, validated against true neural oracles at Spearman 0.97, with a directly measured companion BPC@32K). We report two dissociated findings. First, **pattern is a property of the agentic *format***: α is nearly constant across train/eval roles (median 0.24–0.34), and agentic data occupies a distinct correlation-decay phase (β ≈ 0.2–0.5) that does not overlap natural-language prose (β ≈ 1.1–1.4), with code/math as the bridge (β ≈ 0.5–0.8). Second, **content is set by who authored the token stream, not by whether the data is for training or testing**: median H∞ falls monotonically with generator source (human task 1.22, human demo 1.13, frontier rollout 0.78, synthetic task 0.45, mid-size rollout 0.00, distilled SFT 0.00), and this ordering cuts across the train/eval boundary — mid-size eval rollouts collapse to the template floor exactly as distilled training mixtures do. The consequence is a measurable **content gap**: the benchmark tasks we score agents against are human-authored and dense (median H∞ 1.22) while the training data we feed agents is content-sparse (median 0.26). We connect these statistics to a learning-curve theory (α_D = γ/2β) and to a training experiment that confirms SFT teaches trajectory *form*, and we surface one method caveat that survived audit: on single-harness-pooled eval rollouts the 3-point H∞ measures the agent scaffold as much as the generator, so BPC@32K and turn-count are the robust separators there. We keep the reference 3-point clamped H∞ as canonical for cross-domain comparability.
 
 ---
 
@@ -23,7 +23,7 @@ Long-horizon agentic data — multi-turn trajectories where a model interacts wi
 
 **Statement of contribution.** In summary, we:
 
-1. assemble and release a merged table of 102 long-horizon agentic corpora, each classified by role (train / eval-task / eval-traj), domain, and generator source, with reference-exact (α, H∞), directly measured BPC@32K, and where available β and Hurst (`data/merged_analysis.csv`);
+1. assemble and release a merged table of 104 long-horizon agentic corpora, each classified by role (train / eval-task / eval-traj), domain, and generator source, with reference-exact (α, H∞), directly measured BPC@32K, and where available β and Hurst (`data/merged_analysis.csv`);
 2. show that **pattern is the agentic-format genre signature** — α invariant across roles, and a distinct low-β correlation-decay phase separating agentic data from prose with code/math as the bridge (§4);
 3. show that **content (H∞) tracks generator source, not the train/eval role**, exposing a quantified content gap between human-authored benchmark tasks (median H∞ 1.22) and machine-generated training data (median 0.26) (§5);
 4. give a domain-dependent form/content decomposition (web/GUI observations are form, SWE observations are content) and a training experiment confirming SFT teaches form (§6–7); and
@@ -49,7 +49,7 @@ Long-horizon agentic data — multi-turn trajectories where a model interacts wi
 
 ### 3.1 The merged corpus
 
-The registry holds **108 scored rows**; 6 are 3-point fit artifacts (α < 0 or H∞ ≫ 1, plus one single-episode dump) and are dropped, leaving **102 active corpora**. We classify each along three axes (`scripts/build_merged_table.py`):
+The registry holds **110 scored rows**; 6 are 3-point fit artifacts (α < 0 or H∞ ≫ 1, plus one single-episode dump) and are dropped, leaving **104 active corpora**. We classify each along three axes (`scripts/build_merged_table.py`):
 
 | axis | values |
 | :-- | :-- |
@@ -57,7 +57,7 @@ The registry holds **108 scored rows**; 6 are 3-point fit artifacts (α < 0 or H
 | **domain** | swe · web · gui · tool · search · terminal · safety · embodied · mixed |
 | **source** | `human_task` · `human_demo` · `synth_task` · `frontier` (frontier-model rollout) · `mid` (mid-size-model rollout) · `distill` (GPT-4-class distillation/SFT mixture) |
 
-Counts: **TRAIN 69, EVAL_TASK 13, EVAL_TRAJ 20**; by source, frontier 46, distill 24, mid 15, human_demo 10, human_task 5, synth_task 2. The merge is deliberate: human-demonstration datasets (Mind2Web, WebLINX, GUI-Odyssey, AndroidControl, AgentNet, OpenCUA) straddle the train/eval line — they ship test splits *and* serve as demonstration training data — so `source` is the axis that carries the real signal, while `role` tests whether the train/eval label predicts anything (it largely does not; §5).
+Counts: **TRAIN 69, EVAL_TASK 13, EVAL_TRAJ 22**; by source, frontier 47, distill 24, mid 16, human_demo 10, human_task 5, synth_task 2. The merge is deliberate: human-demonstration datasets (Mind2Web, WebLINX, GUI-Odyssey, AndroidControl, AgentNet, OpenCUA) straddle the train/eval line — they ship test splits *and* serve as demonstration training data — so `source` is the axis that carries the real signal, while `role` tests whether the train/eval label predicts anything (it largely does not; §5).
 
 The role label is editorial for a handful of corpora: SWE-Gym and SWE-rebench are training *environments* whose released form is a task corpus (labeled `EVAL_TASK`); AgentNet/OpenCUA are human demos released as *training* data (labeled `TRAIN`, source `human_demo`). These calls do not move the central result, which is organized by `source`.
 
@@ -104,9 +104,9 @@ This is the paper's central result (Figure 1).
 | :-- | --: | --: | --: | --: |
 | human task (written problems) | 5 | **1.22** | 1.06 | 4/5 |
 | human demo (action streams) | 10 | **1.13** | 0.92 | 6/10 |
-| frontier-model rollout | 46 | **0.76** | 0.74 | 31/46 |
+| frontier-model rollout | 47 | **0.78** | 0.75 | 32/47 |
 | synthetic task | 2 | 0.45 | 0.45 | 1/2 |
-| mid-size-model rollout | 15 | **0.00** | 0.11 | 2/15 |
+| mid-size-model rollout | 16 | **0.00** | 0.18 | 3/16 |
 | distilled SFT mixture | 24 | **0.00** | 0.08 | 3/24 |
 
 By role, the same numbers re-sort to expose the gap:
@@ -115,9 +115,9 @@ By role, the same numbers re-sort to expose the gap:
 | :-- | --: | --: | :-- |
 | EVAL_TASK | 13 | **1.22** | human-authored tasks/demos → content-dense |
 | TRAIN | 69 | **0.26** | bimodal: healthy frontier minority + collapsed majority |
-| EVAL_TRAJ | 20 | **0.00** | model rollouts span the full range; H∞ also harness-confounded (§5.3) |
+| EVAL_TRAJ | 22 | **0.00** | model rollouts span the full range; H∞ also harness-confounded (§5.3) |
 
-**Content is authored, not roled.** The high-content end is human (written tasks + demonstrations); the low-content end is mid-size or distilled *model* generation. The decisive variable is the generator, and it dominates both train and eval. An eval rollout produced by a 7B–32B model (`EVAL_TRAJ`, source `mid`, H∞ ≈ 0) is statistically indistinguishable from a distilled training mixture (`TRAIN`, source `distill`, H∞ ≈ 0) — same template floor, same failure-loop length inflation (§6). Quantitatively, a one-way variance decomposition of H∞ confirms the asymmetry: **generator source accounts for η² = 0.35 of the variance, versus 0.11 for the train/eval role and 0.09 for domain** — source explains roughly **3× more** than the train/eval label. Pattern (α) shows the mirror image (§4): it is nearly flat across source but, like everything else here, flat across role.
+**Content is authored, not roled.** The high-content end is human (written tasks + demonstrations); the low-content end is mid-size or distilled *model* generation. The decisive variable is the generator, and it dominates both train and eval. An eval rollout produced by a 7B–32B model (`EVAL_TRAJ`, source `mid`, H∞ ≈ 0) is statistically indistinguishable from a distilled training mixture (`TRAIN`, source `distill`, H∞ ≈ 0) — same template floor, same failure-loop length inflation (§6). Quantitatively, a one-way variance decomposition of H∞ confirms the asymmetry: **generator source accounts for η² = 0.33 of the variance, versus 0.10 for the train/eval role and 0.09 for domain** — source explains roughly **3× more** than the train/eval label. Pattern (α) shows the mirror image (§4): it is nearly flat across source but, like everything else here, flat across role.
 
 ### 5.2 The content gap
 
@@ -129,6 +129,8 @@ A batch of benchmark eval rollouts (iters 69–71) makes the source dominance co
 
 | benchmark | rollout generator | source | agent harness | H∞ | BPC@32K | turns |
 | :-- | :-- | :-- | :-- | --: | --: | --: |
+| SWE-bench-Verified | GPT-5-mini | small | SWE-Router | **1.22** | 2.08 | 31 |
+| SWE-bench-Verified | GPT-5.2 | frontier | SWE-Router | **1.01** | 2.11 | 32 |
 | SWE-bench-Verified | CoderForge-32B | mid | OpenHands | **0.83** | 1.73 | 136 |
 | SWE-bench-Verified | Claude-Sonnet-4.5 | frontier | mini-swe-agent | **0.00** | 1.60 | 106 |
 | GAIA-127 | ii-agent | frontier | ii-agent | **1.25** | 3.05 | 47 |
@@ -141,7 +143,7 @@ A batch of benchmark eval rollouts (iters 69–71) makes the source dominance co
 
 The mid rollouts on GAIA and Terminal-Bench collapse to the template floor with the longest failure loops in their domains (long horizon is *not* high information density; §6). The SWE rollout stays healthy at 0.83 not because a 32B generator is strong but because **repository observations are content** (§6): on SWE the environment injects real code regardless of the agent.
 
-But reading the table carefully exposes a cautionary measurement result. **Within a fixed harness** (the five Terminal-Bench-2 rows, all `terminus-2`), H∞ is pinned at ≈ 0 for *every* model — flagship and small alike — yet BPC@32K spans a wide 0.97 → 1.77 and orders the generators by capability/success: flagship frontier (GPT-5 1.77, Sonnet-4.5 1.75) > small frontier-family (Haiku-4.5 1.53, GPT-5-nano 1.43) > open Qwen3-32B (0.97), whose 172-turn failure loop dilutes content per byte (finding 12, now within a controlled harness). Turn-count corroborates (GPT-5 solves in 10 turns; Qwen3-32B grinds 172). **Across harnesses, by contrast, H∞ entangles the agent scaffold with the generator**: the *same* frontier model, Claude-Sonnet-4.5, reads H∞ 0.16 under `terminus-2` but 0.00 under `mini-swe-agent` on SWE-bench-Verified, and a *mid* model under OpenHands (CoderForge 0.83) outscores it — because `mini-swe-agent`'s large fixed system prompt pools to zero across episodes (the §8 effect at benchmark scale). The clean-looking GAIA-127 contrast inherits the same caveat (ii-agent vs OpenHands). **The two statistics that survive the harness are BPC@32K and turn-count.** The operational rule for eval rollouts is therefore: prefer BPC@32K + turn-count over the 3-point H∞, which on single-harness-pooled rollouts measures the scaffold as much as the generator. (This does not bear on the §5.1 train-data result, where corpora mix many sources and are not pooled under one giant shared system prompt.)
+But reading the table carefully exposes a cautionary measurement result. **Within a fixed harness** (the five Terminal-Bench-2 rows, all `terminus-2`), H∞ is pinned at ≈ 0 for *every* model — flagship and small alike — yet BPC@32K spans a wide 0.97 → 1.77 and orders the generators by capability/success: flagship frontier (GPT-5 1.77, Sonnet-4.5 1.75) > small frontier-family (Haiku-4.5 1.53, GPT-5-nano 1.43) > open Qwen3-32B (0.97), whose 172-turn failure loop dilutes content per byte (finding 12, now within a controlled harness). Turn-count corroborates (GPT-5 solves in 10 turns; Qwen3-32B grinds 172). **Across harnesses, by contrast, H∞ entangles the agent scaffold with the generator.** The four SWE-bench-Verified rows make this a clean gradient on a *single* benchmark: the same task set reads H∞ 0.00 under `mini-swe-agent` (Claude-Sonnet-4.5), 0.83 under OpenHands (CoderForge-32B), and 1.01–1.22 under the light-scaffold SWE-Router harness (GPT-5.2 / GPT-5-mini) — the H∞ ladder tracks **how heavy each harness's shared system prompt is**, not the generator, because heavy fixed prompts pool to zero across episodes (the §8 effect at benchmark scale). Two corollaries: (i) the *same* frontier model, Claude-Sonnet-4.5, reads 0.16 under `terminus-2` but 0.00 under `mini-swe-agent`; and (ii) under the light SWE-Router harness, where the repository content survives, frontier and small are statistically tied (GPT-5.2 1.01 ≈ GPT-5-mini 1.22, within seed-σ) — on SWE the environment injects the content regardless of the agent (finding 16, §6), so capability barely moves H∞. The clean-looking GAIA-127 contrast inherits the same harness caveat (ii-agent vs OpenHands). **The two statistics that survive the harness are BPC@32K and turn-count.** The operational rule for eval rollouts is therefore: prefer BPC@32K + turn-count over the 3-point H∞, which on single-harness-pooled rollouts measures the scaffold as much as the generator. (This does not bear on the §5.1 train-data result, where corpora mix many sources and are not pooled under one giant shared system prompt.)
 
 ### 5.4 The probe is a regime selector, not a recipe selector
 

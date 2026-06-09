@@ -60,6 +60,9 @@ CLASS = {
     "terminal-bench2-claude-haiku45":        ("EVAL_TRAJ", "terminal", "mid"),
     # iter 73: frontier tool-use eval rollout (tau-bench, shared policy prompt)
     "taubench-deepseek-r1-eval":             ("EVAL_TRAJ", "tool",     "frontier"),
+    # iter 75: within-harness frontier-vs-small SWE-bench-Verified (light scaffold)
+    "swebench-verified-gpt52-eval":          ("EVAL_TRAJ", "swe",      "frontier"),
+    "swebench-verified-gpt5mini-eval":       ("EVAL_TRAJ", "swe",      "mid"),
     # --- human-demonstration datasets (benchmarks w/ test splits + demos) ---
     "mind2web-actions":        ("EVAL_TASK", "web",    "human_demo"),
     "mind2web-fullobs":        ("EVAL_TASK", "web",    "human_demo"),
