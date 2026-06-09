@@ -82,13 +82,15 @@ $$\mathrm{BPC}(n) = H_\infty + c\,n^{-\alpha}.$$
 
 **α is nearly invariant to role.** Median α is 0.24 (TRAIN), 0.34 (EVAL_TASK), 0.23 (EVAL_TRAJ) — a ~0.1-wide band (Figure 1b). Whatever long-range structure the LZ probe sees is a property of the multi-turn agentic *serialization* (JSON scaffolds, repeated system prompts, turn templates) and is present whether the corpus is a training mixture or a benchmark. Pattern, in this sense, is the genre signature; it does not tell training from evaluation apart.
 
-**Agentic data occupies a distinct correlation-decay phase.** Measuring β with the same byte-level protocol across 19 reference corpora plus the FineFineWeb domains (`data/gamma_beta_all.csv`; Figure 3, with the detailed γ–β phase plane in Figure 7) gives three non-overlapping bands:
+**Agentic data occupies a distinct correlation-decay phase.** Measuring β with the same byte-level protocol across 19 reference corpora plus the FineFineWeb domains (`data/gamma_beta_all.csv`; Figure 3, with the detailed γ–β phase plane in Figure 7) gives an ordered three-band structure:
 
-| phase | β | examples |
+| phase | β (measured range) | examples |
 | :-- | :-- | :-- |
-| **agentic** | **0.2–0.5** | the trajectories in this survey |
+| **agentic** (model trajectories) | **0.15–0.52** | the trajectories in this survey |
 | **code / math (bridge)** | 0.52–0.79 | Python code 0.74, Proof-Pile arxiv 0.52, open-web-math 0.79, The Pile 0.78 |
-| **natural-language prose** | 1.1–1.37 | C4 1.32, FineWeb-Edu 1.35, WikiText 1.22, TinyStories 1.35 |
+| **natural-language prose** | 1.11–1.37 | C4 1.32, FineWeb-Edu 1.35, WikiText 1.22, TinyStories 1.35 |
+
+The agentic and code/math bands are **contiguous, meeting exactly at β = 0.52** — and the corpus sitting on that seam is a *SWE* trajectory set (JetBrains GPT-5.2, β 0.52), the same value as Proof-Pile-arxiv — which is "code is the bridge" stated literally: code-heavy agentic data shades continuously into the code phase. The genuinely empty gap is **0.79 → 1.11**, separating everything procedural (agentic + code/math) from natural-language prose.
 
 Through α_D = γ/2β [1], the low agentic β predicts an unusually high data-limited learning exponent (α_D ≈ 0.3–1.0): agentic data should be sample-efficient to fit — consistent with the observation that SFT drives trajectory *form* to ceiling almost immediately (§7), and a hypothesis still awaiting a from-scratch training test (§9). The phase is a property of the agentic *format*, training and evaluation alike: benchmark eval rollouts (iters 69–73) fall in the same band (GPT-5/Terminal-Bench β = 0.45, DeepSeek-R1/tau-bench 0.34, Qwen3-32B/Terminal-Bench 0.33, CoderForge/SWE-bench 0.15; Figure 7), reinforcing the §5 dissociation from the pattern side. The 0.2–0.5 band describes *model-generated* trajectories specifically; the human-demonstration and machine-annotation layers spread higher (Mind2Web action stream β = 0.77, AgentNet VLM annotation 1.30) because **repetition structure, not domain, sets β** — non-repetitive human action and prose-like annotation decorrelate faster (Figure 7). Heavily templated event-stream serializations sit at the opposite extreme, with correlation curves so flat that β is unfit (openhands-feedback decay ratio ≈ 1×, excluded as an artifact alongside the FineMath/Pile reference cases).
 
