@@ -127,3 +127,4 @@ qwen37-max-pi-sessions,armand0e/qwen3.7-max-pi-traces,TRAIN,terminal,frontier,0.
 gpt55-agent-sessions,armand0e/gpt-5.5-agent,TRAIN,terminal,frontier,0.3393315345138559,1.9305289333851439,2.537548547503592,,93,172.9,61390,
 kimi-k26-agent-sessions,armand0e/kimi-k2.6-agent,TRAIN,terminal,frontier,0.2670096067075617,0.9802366854655937,2.1490071614583335,,14,99.6,50533,
 minimax-m3-cc-sessions,armand0e/minimax-m3-claude-code-traces,TRAIN,terminal,frontier,0.20706754957813742,0.0,1.6117790153434686,,31,167,117680,
+kimi-k26-cc-sessions,armand0e/kimi-k2.6-claude-code-traces,TRAIN,terminal,frontier,0.26132887859604337,0.34533993818569475,1.6446704864501953,,36,206.6,268783,

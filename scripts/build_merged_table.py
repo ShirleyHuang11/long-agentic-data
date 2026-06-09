@@ -116,6 +116,7 @@ CLASS = {
     "gpt55-agent-sessions":    ("TRAIN", "terminal", "frontier"),
     "kimi-k26-agent-sessions": ("TRAIN", "terminal", "frontier"),
     "minimax-m3-cc-sessions":  ("TRAIN", "terminal", "frontier"),  # claude-code format, harness-pooled H∞=0
+    "kimi-k26-cc-sessions":    ("TRAIN", "terminal", "frontier"),  # iter 121: kimi claude-code (0.35 partial drop)
     "glaive-fc-v2":            ("TRAIN", "tool", "frontier"),
     "hermes-fc-multiturn":     ("TRAIN", "tool", "frontier"),
     "fireact-multitask":       ("TRAIN", "tool", "frontier"),

@@ -1,0 +1,39 @@
+{
+  "hf_dataset": "armand0e/kimi-k2.6-claude-code-traces",
+  "hf_url": "https://huggingface.co/datasets/armand0e/kimi-k2.6-claude-code-traces",
+  "hf_revision_sha": "f5f886fffa24fdceb10065c72846b226d2d26da8",
+  "config": "kimi-k2.6 claude-code harness sessions",
+  "group_key": null,
+  "splits": [
+    "raw"
+  ],
+  "serializer": "score_cli_sessions.py collect_text (content/text values only)",
+  "serializer_doc": "",
+  "sampling": {
+    "mode": "all 10 session files",
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "seed_offset": 0
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-09T21:42:36.977206+00:00",
+  "result": {
+    "alpha": 0.26132887859604337,
+    "h_inf": 0.34533993818569475,
+    "bpc_128": 5.879634857177734,
+    "bpc_2048": 3.026921272277832,
+    "bpc_32768": 1.6446704864501953,
+    "n_episodes": 36,
+    "mean_turns": 206.6,
+    "mean_doc_bytes": 268783,
+    "n_bytes": 8388608
+  }
+}
