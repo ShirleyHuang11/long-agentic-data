@@ -272,4 +272,4 @@ Merging training and evaluation corpora into one compression-oracle table separa
 
 [7] *Reference protocol:* `reference/data_format.md` — the 358-dataset formal-math LZ-oracle survey (3-point clamped H∞; LZ↔neural H∞ Spearman 0.97) reproduced bit-for-bit.
 
-*Supporting material: `SAMPLES.md` (full registry + cumulative findings), `reports/` (openthoughts, formchoice, lz_select, inferredbugs, hinf_clamp), `figures/FIGURES.md` (figure index), `data/merged_analysis.csv` (per-row table).*
+*Supporting material: `SAMPLES.md` (full registry + cumulative findings), `reports/` (openthoughts, formchoice, lz_select, inferredbugs, hinf_clamp), `figures/FIGURES.md` (figure index), `data/merged_analysis.csv` (per-row table), and **Appendix A** (`paper/appendix_corpus_table.md`) — the complete per-corpus listing of all 104 active corpora with role, source, domain, α, H∞, BPC@32K, and turns.*
