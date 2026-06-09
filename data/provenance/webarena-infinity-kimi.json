@@ -1,0 +1,31 @@
+{
+  "hf_dataset": "webarena-x/webarena-infinity-trajectories",
+  "hf_url": "https://huggingface.co/datasets/webarena-x/webarena-infinity-trajectories",
+  "config": "data/kimi/** history.json (13 sites, text only)",
+  "generator": "kimi",
+  "splits": [
+    "raw"
+  ],
+  "serializer": "score_webarena_infinity.py (model_output+result+state, screenshots excluded)",
+  "sampling": {
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "cap_per_model": 130
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "result": {
+    "alpha": 0.31372597298318455,
+    "h_inf": 0.5201770595722333,
+    "bpc_128": 6.4670182291666665,
+    "bpc_2048": 3.01203125,
+    "bpc_32768": 1.5643174913194444
+  }
+}

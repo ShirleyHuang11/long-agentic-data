@@ -132,6 +132,9 @@ CLASS = {
     "cua-agentnet-gimp-text":  ("TRAIN", "gui", "human_demo"),
     "nnetnav-live":            ("TRAIN", "web", "frontier"),  # real-web rollouts
     "nnetnav-wa":              ("TRAIN", "web", "mid"),        # simulated webarena
+    "webarena-infinity-gemini": ("EVAL_TRAJ", "web", "frontier"),  # browser-use framework
+    "webarena-infinity-kimi":   ("EVAL_TRAJ", "web", "frontier"),  # computer-use framework
+    "webarena-infinity-qwen":   ("EVAL_TRAJ", "web", "mid"),       # computer-use framework
     "agenttrek":               ("TRAIN", "web", "distill"),
     # --- training trajectories: distillation / SFT mixtures (template band) ---
     "agentgym-agenttraj-l":    ("TRAIN", "mixed", "distill"),

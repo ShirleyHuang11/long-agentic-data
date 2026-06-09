@@ -129,3 +129,6 @@ kimi-k26-agent-sessions,armand0e/kimi-k2.6-agent,TRAIN,terminal,frontier,0.26700
 minimax-m3-cc-sessions,armand0e/minimax-m3-claude-code-traces,TRAIN,terminal,frontier,0.20706754957813742,0.0,1.6117790153434686,,31,167,117680,
 kimi-k26-cc-sessions,armand0e/kimi-k2.6-claude-code-traces,TRAIN,terminal,frontier,0.26132887859604337,0.34533993818569475,1.6446704864501953,,36,206.6,268783,
 dcagent-glm47-nebius-swe,DCAgent/neulab-nebius-swe-agent-trajectories-sandboxes_glm_4.7_traces_jupiter,TRAIN,terminal,frontier,0.27534197013002165,0.6558254484948605,1.805851936340332,,133,36.8,63378,True
+webarena-infinity-gemini,webarena-x/webarena-infinity-trajectories,EVAL_TRAJ,web,frontier,0.30470359851613793,0.030199594929922524,1.19903564453125,,130,11.5,8114,True
+webarena-infinity-kimi,webarena-x/webarena-infinity-trajectories,EVAL_TRAJ,web,frontier,0.31372597298318455,0.5201770595722333,1.5643174913194444,,130,11.0,4725,True
+webarena-infinity-qwen,webarena-x/webarena-infinity-trajectories,EVAL_TRAJ,web,mid,0.4447340648810863,0.32909165580216587,0.8282564603365384,,130,11.0,3445,True

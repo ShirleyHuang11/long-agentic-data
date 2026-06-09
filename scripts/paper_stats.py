@@ -84,7 +84,13 @@ if "--check-paper" in sys.argv:
         (f"| mid-size-model rollout | {ns('mid')} |","src mid n"),
         (f"| distilled SFT mixture | {ns('distill')} |","src distill n"),
         (f"human task n = {ns('human_task')}","limitations human_task n"),
+        (f"Counts: **TRAIN {n('TRAIN')}, EVAL_TASK {n('EVAL_TASK')}, EVAL_TRAJ {n('EVAL_TRAJ')}**","§3.1 role counts"),
     ]
+    # §5.5 domain-table counts (n>2 domains are stable enough to assert literally)
+    dc={}
+    for r in rows: dc[r["domain"]]=dc.get(r["domain"],0)+1
+    for dom in ["swe","terminal","tool","web","search","gui","safety","mixed","embodied"]:
+        checks.append((f"| {dom} | {dc.get(dom,0)} |",f"domain {dom} n"))
     print("\n[check-paper]")
     bad=0
     for needle,label in checks:
