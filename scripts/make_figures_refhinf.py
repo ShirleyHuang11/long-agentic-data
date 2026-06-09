@@ -51,6 +51,7 @@ ANN={"ii-agent-gaia-traj":"II-Agent GAIA","gdpval-tasks":"GDPval","weblinx-actio
 for h,a,cat,s in pts:
     if s in ANN: ax.annotate(ANN[s],(h,a),fontsize=11,fontweight="bold",xytext=(7,5),textcoords="offset points")
 ax.axvspan(-0.05,0.05,color="red",alpha=.05)
+ax.set_xlim(-0.06,2.25)  # room for the WebLINX annotation at H∞≈1.95
 ax.text(0.0,0.52,"H∞≈0\ntemplate-\ndegenerate\ncluster",fontsize=10,color="#b22",ha="center")
 ax.set_xlabel("H∞  (reference-exact clamped, BPC) — content floor"); ax.set_ylabel(r"$\alpha$ (structure)")
 ax.set_title("Fig 1 (reference metric) · Signature map: H∞ × α\n~40% of agentic data at H∞=0 = reference 'template-degenerate' signal",loc="left")
@@ -72,7 +73,7 @@ for yi,(l,s) in zip(y,GEN):
     ax.text(max(v,0)+.02,yi,f"{v:.2f}",va="center",fontweight="bold",fontsize=13)
 ax.set_yticks(list(y)); ax.set_yticklabels([l for l,_ in GEN]); ax.set_xlim(0,2.6)
 ax.set_xlabel("H∞ (reference-exact, BPC) — content floor")
-ax.set_title("Fig 2 (reference metric) · Content ranking by H∞\nsynthetic data spans the full range — ToolAce/crypto content-rich vs APIGen/AgentInstruct at 0: diversity, not the label, decides",loc="left")
+ax.set_title("Fig 2 (reference metric) · Content ranking by H∞\nsynthetic data (synth) spans the full range — diversity decides, not the label",loc="left")
 ax.legend(handles=[plt.Rectangle((0,0),1,1,color=c) for c in ["#2ca02c","#ff7f0e","#9e9e9e"]],
           labels=["content-rich (≥1.0)","mixed (0–1.0)","H∞=0 template-degenerate"],loc="lower right")
 ax.grid(axis="y",visible=False); fig.tight_layout(); fig.savefig(f"{OUT}/fig2_ranking_refhinf.png"); plt.close()
