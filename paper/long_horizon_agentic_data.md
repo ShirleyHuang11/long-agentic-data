@@ -96,7 +96,7 @@ Through α_D = γ/2β [1], the low agentic β predicts an unusually high data-li
 
 **Hurst alone cannot grade agentic data.** Across 9 representative corpora (`data/hurst.csv`; Figure 4), template/spin corpora sit in the *same* Hurst band as healthy ones (APIGen 0.80, Ko-Agent 0.83 vs JetBrains 0.78, Toucan 0.90, SWE-ZERO 0.93) — because repetition itself is long-range dependence. Hurst conflates form-LRD with content-LRD and is nearly orthogonal to H∞ here (the highest-content corpus, WebLINX-actions H∞ 1.95, has the *lowest* Hurst 0.67). The (H, H∞) pair separates them; H∞ alone does not.
 
-**How the statistics relate (rank correlations over the 112 active corpora).** The pattern and content axes are not all independent, and quantifying their relationship clarifies what each adds. Spearman(α, H∞) = **+0.79** — α and H∞ co-vary strongly, since templating depresses both the exploitable structure and the content floor; they are two readouts of the same healthy↔template axis, not orthogonal dimensions. Spearman(BPC@32K, H∞) = **+0.56** — the directly measured companion agrees with H∞ on clean corpora but only moderately overall, precisely because the two *diverge* on harness-pooled eval rollouts (§5.3), where H∞ collapses to 0 while BPC@32K stays mid-band. Spearman(Hurst, H∞) = **−0.02** (n = 9) — Hurst is the one statistic genuinely orthogonal to content, which is exactly why it cannot grade agentic data alone. The honest summary: α (and β) track the same healthy↔template structure as content, Hurst is orthogonal to it, and BPC@32K is content's robust stand-in where the 3-point H∞ is harness-confounded.
+**How the statistics relate (rank correlations over the 112 active corpora).** The pattern and content axes are not all independent, and quantifying their relationship clarifies what each adds. Spearman(α, H∞) = **+0.80** — α and H∞ co-vary strongly, since templating depresses both the exploitable structure and the content floor; they are two readouts of the same healthy↔template axis, not orthogonal dimensions. Spearman(BPC@32K, H∞) = **+0.56** — the directly measured companion agrees with H∞ on clean corpora but only moderately overall, precisely because the two *diverge* on harness-pooled eval rollouts (§5.3), where H∞ collapses to 0 while BPC@32K stays mid-band. Spearman(Hurst, H∞) = **−0.02** (n = 9) — Hurst is the one statistic genuinely orthogonal to content, which is exactly why it cannot grade agentic data alone. The honest summary: α (and β) track the same healthy↔template structure as content, Hurst is orthogonal to it, and BPC@32K is content's robust stand-in where the 3-point H∞ is harness-confounded.
 
 ---
 
@@ -179,7 +179,7 @@ Cutting the active registry by domain (median over each domain's corpora) shows 
 | gui | 6 | **1.13** | 1.67 | 0.38 |
 | safety | 5 | 0.71 | 1.71 | 0.28 |
 | web | 8 | 0.66 | 1.58 | 0.38 |
-| swe | 46 | 0.66 | 1.64 | 0.26 |
+| swe | 46 | 0.66 | 1.65 | 0.26 |
 | search | 8 | 0.60 | **2.42** | 0.19 |
 | tool | 16 | 0.13 | 1.88 | 0.25 |
 | mixed | 7 | 0.00 | 1.23 | 0.13 |
