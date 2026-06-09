@@ -1,0 +1,31 @@
+{
+  "hf_dataset": "DCAgent/claude-sonnet-4-5-terminal-bench-2",
+  "hf_url": "https://huggingface.co/datasets/DCAgent/claude-sonnet-4-5-terminal-bench-2",
+  "hf_revision_sha": "739abfe6999e998ffcc9bab9a8755951b717841b",
+  "splits": [
+    "train"
+  ],
+  "serializer": "ser_conversations_rc",
+  "sampling": {
+    "mode": "streaming first-N",
+    "max_docs": 1500,
+    "max_bytes": 8388608
+  },
+  "oracle": {
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-09T15:26:37.016188+00:00",
+  "result": {
+    "alpha": 0.23072825135356045,
+    "h_inf": 0.15657993487132082,
+    "bpc_32768": 1.7465518043154762,
+    "n_episodes": 86,
+    "mean_turns": 27.6,
+    "n_bytes": 3452894
+  }
+}

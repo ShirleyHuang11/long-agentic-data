@@ -1,7 +1,7 @@
 # A Compression-Oracle Survey of Long-Horizon Agentic Data: Merging Training and Evaluation Corpora by Pattern and Content
 
 *Analysis paper, long-agentic-data project. Built from the `SAMPLES.md` registry
-(96 active datasets / 102 scored rows, iters 1–69) and the metrics validated in
+(98 active datasets / 104 scored rows, iters 1–70) and the metrics validated in
 `reports/`. Figures in `figures/`; per-row merged table in
 `data/merged_analysis.csv` (`scripts/build_merged_table.py`).*
 
@@ -9,7 +9,7 @@
 
 ## Abstract
 
-We survey **96 long-horizon agentic corpora** — spanning model-trained SFT/RL
+We survey **98 long-horizon agentic corpora** — spanning model-trained SFT/RL
 trajectories, human-written benchmark tasks, human demonstrations, and agent
 rollouts collected on benchmarks — with a single cheap, tokenizer-free
 compression oracle. For every corpus we measure a **pattern** axis (the
@@ -71,8 +71,8 @@ recent literature (β, Hurst, seed-σ).
 
 ## 2. The merged corpus
 
-The registry holds **102 scored rows**; 6 are 3-point fit artifacts (α<0 or
-H∞≫1, plus one single-episode dump) and are dropped, leaving **96 active
+The registry holds **104 scored rows**; 6 are 3-point fit artifacts (α<0 or
+H∞≫1, plus one single-episode dump) and are dropped, leaving **98 active
 corpora**. We classify each along three axes (`scripts/build_merged_table.py`,
 output `data/merged_analysis.csv`):
 
@@ -82,7 +82,7 @@ output `data/merged_analysis.csv`):
 | **domain** | swe · web · gui · tool · search · terminal · safety · embodied · mixed |
 | **source** | `human_task` · `human_demo` · `synth_task` · `frontier` (frontier-model rollout) · `mid` (mid-size-model rollout) · `distill` (GPT-4-class distillation/SFT mixture) |
 
-Counts: **TRAIN 69, EVAL_TASK 13, EVAL_TRAJ 14**; by source, frontier 42,
+Counts: **TRAIN 69, EVAL_TASK 13, EVAL_TRAJ 16**; by source, frontier 44,
 distill 24, mid 13, human_demo 10, human_task 5, synth_task 2. The merge is
 deliberate: human-demonstration datasets (Mind2Web, WebLINX, GUI-Odyssey,
 AndroidControl, AgentNet, OpenCUA) straddle the train/eval line — they ship test
@@ -177,7 +177,7 @@ This is the paper's central result (`figures/fig_merge_content_source.png`).
 | :-- | --: | --: | --: | --: |
 | human task (written problems) | 5 | **1.22** | 1.06 | 4/5 |
 | human demo (action streams) | 10 | **1.13** | 0.92 | 6/10 |
-| frontier-model rollout | 42 | **0.80** | 0.81 | 31/42 |
+| frontier-model rollout | 44 | **0.79** | 0.78 | 31/44 |
 | synthetic task | 2 | 0.45 | 0.45 | 1/2 |
 | mid-size-model rollout | 13 | **0.00** | 0.13 | 2/13 |
 | distilled SFT mixture | 24 | **0.00** | 0.08 | 3/24 |
@@ -188,7 +188,7 @@ This is the paper's central result (`figures/fig_merge_content_source.png`).
 | :-- | --: | --: | :-- |
 | EVAL_TASK | 13 | **1.22** | human-authored tasks/demos → content-dense |
 | TRAIN | 69 | **0.26** | bimodal: healthy frontier minority + collapsed majority |
-| EVAL_TRAJ | 14 | **0.04** | model rollouts span the full range; mid-model runs collapse |
+| EVAL_TRAJ | 16 | **0.04** | model rollouts span the full range; mid-model runs collapse |
 
 Three things follow.
 
@@ -214,6 +214,22 @@ identical eval tasks. The SWE rollout stays healthy at 0.83 — not because the
 agent. So eval rollouts inherit the *generator's* content signature, *modulated
 by whether the domain's observations are content (SWE) or boilerplate
 (terminal/search)* — never by the train/eval label.
+
+A follow-up (iter 70) adds frontier rollouts on Terminal-Bench-2 — GPT-5 and
+Claude-Sonnet-4.5 — and exposes a *measurement* nuance worth stating plainly.
+On this benchmark the canonical H∞ reads ≈ 0 for **everyone**, frontier
+included (GPT-5 0.00, Sonnet-4.5 0.16, Qwen3-32B 0.00): the terminal domain's
+heavy JSON scaffold and short shell commands put the corpus squarely in the
+pooling-degenerate regime of §8, where the clamped 3-point H∞ cannot separate
+generators. The frontier-vs-mid gap is still there — it just lives in the
+*companion* signals: directly measured BPC@32K is 1.77 / 1.75 for the frontier
+rollouts vs **0.97** for the mid one, and the frontier agents solve in **10–28
+turns** vs the mid agent's **172-turn failure loop**. This is exactly why we
+carry BPC@32K and turn-count alongside H∞ rather than instead of it: on
+content-bearing domains (SWE, search) H∞ separates generators cleanly, but on
+scaffold-heavy domains it saturates at the floor and the companions do the
+separating. The thesis is unchanged — generator dominates, role does not — but
+*which statistic reveals it* is domain-dependent.
 
 **(ii) The content gap.** The benchmark *tasks* we measure agents against are
 human-written and dense (median H∞ 1.22); the training data we feed agents is

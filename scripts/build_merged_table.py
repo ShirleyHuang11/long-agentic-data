@@ -50,6 +50,9 @@ CLASS = {
     "coderforge-32b-swebench-verified-eval": ("EVAL_TRAJ", "swe",      "mid"),
     "terminal-bench2-qwen3-32b":             ("EVAL_TRAJ", "terminal", "mid"),
     "gaia127-r2egym-32b-eval":               ("EVAL_TRAJ", "search",   "mid"),
+    # iter 70: frontier Terminal-Bench-2 rollouts (vs iter-69 mid on same bench)
+    "terminal-bench2-gpt5":                  ("EVAL_TRAJ", "terminal", "frontier"),
+    "terminal-bench2-claude-sonnet45":       ("EVAL_TRAJ", "terminal", "frontier"),
     # --- human-demonstration datasets (benchmarks w/ test splits + demos) ---
     "mind2web-actions":        ("EVAL_TASK", "web",    "human_demo"),
     "mind2web-fullobs":        ("EVAL_TASK", "web",    "human_demo"),
