@@ -1,0 +1,23 @@
+{
+  "hf_dataset": "UdeM-Mila-Subagents/swesmith-multi-agent-trajectories",
+  "config": "original_messages",
+  "hf_revision_sha": "c7a5bb923b8fc0bf5be532f584b1c8c59587665b",
+  "serializer": "messages_rc",
+  "oracle": {
+    "compressor": "zstd 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-09T18:08:05.611171+00:00",
+  "result": {
+    "alpha": 0.3322562107791217,
+    "h_inf": 1.0245549471793232,
+    "bpc_32768": 1.7453088760375977,
+    "n_episodes": 148,
+    "mean_turns": 47.8,
+    "n_bytes": 8388608
+  }
+}

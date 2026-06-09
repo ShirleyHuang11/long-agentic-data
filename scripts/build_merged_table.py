@@ -63,6 +63,9 @@ CLASS = {
     # iter 75: within-harness frontier-vs-small SWE-bench-Verified (light scaffold)
     "swebench-verified-gpt52-eval":          ("EVAL_TRAJ", "swe",      "frontier"),
     "swebench-verified-gpt5mini-eval":       ("EVAL_TRAJ", "swe",      "mid"),
+    # iter 81: single- vs multi-agent serialization of the same SWE-smith tasks
+    "swesmith-singleagent-traj":             ("TRAIN", "swe", "frontier"),
+    "swesmith-multiagent-traj":              ("TRAIN", "swe", "frontier"),
     # --- human-demonstration datasets (benchmarks w/ test splits + demos) ---
     "mind2web-actions":        ("EVAL_TASK", "web",    "human_demo"),
     "mind2web-fullobs":        ("EVAL_TASK", "web",    "human_demo"),
