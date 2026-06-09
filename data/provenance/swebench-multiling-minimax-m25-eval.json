@@ -1,0 +1,22 @@
+{
+  "hf_dataset": "AlienKevin/SWE-bench-multilingual-minimax-m2.5-trajectories",
+  "hf_revision_sha": "479f2e1f49c71c6d8fa778e5de945b380c073b8c",
+  "serializer": "messages_rc",
+  "oracle": {
+    "compressor": "zstd 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-09T19:51:02.639132+00:00",
+  "result": {
+    "alpha": 0.31260127731211657,
+    "h_inf": 0.8738871605405227,
+    "bpc_32768": 1.7408208847045898,
+    "n_episodes": 103,
+    "mean_turns": 156.1,
+    "n_bytes": 8388608
+  }
+}

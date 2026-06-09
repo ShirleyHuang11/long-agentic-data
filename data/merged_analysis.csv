@@ -115,3 +115,5 @@ deepswe-kimi-k2-traj,SWE-Factory/DeepSWE-Agent-Kimi-K2-Trajectories-2.8K,TRAIN,s
 swe-agent-llama70b-traj,ElenaFu/SWE-agent-trajectories,TRAIN,swe,mid,0.16844446302668326,0.0,1.4281415939331055,,133,57.2,63460,
 deepswe-kimi-k2-rejsample-traj,SWE-Factory/DeepSWE-Agent-Kimi-K2-Trajectories-Rejection-Sampling,TRAIN,swe,frontier,0.28659804327561056,0.6664100406983011,1.7197093963623047,,98,76.4,86497,
 swe-factory-gym-tasks,SWE-Factory/SWE-Factory-Gym,EVAL_TASK,swe,human_task,0.4121878794467896,1.1124451781348972,1.5667858123779297,,428,1,24460,
+swebench-multiling-glm5-eval,AlienKevin/SWE-bench-multilingual-glm-5-trajectories,EVAL_TRAJ,swe,frontier,0.3284909124884828,0.9662772609470438,1.734908103942871,,99,141.0,85204,
+swebench-multiling-minimax-m25-eval,AlienKevin/SWE-bench-multilingual-minimax-m2.5-trajectories,EVAL_TRAJ,swe,frontier,0.31260127731211657,0.8738871605405227,1.7408208847045898,,103,156.1,81704,

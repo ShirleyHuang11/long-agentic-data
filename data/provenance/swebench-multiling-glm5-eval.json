@@ -1,0 +1,22 @@
+{
+  "hf_dataset": "AlienKevin/SWE-bench-multilingual-glm-5-trajectories",
+  "hf_revision_sha": "337a922eac45fc0d63271c2a50c3a7c84dae34de",
+  "serializer": "messages_rc",
+  "oracle": {
+    "compressor": "zstd 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-09T19:50:55.150853+00:00",
+  "result": {
+    "alpha": 0.3284909124884828,
+    "h_inf": 0.9662772609470438,
+    "bpc_32768": 1.734908103942871,
+    "n_episodes": 99,
+    "mean_turns": 141.0,
+    "n_bytes": 8388608
+  }
+}
