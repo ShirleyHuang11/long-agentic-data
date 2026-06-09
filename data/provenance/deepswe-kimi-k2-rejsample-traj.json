@@ -1,0 +1,22 @@
+{
+  "hf_dataset": "SWE-Factory/DeepSWE-Agent-Kimi-K2-Trajectories-Rejection-Sampling",
+  "hf_revision_sha": "03fc52c28757dbf9f8d47beece97f94f9e69a023",
+  "serializer": "messages_rc",
+  "oracle": {
+    "compressor": "zstd 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-09T19:39:56.349582+00:00",
+  "result": {
+    "alpha": 0.28659804327561056,
+    "h_inf": 0.6664100406983011,
+    "bpc_32768": 1.7197093963623047,
+    "n_episodes": 98,
+    "mean_turns": 76.4,
+    "n_bytes": 8388608
+  }
+}

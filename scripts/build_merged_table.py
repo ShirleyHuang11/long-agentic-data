@@ -69,6 +69,7 @@ CLASS = {
     # iter 100: two new SWE training sources (mid llama-70b vs frontier Kimi-K2)
     "swe-agent-llama70b-traj":               ("TRAIN", "swe", "mid"),
     "deepswe-kimi-k2-traj":                  ("TRAIN", "swe", "frontier"),
+    "deepswe-kimi-k2-rejsample-traj":        ("TRAIN", "swe", "frontier"),
     # --- human-demonstration datasets (benchmarks w/ test splits + demos) ---
     "mind2web-actions":        ("EVAL_TASK", "web",    "human_demo"),
     "mind2web-fullobs":        ("EVAL_TASK", "web",    "human_demo"),
