@@ -61,6 +61,9 @@ CLASS = {
     "terminal-bench2-claude-haiku45":        ("EVAL_TRAJ", "terminal", "mid"),
     # iter 73: frontier tool-use eval rollout (tau-bench, shared policy prompt)
     "taubench-deepseek-r1-eval":             ("EVAL_TRAJ", "tool",     "frontier"),
+    # iter 113: tau2-bench (successor to tau-bench) frontier vs mid
+    "tau2-airline-gpt51codex-eval":          ("EVAL_TRAJ", "tool",     "frontier"),
+    "tau2-retail-qwen35-9b-eval":            ("EVAL_TRAJ", "tool",     "mid"),
     # iter 75: within-harness frontier-vs-small SWE-bench-Verified (light scaffold)
     "swebench-verified-gpt52-eval":          ("EVAL_TRAJ", "swe",      "frontier"),
     "swebench-verified-gpt5mini-eval":       ("EVAL_TRAJ", "swe",      "mid"),

@@ -1,0 +1,22 @@
+{
+  "hf_dataset": "KermitCO/qwen3.5-9B-tau2bench-retail-traces",
+  "hf_revision_sha": "a96b45b78305727ac4d4b96500a7456efaeb47a4",
+  "serializer": "messages_rc",
+  "oracle": {
+    "compressor": "zstd 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-09T21:00:49.790033+00:00",
+  "result": {
+    "alpha": 0.20931575604285466,
+    "h_inf": 0.0,
+    "bpc_32768": 1.6697006225585938,
+    "n_episodes": 666,
+    "mean_turns": 26.8,
+    "n_bytes": 8388608
+  }
+}

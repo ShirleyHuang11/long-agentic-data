@@ -1,0 +1,22 @@
+{
+  "hf_dataset": "snorkelai/Tau2-Bench-Verified-Airline-With-Code-Agents",
+  "hf_revision_sha": "23e3afcdd9492e9e6cc240c124be07665a8d211b",
+  "serializer": "trace_rc",
+  "oracle": {
+    "compressor": "zstd 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-09T21:00:38.212622+00:00",
+  "result": {
+    "alpha": 0.35709577406637755,
+    "h_inf": 1.001923728226855,
+    "bpc_32768": 1.6997547149658203,
+    "n_episodes": 711,
+    "mean_turns": 39.3,
+    "n_bytes": 8388608
+  }
+}

@@ -117,3 +117,5 @@ deepswe-kimi-k2-rejsample-traj,SWE-Factory/DeepSWE-Agent-Kimi-K2-Trajectories-Re
 swe-factory-gym-tasks,SWE-Factory/SWE-Factory-Gym,EVAL_TASK,swe,human_task,0.4121878794467896,1.1124451781348972,1.5667858123779297,,428,1,24460,
 swebench-multiling-glm5-eval,AlienKevin/SWE-bench-multilingual-glm-5-trajectories,EVAL_TRAJ,swe,frontier,0.3284909124884828,0.9662772609470438,1.734908103942871,,99,141.0,85204,
 swebench-multiling-minimax-m25-eval,AlienKevin/SWE-bench-multilingual-minimax-m2.5-trajectories,EVAL_TRAJ,swe,frontier,0.31260127731211657,0.8738871605405227,1.7408208847045898,,103,156.1,81704,
+tau2-airline-gpt51codex-eval,snorkelai/Tau2-Bench-Verified-Airline-With-Code-Agents,EVAL_TRAJ,tool,frontier,0.35709577406637755,1.001923728226855,1.6997547149658203,,711,39.3,11830,
+tau2-retail-qwen35-9b-eval,KermitCO/qwen3.5-9B-tau2bench-retail-traces,EVAL_TRAJ,tool,mid,0.20931575604285466,0.0,1.6697006225585938,,666,26.8,12596,
