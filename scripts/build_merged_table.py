@@ -58,6 +58,8 @@ CLASS = {
     # iter 72: extend terminus-2 capability ladder (small models)
     "terminal-bench2-gpt5nano":              ("EVAL_TRAJ", "terminal", "mid"),
     "terminal-bench2-claude-haiku45":        ("EVAL_TRAJ", "terminal", "mid"),
+    # iter 73: frontier tool-use eval rollout (tau-bench, shared policy prompt)
+    "taubench-deepseek-r1-eval":             ("EVAL_TRAJ", "tool",     "frontier"),
     # --- human-demonstration datasets (benchmarks w/ test splits + demos) ---
     "mind2web-actions":        ("EVAL_TASK", "web",    "human_demo"),
     "mind2web-fullobs":        ("EVAL_TASK", "web",    "human_demo"),

@@ -106,3 +106,4 @@ terminal-bench2-claude-sonnet45,DCAgent/claude-sonnet-4-5-terminal-bench-2,EVAL_
 swebench-verified-claude-sonnet45-eval,livesweagent/claude-sonnet-4-5_swebench_verified_traj,EVAL_TRAJ,swe,frontier,0.1887237835524238,0.0,1.6006040573120117,,64,106.2,131238,
 terminal-bench2-gpt5nano,DCAgent/GPT-5-nano-terminal-bench-2,EVAL_TRAJ,terminal,mid,0.1849380638715395,0.0,1.4293544439621915,,85,25.3,62544,
 terminal-bench2-claude-haiku45,DCAgent/eval-terminal-bench-2.0-claude-haiku-4-5-20251001-20260115_165217,EVAL_TRAJ,terminal,mid,0.18476737708986127,0.0,1.5271453857421875,,92,74.0,91241,
+taubench-deepseek-r1-eval,AgentSuite/tau-bench-trajectories,EVAL_TRAJ,tool,frontier,0.17438208753468545,0.0,1.5721626281738281,,475,31.3,17671,

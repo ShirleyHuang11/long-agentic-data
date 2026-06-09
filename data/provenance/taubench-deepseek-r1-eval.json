@@ -1,0 +1,26 @@
+{
+  "hf_dataset": "AgentSuite/tau-bench-trajectories",
+  "hf_url": "https://huggingface.co/datasets/AgentSuite/tau-bench-trajectories",
+  "hf_revision_sha": "7a2accf811e0d85fa5443ec73cbc262884b29539",
+  "splits": [
+    "train"
+  ],
+  "serializer": "messages_rc",
+  "oracle": {
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-09T17:00:29.991688+00:00",
+  "result": {
+    "alpha": 0.17438208753468545,
+    "h_inf": 0.0,
+    "bpc_32768": 1.5721626281738281,
+    "n_episodes": 475,
+    "mean_turns": 31.3,
+    "n_bytes": 8388608
+  }
+}

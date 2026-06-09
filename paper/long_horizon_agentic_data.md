@@ -1,13 +1,13 @@
 # A Compression-Oracle Survey of Long-Horizon Agentic Data: Merging Training and Evaluation by Pattern and Content
 
 **long-agentic-data project**
-*Built from the `SAMPLES.md` registry (101 active datasets / 107 scored rows, iters 1–72). Per-row table: `data/merged_analysis.csv` (`scripts/build_merged_table.py`). Figures: `figures/`. Supporting reports: `reports/`.*
+*Built from the `SAMPLES.md` registry (102 active datasets / 108 scored rows, iters 1–73). Per-row table: `data/merged_analysis.csv` (`scripts/build_merged_table.py`). Figures: `figures/`. Supporting reports: `reports/`.*
 
 ---
 
 ## Abstract
 
-We survey **101 long-horizon agentic corpora** — spanning model-trained SFT/RL trajectories, human-written benchmark tasks, human demonstrations, and agent rollouts collected on benchmarks — with a single cheap, tokenizer-free compression oracle, and merge training and evaluation data into one measurement table. For every corpus we measure a *pattern* axis (the context-scaling exponent α, the token-correlation decay β, and the Hurst exponent H) and a *content* axis (the reference-exact incompressible floor H∞, validated against true neural oracles at Spearman 0.97, with a directly measured companion BPC@32K). We report two dissociated findings. First, **pattern is a property of the agentic *format***: α is nearly constant across train/eval roles (median 0.24–0.34), and agentic data occupies a distinct correlation-decay phase (β ≈ 0.2–0.5) that does not overlap natural-language prose (β ≈ 1.1–1.4), with code/math as the bridge (β ≈ 0.5–0.8). Second, **content is set by who authored the token stream, not by whether the data is for training or testing**: median H∞ falls monotonically with generator source (human task 1.22, human demo 1.13, frontier rollout 0.78, synthetic task 0.45, mid-size rollout 0.00, distilled SFT 0.00), and this ordering cuts across the train/eval boundary — mid-size eval rollouts collapse to the template floor exactly as distilled training mixtures do. The consequence is a measurable **content gap**: the benchmark tasks we score agents against are human-authored and dense (median H∞ 1.22) while the training data we feed agents is content-sparse (median 0.26). We connect these statistics to a learning-curve theory (α_D = γ/2β) and to a training experiment that confirms SFT teaches trajectory *form*, and we surface one method caveat that survived audit: on single-harness-pooled eval rollouts the 3-point H∞ measures the agent scaffold as much as the generator, so BPC@32K and turn-count are the robust separators there. We keep the reference 3-point clamped H∞ as canonical for cross-domain comparability.
+We survey **102 long-horizon agentic corpora** — spanning model-trained SFT/RL trajectories, human-written benchmark tasks, human demonstrations, and agent rollouts collected on benchmarks — with a single cheap, tokenizer-free compression oracle, and merge training and evaluation data into one measurement table. For every corpus we measure a *pattern* axis (the context-scaling exponent α, the token-correlation decay β, and the Hurst exponent H) and a *content* axis (the reference-exact incompressible floor H∞, validated against true neural oracles at Spearman 0.97, with a directly measured companion BPC@32K). We report two dissociated findings. First, **pattern is a property of the agentic *format***: α is nearly constant across train/eval roles (median 0.24–0.34), and agentic data occupies a distinct correlation-decay phase (β ≈ 0.2–0.5) that does not overlap natural-language prose (β ≈ 1.1–1.4), with code/math as the bridge (β ≈ 0.5–0.8). Second, **content is set by who authored the token stream, not by whether the data is for training or testing**: median H∞ falls monotonically with generator source (human task 1.22, human demo 1.13, frontier rollout 0.76, synthetic task 0.45, mid-size rollout 0.00, distilled SFT 0.00), and this ordering cuts across the train/eval boundary — mid-size eval rollouts collapse to the template floor exactly as distilled training mixtures do. The consequence is a measurable **content gap**: the benchmark tasks we score agents against are human-authored and dense (median H∞ 1.22) while the training data we feed agents is content-sparse (median 0.26). We connect these statistics to a learning-curve theory (α_D = γ/2β) and to a training experiment that confirms SFT teaches trajectory *form*, and we surface one method caveat that survived audit: on single-harness-pooled eval rollouts the 3-point H∞ measures the agent scaffold as much as the generator, so BPC@32K and turn-count are the robust separators there. We keep the reference 3-point clamped H∞ as canonical for cross-domain comparability.
 
 ---
 
@@ -23,7 +23,7 @@ Long-horizon agentic data — multi-turn trajectories where a model interacts wi
 
 **Statement of contribution.** In summary, we:
 
-1. assemble and release a merged table of 101 long-horizon agentic corpora, each classified by role (train / eval-task / eval-traj), domain, and generator source, with reference-exact (α, H∞), directly measured BPC@32K, and where available β and Hurst (`data/merged_analysis.csv`);
+1. assemble and release a merged table of 102 long-horizon agentic corpora, each classified by role (train / eval-task / eval-traj), domain, and generator source, with reference-exact (α, H∞), directly measured BPC@32K, and where available β and Hurst (`data/merged_analysis.csv`);
 2. show that **pattern is the agentic-format genre signature** — α invariant across roles, and a distinct low-β correlation-decay phase separating agentic data from prose with code/math as the bridge (§4);
 3. show that **content (H∞) tracks generator source, not the train/eval role**, exposing a quantified content gap between human-authored benchmark tasks (median H∞ 1.22) and machine-generated training data (median 0.26) (§5);
 4. give a domain-dependent form/content decomposition (web/GUI observations are form, SWE observations are content) and a training experiment confirming SFT teaches form (§6–7); and
@@ -49,7 +49,7 @@ Long-horizon agentic data — multi-turn trajectories where a model interacts wi
 
 ### 3.1 The merged corpus
 
-The registry holds **107 scored rows**; 6 are 3-point fit artifacts (α < 0 or H∞ ≫ 1, plus one single-episode dump) and are dropped, leaving **101 active corpora**. We classify each along three axes (`scripts/build_merged_table.py`):
+The registry holds **108 scored rows**; 6 are 3-point fit artifacts (α < 0 or H∞ ≫ 1, plus one single-episode dump) and are dropped, leaving **102 active corpora**. We classify each along three axes (`scripts/build_merged_table.py`):
 
 | axis | values |
 | :-- | :-- |
@@ -57,7 +57,7 @@ The registry holds **107 scored rows**; 6 are 3-point fit artifacts (α < 0 or H
 | **domain** | swe · web · gui · tool · search · terminal · safety · embodied · mixed |
 | **source** | `human_task` · `human_demo` · `synth_task` · `frontier` (frontier-model rollout) · `mid` (mid-size-model rollout) · `distill` (GPT-4-class distillation/SFT mixture) |
 
-Counts: **TRAIN 69, EVAL_TASK 13, EVAL_TRAJ 19**; by source, frontier 45, distill 24, mid 15, human_demo 10, human_task 5, synth_task 2. The merge is deliberate: human-demonstration datasets (Mind2Web, WebLINX, GUI-Odyssey, AndroidControl, AgentNet, OpenCUA) straddle the train/eval line — they ship test splits *and* serve as demonstration training data — so `source` is the axis that carries the real signal, while `role` tests whether the train/eval label predicts anything (it largely does not; §5).
+Counts: **TRAIN 69, EVAL_TASK 13, EVAL_TRAJ 20**; by source, frontier 46, distill 24, mid 15, human_demo 10, human_task 5, synth_task 2. The merge is deliberate: human-demonstration datasets (Mind2Web, WebLINX, GUI-Odyssey, AndroidControl, AgentNet, OpenCUA) straddle the train/eval line — they ship test splits *and* serve as demonstration training data — so `source` is the axis that carries the real signal, while `role` tests whether the train/eval label predicts anything (it largely does not; §5).
 
 The role label is editorial for a handful of corpora: SWE-Gym and SWE-rebench are training *environments* whose released form is a task corpus (labeled `EVAL_TASK`); AgentNet/OpenCUA are human demos released as *training* data (labeled `TRAIN`, source `human_demo`). These calls do not move the central result, which is organized by `source`.
 
@@ -104,7 +104,7 @@ This is the paper's central result (Figure 1).
 | :-- | --: | --: | --: | --: |
 | human task (written problems) | 5 | **1.22** | 1.06 | 4/5 |
 | human demo (action streams) | 10 | **1.13** | 0.92 | 6/10 |
-| frontier-model rollout | 45 | **0.78** | 0.76 | 31/45 |
+| frontier-model rollout | 46 | **0.76** | 0.74 | 31/46 |
 | synthetic task | 2 | 0.45 | 0.45 | 1/2 |
 | mid-size-model rollout | 15 | **0.00** | 0.11 | 2/15 |
 | distilled SFT mixture | 24 | **0.00** | 0.08 | 3/24 |
@@ -115,7 +115,7 @@ By role, the same numbers re-sort to expose the gap:
 | :-- | --: | --: | :-- |
 | EVAL_TASK | 13 | **1.22** | human-authored tasks/demos → content-dense |
 | TRAIN | 69 | **0.26** | bimodal: healthy frontier minority + collapsed majority |
-| EVAL_TRAJ | 19 | **0.00** | model rollouts span the full range; H∞ also harness-confounded (§5.3) |
+| EVAL_TRAJ | 20 | **0.00** | model rollouts span the full range; H∞ also harness-confounded (§5.3) |
 
 **Content is authored, not roled.** The high-content end is human (written tasks + demonstrations); the low-content end is mid-size or distilled *model* generation. The decisive variable is the generator, and it dominates both train and eval. An eval rollout produced by a 7B–32B model (`EVAL_TRAJ`, source `mid`, H∞ ≈ 0) is statistically indistinguishable from a distilled training mixture (`TRAIN`, source `distill`, H∞ ≈ 0) — same template floor, same failure-loop length inflation (§6).
 
@@ -146,6 +146,24 @@ But reading the table carefully exposes a cautionary measurement result. **Withi
 ### 5.4 The probe is a regime selector, not a recipe selector
 
 Within the frontier band H∞ does not separate teachers (DTap Opus/Sonnet/Gemini cluster at 0.71–0.81, inside seed-σ), and EVAL_TASK BPC@32K is flat (1.71) even where H∞ separates sharply. The probe cleanly tells frontier-or-human from mid-or-distilled, but within a healthy band a proxy training run is still required. The signature clusters (Figure 2) make this concrete: a *healthy long-trajectory* cluster (frontier generators, α 0.26–0.38, H∞ 0.57–1.63), a *distillation template* cluster (α 0.05–0.26, H∞ ≈ 0), a *mid-size failure-loop* cluster (longest episodes, H∞ 0–0.08), and a *compact human-action* cluster (α 0.40–0.49, H∞ 1.7–1.95, the densest data in the survey, shortest episodes).
+
+### 5.5 Content by domain
+
+Cutting the active registry by domain (median over each domain's corpora) shows content is also domain-stratified, in a way that reflects the source mix and the observation–content relationship of §6:
+
+| domain | n | median H∞ | median BPC@32K | median α |
+| :-- | --: | --: | --: | --: |
+| gui | 6 | **1.13** | 1.67 | 0.38 |
+| safety | 5 | 0.71 | 1.71 | 0.28 |
+| web | 8 | 0.66 | 1.58 | 0.38 |
+| search | 8 | 0.60 | **2.42** | 0.19 |
+| swe | 36 | 0.57 | 1.62 | 0.26 |
+| tool | 16 | 0.13 | 1.88 | 0.25 |
+| mixed | 7 | 0.00 | 1.23 | 0.13 |
+| embodied | 3 | 0.00 | 0.89 | 0.25 |
+| terminal | 13 | 0.00 | 1.57 | 0.19 |
+
+Three patterns recur. (a) The high-H∞ domains are those dominated by **human action streams** (gui 1.13, web 0.66 — Mind2Web/WebLINX/AndroidControl/GUI-Odyssey) or by **frontier rollouts in real environments** (safety 0.71 = DTap, swe 0.57 = OpenHands family). (b) **search has the highest BPC@32K (2.42)** despite middling H∞, because search trajectories splice in large spans of retrieved web text — directly measured density is high even where the 3-point floor is conservative. (c) The H∞ ≈ 0 domains split by cause: **embodied** (ALFWorld) and **mixed** (distillation soups) are genuinely template-degenerate (low BPC@32K too), whereas **terminal** reads H∞ 0 only because of the harness-pooling confound of §5.3 — its BPC@32K (1.57) is mid-band, not floor. The domain cut therefore reinforces the §5 thesis (content follows who/what authored the stream) and the §5.3 caveat (terminal's zero is a measurement artifact, not empty data) at once.
 
 ---
 
