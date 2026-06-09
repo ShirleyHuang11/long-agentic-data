@@ -72,7 +72,7 @@ for i,(a,b,lab,dom) in enumerate(PAIRS):
     ax.scatter([i],[bb],c="#555",s=70,zorder=3); ax.scatter([i],[ba],c=col,s=70,zorder=3)
     ax.text(i,max(ba,bb)+.08,f"{lab}\n({dom})",ha="center",fontsize=11)
 ax.set_xticks([]); ax.set_ylabel("content density = BPC@32K"); ax.set_ylim(0,2.6)
-ax.set_title("Fig 3 · View decomposition (corrected): strip observations →\n"
+ax.set_title("View decomposition (corrected): strip observations →\n"
              "green=content recovered (web/GUI) · red=content lost (SWE obs ARE content)",loc="left")
 ax.text(.02,.02,"grey=full view → colored=stripped view",transform=ax.transAxes,fontsize=11,alpha=.8)
 fig.tight_layout(); fig.savefig(f"{OUT}/fig3_view_decomposition.png"); plt.close()
@@ -106,7 +106,7 @@ for s,(l,c) in P.items():
         ax.annotate(l,(B(s),hu[s]),fontsize=12,xytext=(7,5),textcoords="offset points")
 ax.axvline(1.5,color="gray",lw=1.2,ls="--")
 ax.set_xlabel("content density = BPC@32K"); ax.set_ylabel("Hurst exponent H (long-range organization)")
-ax.set_title("Fig 5 · Hurst vs content: templates & healthy data span similar Hurst\n→ Hurst alone can't rate data (repetition IS long-range dependence)",loc="left")
+ax.set_title("Hurst vs content: templates & healthy data span similar Hurst\n→ Hurst alone can't rate data (repetition IS long-range dependence)",loc="left")
 fig.tight_layout(); fig.savefig(f"{OUT}/fig5_hurst_vs_content.png"); plt.close()
 
 # ---------- fig6: gamma-beta plane colored by content ----------
@@ -126,7 +126,7 @@ fig.colorbar(sc,ax=ax,shrink=.8,label="content density = BPC@32K")
 ax.axvspan(.05,.55,alpha=.05,color="tab:blue"); ax.text(.3,.55,"agentic phase",fontsize=12,ha="center",color="tab:blue")
 ax.text(1.2,.55,"natural-language phase",fontsize=12,ha="center",color="tab:green")
 ax.set_xlabel(r"$\beta$ (byte-correlation decay)"); ax.set_ylabel(r"$\gamma$ (LZ-oracle $\alpha$)")
-ax.set_title("Fig 6 · gamma-beta phase plane (color = corrected content density)",loc="left")
+ax.set_title("γ–β phase plane (color = corrected content density)",loc="left")
 fig.tight_layout(); fig.savefig(f"{OUT}/fig6_gamma_beta.png"); plt.close()
 
 print("regenerated fig1..fig6 on BPC@32K")

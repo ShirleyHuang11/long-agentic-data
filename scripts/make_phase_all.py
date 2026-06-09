@@ -132,7 +132,7 @@ ax.legend(fontsize=8.5, loc="lower right")
 
 ax.set_xlabel(r"$\beta$  (byte-level correlation decay, $\|C(n)\|_{op}\propto n^{-\beta}$)")
 ax.set_ylabel(r"$\gamma$  (entropy decay; LZ-oracle $\alpha$)")
-ax.set_title("Fig 9: gamma-beta phase plane — agentic vs code/math vs prose "
+ax.set_title("γ–β phase plane (all corpora) — agentic vs code/math vs prose "
              "(one byte-level protocol)\ncode sits between prose and agentic: "
              "the LRD bridge domain; contours = $\\alpha_D=\\gamma/2\\beta$")
 fig.tight_layout()
