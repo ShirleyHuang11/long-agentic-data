@@ -140,6 +140,8 @@ Crucially, the gap is **within-domain, not a composition artifact** of train and
 
 The human-authored benchmark tasks out-score the model-generated training trajectories in the *same* domain every time — the content gap is a property of *who authored the data*, reproduced inside each domain, not an accident of which domains happen to be over-represented on each side.
 
+Placed against the reference registry's whole-corpus content floors — natural language 2.6, code 2.63, formal-math 1.57 — **agentic data is the lowest-content and most bimodal domain measured**: median H∞ 0.26 (mean 0.54), well below all three, with **42% of corpora pinned at the floor (H∞ < 0.05)**. Yet its healthy tail (frontier rollouts + human action streams, median 1.10, max 1.95) reaches into the code/formal-math range. So agentic data is not uniformly low-content — it is uniquely *split* between a large boilerplate mass and a dense minority, which is precisely why a per-corpus probe (rather than a domain-level prior) is worth running.
+
 ### 5.3 A controlled benchmark-rollout study, and a harness confound
 
 A batch of benchmark eval rollouts (iters 69–71) makes the source dominance concrete and adds a domain modulation. Consolidated:
