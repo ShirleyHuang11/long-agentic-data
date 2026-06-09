@@ -74,6 +74,8 @@ $$\mathrm{BPC}(n) = H_\infty + c\,n^{-\alpha}.$$
 - **Hurst H [2].** R/S on order-3 byte-n-gram surprisal increments; correlates with downstream accuracy in the fixed-data, cross-model setting.
 - **seed-σ — reproducibility.** Re-scoring on disjoint slices bounds which differences are real (cluster-level ≫ σ; within-band < 0.3 is noise).
 
+**Cost.** "Cheap" is literal: scoring a full 8 MB corpus with the reference 3-point oracle (zstd-19 at three context sizes) takes ≈ 4.5 s on a single CPU core, so the entire 106-corpus registry scores in a few minutes with no GPU — the point of a compression probe is that it runs before, and at a tiny fraction of the cost of, any training.
+
 ---
 
 ## 4. Pattern Analysis: the Agentic Format Is Its Own Statistical Phase
