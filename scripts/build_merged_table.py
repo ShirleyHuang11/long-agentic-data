@@ -34,6 +34,7 @@ CLASS = {
     "gdpval-tasks":            ("EVAL_TASK", "mixed",  "human_task"),
     "nemotron-rl-injection-v1":("EVAL_TASK", "safety", "synth_task"),
     "inferredbugs-tasks-clean":("EVAL_TASK", "swe",    "human_task"),
+    "swe-factory-gym-tasks":   ("EVAL_TASK", "swe",    "human_task"),  # multilingual SWE
     # --- agent rollouts collected ON a benchmark (for evaluation/analysis) ---
     "ii-agent-gaia-traj":      ("EVAL_TRAJ", "search", "frontier"),
     "smolagents-gaia-traces":  ("EVAL_TRAJ", "search", "frontier"),

@@ -1,0 +1,22 @@
+{
+  "hf_dataset": "SWE-Factory/SWE-Factory-Gym",
+  "hf_revision_sha": "c31daaecf6cd8bb6392a798058f547ee8b24d713",
+  "serializer": "problem+hints+patch+test_patch",
+  "oracle": {
+    "compressor": "zstd 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-09T19:45:00.680076+00:00",
+  "result": {
+    "alpha": 0.4121878794467896,
+    "h_inf": 1.1124451781348972,
+    "bpc_32768": 1.5667858123779297,
+    "n_episodes": 428,
+    "mean_turns": 1,
+    "n_bytes": 8388608
+  }
+}
