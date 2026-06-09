@@ -125,6 +125,17 @@ By role, the same numbers re-sort to expose the gap:
 
 The benchmark *tasks* we measure agents against are human-written and dense (median H∞ 1.22); the training data we feed agents is mostly boilerplate (median 0.26). We evaluate on human richness and train on machine repetition. The healthy training minority that closes this gap — frontier rollouts in diverse, real environments, and human action streams — is exactly the data the probe scores ≥ 0.6 in seconds.
 
+Crucially, the gap is **within-domain, not a composition artifact** of train and eval covering different areas. In every domain that has both a training-trajectory and a human-authored eval-task cohort, the eval-task content floor is higher:
+
+| domain | TRAIN (model trajectories) median H∞ | EVAL_TASK (human-authored) median H∞ |
+| :-- | --: | --: |
+| gui | 0.51 (n=4) | **1.40** (n=2) |
+| web | 0.66 (n=4) | **1.00** (n=4) |
+| swe | 0.62 (n=26) | **0.89** (n=5) |
+| mixed | 0.00 (n=6) | **1.67** (n=1) |
+
+The human-authored benchmark tasks out-score the model-generated training trajectories in the *same* domain every time — the content gap is a property of *who authored the data*, reproduced inside each domain, not an accident of which domains happen to be over-represented on each side.
+
 ### 5.3 A controlled benchmark-rollout study, and a harness confound
 
 A batch of benchmark eval rollouts (iters 69–71) makes the source dominance concrete and adds a domain modulation. Consolidated:
