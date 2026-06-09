@@ -86,6 +86,9 @@ if "--check-paper" in sys.argv:
         (f"human task n = {ns('human_task')}","limitations human_task n"),
         (f"Counts: **TRAIN {n('TRAIN')}, EVAL_TASK {n('EVAL_TASK')}, EVAL_TRAJ {n('EVAL_TRAJ')}**","§3.1 role counts"),
     ]
+    # abstract source-median list — frontier drifts most as rollouts accumulate
+    fm=med([r for r in rows if r["source"]=="frontier"])
+    checks.append((f"frontier rollout {fm:.2f}","abstract frontier median"))
     # §5.5 domain-table counts (n>2 domains are stable enough to assert literally)
     dc={}
     for r in rows: dc[r["domain"]]=dc.get(r["domain"],0)+1
