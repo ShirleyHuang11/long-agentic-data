@@ -1,0 +1,27 @@
+{
+  "hf_dataset": "mlfoundations/gelato-osworld-agent-trajectories",
+  "hf_url": "https://huggingface.co/datasets/mlfoundations/gelato-osworld-agent-trajectories",
+  "config": "gelato-30b/** traj.jsonl (OSWorld computer-use, reasoning+pyautogui, screenshots excluded)",
+  "generator": "gelato-30b",
+  "serializer": "reasoning+name+command+tool_output+args per step; screenshots excluded",
+  "sampling": {
+    "shuffled_seed": 0,
+    "cap": 200
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "result": {
+    "alpha": 0.2678481350862125,
+    "h_inf": 0.0,
+    "bpc_128": 6.274217482971132,
+    "bpc_2048": 2.886568665628245,
+    "bpc_32768": 1.27452392578125
+  }
+}

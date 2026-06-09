@@ -86,6 +86,7 @@ CLASS = {
     "weblinx-fullobs":         ("EVAL_TASK", "web",    "human_demo"),
     "gui-odyssey-actions":     ("EVAL_TASK", "gui",    "human_demo"),
     "android-control-text":    ("EVAL_TASK", "gui",    "human_demo"),
+    "gelato-osworld-gui":      ("EVAL_TRAJ", "gui",    "mid"),  # Gelato-30B OSWorld computer-use rollout
     # --- training trajectories: frontier-model rollouts (healthy) ---
     "swe-rebench-oh-traj":     ("TRAIN", "swe", "frontier"),
     "swe-rebench-oh-assistant-only": ("TRAIN", "swe", "frontier"),
