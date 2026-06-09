@@ -117,7 +117,7 @@ By role, the same numbers re-sort to expose the gap:
 | TRAIN | 69 | **0.26** | bimodal: healthy frontier minority + collapsed majority |
 | EVAL_TRAJ | 20 | **0.00** | model rollouts span the full range; H∞ also harness-confounded (§5.3) |
 
-**Content is authored, not roled.** The high-content end is human (written tasks + demonstrations); the low-content end is mid-size or distilled *model* generation. The decisive variable is the generator, and it dominates both train and eval. An eval rollout produced by a 7B–32B model (`EVAL_TRAJ`, source `mid`, H∞ ≈ 0) is statistically indistinguishable from a distilled training mixture (`TRAIN`, source `distill`, H∞ ≈ 0) — same template floor, same failure-loop length inflation (§6).
+**Content is authored, not roled.** The high-content end is human (written tasks + demonstrations); the low-content end is mid-size or distilled *model* generation. The decisive variable is the generator, and it dominates both train and eval. An eval rollout produced by a 7B–32B model (`EVAL_TRAJ`, source `mid`, H∞ ≈ 0) is statistically indistinguishable from a distilled training mixture (`TRAIN`, source `distill`, H∞ ≈ 0) — same template floor, same failure-loop length inflation (§6). Quantitatively, a one-way variance decomposition of H∞ confirms the asymmetry: **generator source accounts for η² = 0.35 of the variance, versus 0.11 for the train/eval role and 0.09 for domain** — source explains roughly **3× more** than the train/eval label. Pattern (α) shows the mirror image (§4): it is nearly flat across source but, like everything else here, flat across role.
 
 ### 5.2 The content gap
 
