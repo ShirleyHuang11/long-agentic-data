@@ -17,9 +17,17 @@ EX={"nemotron-agentic-v1","rlenv-appworld-train","taubench-sonnet-proxy",
     "aguvis-s2-androidctl-text","saital-browser-reasoning-action","saital-browser-action-only"}
 ns={}; src=open("scripts/make_figures.py").read()
 exec(src[src.index("CAT = {"):src.index("data = [")], ns); CAT=ns["CAT"]
+# iters 69-81 benchmark eval rollouts (added after CAT was authored) — show them
+# as a distinct cohort so the signature map reflects the eval side of the merge.
+CAT.update({s:"benchmark eval rollout" for s in [
+    "coderforge-32b-swebench-verified-eval","terminal-bench2-qwen3-32b",
+    "gaia127-r2egym-32b-eval","terminal-bench2-gpt5","terminal-bench2-claude-sonnet45",
+    "swebench-verified-claude-sonnet45-eval","terminal-bench2-gpt5nano",
+    "terminal-bench2-claude-haiku45","taubench-deepseek-r1-eval",
+    "swebench-verified-gpt52-eval","swebench-verified-gpt5mini-eval"]})
 COL={"SWE traj (frontier)":"#1f77b4","tool/search traj":"#2ca02c","mid-size generator":"#d62728",
      "template SFT":"#9e9e9e","compact action view":"#9467bd","full-obs / annotated view":"#8c564b",
-     "agent-text-only view":"#17becf","task corpus":"#ff7f0e"}
+     "agent-text-only view":"#17becf","task corpus":"#ff7f0e","benchmark eval rollout":"#e7298a"}
 rng=np.random.default_rng(0)
 pts=[]
 for s,r in R.items():

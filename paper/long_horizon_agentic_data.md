@@ -244,7 +244,7 @@ Merging training and evaluation corpora into one compression-oracle table separa
 
 **Figure 1.** Merged train+eval content map (`figures/fig_merge_content_source.png`, n = 99). (a) reference-exact H∞ by generator source, split by role — content tracks source, not the train/eval label; medians fall monotonically. (b) the α × H∞ plane — α is ~constant while H∞ spreads with source.
 
-**Figure 2.** Signature clusters in the α × H∞ plane (`figures/fig1_signature_refhinf.png`): healthy long-trajectory, distillation-template, mid-size failure-loop, and compact human-action clusters.
+**Figure 2.** Signature clusters in the α × H∞ plane (`figures/fig1_signature_refhinf.png`): healthy long-trajectory, distillation-template, mid-size failure-loop, and compact human-action clusters, plus the benchmark-eval-rollout cohort (magenta), which splits between the H∞≈0 harness-pooled zone (terminal/tool/GAIA-mid) and the healthy ~1.0 SWE zone (SWE-Router) — a visual of the §5.3 harness effect.
 
 **Figure 3.** γ–β phase plane (`figures/fig6_gamma_beta.png`): the three non-overlapping β bands (agentic 0.2–0.5, code/math 0.5–0.8, prose 1.1–1.4).
 
