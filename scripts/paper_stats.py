@@ -86,6 +86,8 @@ if "--check-paper" in sys.argv:
         (f"human task n = {ns('human_task')}","limitations human_task n"),
         (f"Counts: **TRAIN {n('TRAIN')}, EVAL_TASK {n('EVAL_TASK')}, EVAL_TRAJ {n('EVAL_TRAJ')}**","§3.1 role counts"),
     ]
+    # Figure 1 caption n (merge figure plots all active rows) — drifts each add
+    checks.append((f"fig_merge_content_source.png`, n = {len(rows)}","Figure 1 caption n"))
     # abstract source-median list — frontier drifts most as rollouts accumulate
     fm=med([r for r in rows if r["source"]=="frontier"])
     checks.append((f"frontier rollout {fm:.2f}","abstract frontier median"))

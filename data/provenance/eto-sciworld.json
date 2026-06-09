@@ -1,0 +1,22 @@
+{
+  "hf_dataset": "agent-eto/eto-sft-trajectory",
+  "hf_url": "https://huggingface.co/datasets/agent-eto/eto-sft-trajectory",
+  "config": "data/sciworld_sft.json (ETO ReAct SFT)",
+  "serializer": "conversations from:value",
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "result": {
+    "alpha": 0.1621176405412777,
+    "h_inf": 0.0,
+    "bpc_128": 5.649380683898926,
+    "bpc_2048": 2.8494834899902344,
+    "bpc_32768": 1.0632715225219727
+  }
+}
