@@ -110,6 +110,7 @@ CLASS = {
     "toucan-15m-sft":          ("TRAIN", "tool", "frontier"),
     "cli-agent-sessions-sampler": ("TRAIN", "terminal", "frontier"),
     "opus48-pi-traces":        ("TRAIN", "terminal", "frontier"),
+    "minimax-m27-agent-sessions":("TRAIN", "terminal", "frontier"),  # iter 118: new frontier CLI generator
     "glaive-fc-v2":            ("TRAIN", "tool", "frontier"),
     "hermes-fc-multiturn":     ("TRAIN", "tool", "frontier"),
     "fireact-multitask":       ("TRAIN", "tool", "frontier"),
