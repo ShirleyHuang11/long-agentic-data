@@ -23,7 +23,7 @@ Long-horizon agentic data — multi-turn trajectories where a model interacts wi
 
 **Statement of contribution.** In summary, we:
 
-1. assemble and release a merged table of 123 long-horizon agentic corpora, each classified by role (train / eval-task / eval-traj), domain, and generator source, with reference-exact (α, H∞), directly measured BPC@32K, and where available β and Hurst (`data/merged_analysis.csv`);
+1. assemble and release a merged table of 133 long-horizon agentic corpora, each classified by role (train / eval-task / eval-traj), domain, and generator source, with reference-exact (α, H∞), directly measured BPC@32K, and where available β and Hurst (`data/merged_analysis.csv`);
 2. show that **pattern is the agentic-format genre signature** — α invariant across roles, and a distinct low-β correlation-decay phase separating agentic data from prose with code/math as the bridge (§4);
 3. show that **content (H∞) tracks generator source, not the train/eval role**, exposing a quantified content gap between human-authored benchmark tasks (median H∞ 1.11) and machine-generated training data (median 0.27) (§5);
 4. give a domain-dependent form/content decomposition (web/GUI observations are form, SWE observations are content) and a training experiment confirming SFT teaches form (§6–7); and
@@ -49,7 +49,7 @@ Long-horizon agentic data — multi-turn trajectories where a model interacts wi
 
 ### 3.1 The merged corpus
 
-The registry holds **130 scored rows**; 6 are 3-point fit artifacts (α < 0 or H∞ ≫ 1, plus one single-episode dump) and are dropped, leaving **123 active corpora**. We classify each along three axes (`scripts/build_merged_table.py`):
+The registry holds **139 scored rows**; 6 are 3-point fit artifacts (α < 0 or H∞ ≫ 1, plus one single-episode dump) and are dropped, leaving **133 active corpora**. We classify each along three axes (`scripts/build_merged_table.py`):
 
 | axis | values |
 | :-- | :-- |
@@ -310,4 +310,4 @@ A second, methodological contribution is cautionary and transfers beyond agentic
 
 [7] *Reference protocol:* `reference/data_format.md` — the 358-dataset formal-math LZ-oracle survey (3-point clamped H∞; LZ↔neural H∞ Spearman 0.97) reproduced bit-for-bit.
 
-*Supporting material: `SAMPLES.md` (full registry + cumulative findings), `reports/` (openthoughts, formchoice, lz_select, inferredbugs, hinf_clamp), `figures/FIGURES.md` (figure index), `data/merged_analysis.csv` (per-row table), and **Appendix A** (`paper/appendix_corpus_table.md`) — the complete per-corpus listing of all 104 active corpora with role, source, domain, α, H∞, BPC@32K, and turns.*
+*Supporting material: `SAMPLES.md` (full registry + cumulative findings), `reports/` (openthoughts, formchoice, lz_select, inferredbugs, hinf_clamp), `figures/FIGURES.md` (figure index), `data/merged_analysis.csv` (per-row table), and **Appendix A** (`paper/appendix_corpus_table.md`) — the complete per-corpus listing of all 133 active corpora with role, source, domain, α, H∞, BPC@32K, and turns.*

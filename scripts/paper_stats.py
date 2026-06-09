@@ -102,5 +102,17 @@ if "--check-paper" in sys.argv:
         ok=needle in txt
         bad+=not ok
         print(f"  {'OK ' if ok else 'MISS'} {label}: '{needle}'")
+    # regex ALL-occurrences check: every corpus-count / scored-rows mention must
+    # match the live value, across any phrasing (catches drift in low-traffic spots
+    # the per-iteration header edits miss; presence-checks above can't catch this).
+    import re
+    for pat,want,lbl in [
+        (r"(\d+) (?:active corpora|long-horizon agentic corpora|active datasets)", len(rows), "corpus-count"),
+        (r"(\d+) scored rows", csv_rows, "scored-rows")]:
+        hits=[int(m.group(1)) for m in re.finditer(pat, txt)]
+        wrong=[h for h in hits if h!=want]
+        ok=not wrong
+        bad+=not ok
+        print(f"  {'OK ' if ok else 'MISS'} {lbl} all=={want} ({len(hits)} mentions){'' if ok else f' STALE:{wrong}'}")
     print(f"  {bad} mismatch(es)")
     sys.exit(1 if bad else 0)
