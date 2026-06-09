@@ -1,0 +1,30 @@
+{
+  "hf_dataset": "DCAgent/neulab-nebius-swe-agent-trajectories-sandboxes_glm_4.7_traces_jupiter",
+  "hf_url": "https://huggingface.co/datasets/DCAgent/neulab-nebius-swe-agent-trajectories-sandboxes_glm_4.7_traces_jupiter",
+  "config": "data/train-00000-of-00002.parquet (terminus-2 harness, GLM-4.7, nebius-swe-agent tasks)",
+  "serializer": "role: content join over conversations[]",
+  "splits": [
+    "train"
+  ],
+  "sampling": {
+    "max_docs": 1500,
+    "max_bytes": 8388608,
+    "shard": "00000-of-00002 only"
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "result": {
+    "alpha": 0.27534197013002165,
+    "h_inf": 0.6558254484948605,
+    "bpc_128": 5.949989318847656,
+    "bpc_2048": 3.1232995986938477,
+    "bpc_32768": 1.805851936340332
+  }
+}

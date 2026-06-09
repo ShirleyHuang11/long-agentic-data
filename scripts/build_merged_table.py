@@ -100,6 +100,7 @@ CLASS = {
     "jetbrains-swe-assistant-only":      ("TRAIN", "swe", "frontier"),
     "jetbrains-swesmith-subset":         ("TRAIN", "swe", "frontier"),
     "dcagent-glm47-terminus2": ("TRAIN", "terminal", "frontier"),
+    "dcagent-glm47-nebius-swe": ("TRAIN", "terminal", "frontier"),
     "openhands-feedback":      ("TRAIN", "swe", "frontier"),
     "miroverse-agentic-sft-new":("TRAIN", "search", "frontier"),
     "nemotron-sft-v2-search":  ("TRAIN", "search", "frontier"),
