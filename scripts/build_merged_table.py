@@ -55,6 +55,9 @@ CLASS = {
     "terminal-bench2-claude-sonnet45":       ("EVAL_TRAJ", "terminal", "frontier"),
     # iter 71: frontier SWE-bench-Verified rollout (mini-swe-agent harness)
     "swebench-verified-claude-sonnet45-eval":("EVAL_TRAJ", "swe",      "frontier"),
+    # iter 72: extend terminus-2 capability ladder (small models)
+    "terminal-bench2-gpt5nano":              ("EVAL_TRAJ", "terminal", "mid"),
+    "terminal-bench2-claude-haiku45":        ("EVAL_TRAJ", "terminal", "mid"),
     # --- human-demonstration datasets (benchmarks w/ test splits + demos) ---
     "mind2web-actions":        ("EVAL_TASK", "web",    "human_demo"),
     "mind2web-fullobs":        ("EVAL_TASK", "web",    "human_demo"),

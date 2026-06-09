@@ -1,0 +1,26 @@
+{
+  "hf_dataset": "DCAgent/GPT-5-nano-terminal-bench-2",
+  "hf_url": "https://huggingface.co/datasets/DCAgent/GPT-5-nano-terminal-bench-2",
+  "hf_revision_sha": "385936debbbd37c3f7307ab1b6b69969d29172ff",
+  "splits": [
+    "train"
+  ],
+  "serializer": "conversations_rc",
+  "oracle": {
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-09T16:26:11.860346+00:00",
+  "result": {
+    "alpha": 0.1849380638715395,
+    "h_inf": 0.0,
+    "bpc_32768": 1.4293544439621915,
+    "n_episodes": 85,
+    "mean_turns": 25.3,
+    "n_bytes": 5322862
+  }
+}

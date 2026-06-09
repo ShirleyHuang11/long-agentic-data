@@ -1,0 +1,26 @@
+{
+  "hf_dataset": "DCAgent/eval-terminal-bench-2.0-claude-haiku-4-5-20251001-20260115_165217",
+  "hf_url": "https://huggingface.co/datasets/DCAgent/eval-terminal-bench-2.0-claude-haiku-4-5-20251001-20260115_165217",
+  "hf_revision_sha": "27a30e4b9faf61e4a91b67e23264b14c5e8f90c7",
+  "splits": [
+    "train"
+  ],
+  "serializer": "conversations_rc",
+  "oracle": {
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-09T16:26:19.024703+00:00",
+  "result": {
+    "alpha": 0.18476737708986127,
+    "h_inf": 0.0,
+    "bpc_32768": 1.5271453857421875,
+    "n_episodes": 92,
+    "mean_turns": 74.0,
+    "n_bytes": 8388608
+  }
+}
