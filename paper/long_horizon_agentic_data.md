@@ -279,13 +279,13 @@ Merging training and evaluation corpora into one compression-oracle table separa
 
 ## References
 
-[1] F. Cagnetta et al. *Deriving Neural Scaling Laws from the Statistics of Natural Language.* (γ, β; α_D = γ/2β.)
+[1] F. Cagnetta et al. *Deriving Neural Scaling Laws from the Statistics of Natural Language.* arXiv:2602.07488. (γ, β; α_D = γ/2β.)
 
 [2] I. Alabdulmohsin, V. Q. Tran, M. Dehghani. *Fractal Patterns May Illuminate the Success of Next-Token Prediction.* arXiv:2402.01825, 2024. (Self-similarity, Hurst, downstream prediction.)
 
 [3] *Intrinsic Entropy of Context Length Scaling in LLMs.* (Optimal context length grows with data; Bayes-risk fit = the oracle equation.)
 
-[4] G. Delétang et al. *Language Modeling Is Compression.* (Sequence modeling ⇔ compression.)
+[4] G. Delétang et al. *Language Modeling Is Compression.* arXiv:2309.10668. (Sequence modeling ⇔ compression.)
 
 [5] J. Schmidhuber. *Driven by Compression Progress.* (Formal theory of curiosity; intermediate complexity is most learnable.)
 
