@@ -72,7 +72,7 @@ $$\mathrm{BPC}(n) = H_\infty + c\,n^{-\alpha}.$$
 - **BPC@32K — directly measured content companion.** The raw compressed rate at a 32 KB context — no fit, no clamp, no extrapolation. Validated on synthetic controls (random 2.47 / pure template 0.02 / scaffold+content 1.40) and robust to the 8K-vs-32K-token context choice (ranking invariant). Reported alongside H∞; where they disagree, §5 explains why.
 - **β — token-correlation decay [1].** ‖C(n)‖ ∝ n^(−β); α_D = γ/2β. Measured byte-level here as a proxy.
 - **Hurst H [2].** R/S on order-3 byte-n-gram surprisal increments; correlates with downstream accuracy in the fixed-data, cross-model setting.
-- **seed-σ — reproducibility.** Re-scoring on disjoint slices bounds which differences are real (cluster-level ≫ σ; within-band < 0.3 is noise).
+- **seed-σ — reproducibility.** Re-scoring on disjoint slices (38 rescores over 12 corpora) bounds which differences are real. Measured: homogeneous pipelines σ ≈ 0.03–0.04 (glaive 1.03±0.03, Toucan 1.35±0.04), the template band pinned at σ = 0, and heterogeneous repo-scale corpora up to σ ≈ 0.22 (SWE-ZERO 0.82±0.22, slice-composition dominated). So **cluster-level gaps (0 vs 1+) are ≫ σ and trustworthy, while within-band differences < 0.3 are noise** — the rule used throughout.
 
 **Cost.** "Cheap" is literal: scoring a full 8 MB corpus with the reference 3-point oracle (zstd-19 at three context sizes) takes ≈ 4.5 s on a single CPU core, so the entire 106-corpus registry scores in a few minutes with no GPU — the point of a compression probe is that it runs before, and at a tiny fraction of the cost of, any training.
 
