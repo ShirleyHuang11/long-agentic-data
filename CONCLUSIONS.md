@@ -6,10 +6,15 @@
 
 ## 1. What the project is
 
-A measurement study of **long-horizon agentic training data** on HuggingFace.
-~90 datasets/views scored with a cheap, tokenizer-free compression oracle, plus
-supplementary statistics (β correlation-decay, Hurst, seed-σ, image-channel),
-turned into findings, figures, and a candidate data filter (LZ-Select).
+A measurement study of **long-horizon agentic data** on HuggingFace —
+**106 active datasets/views** (CSV 112 rows) spanning training trajectories,
+benchmark task corpora, human demonstrations, and benchmark eval rollouts,
+scored with a cheap, tokenizer-free compression oracle plus supplementary
+statistics (β correlation-decay, Hurst, seed-σ, image-channel). The training and
+evaluation corpora are merged into one analysis in
+**`paper/long_horizon_agentic_data.md`** (§7 below); this file is the
+plain-language digest. Outputs: findings, figures, a candidate data filter
+(LZ-Select), and a form-vs-choices training experiment.
 
 ## 2. The metric — and an important correction
 
@@ -27,18 +32,22 @@ the extrapolated **H∞ was unreliable** — three compounding failures:
 3. pooling many episodes lets shared scaffolds cancel, measuring boilerplate
    density rather than content.
 
-**Fixes adopted:**
-- **`BPC@32K` (directly measured)** is now the canonical content metric —
-  validated on synthetic controls (random 2.47 / template 0.02 / mixed 1.40),
-  robust to the 8K-vs-32K-token context choice (ranking invariant).
-- **`score_v3`** (7-point bounded least-squares + `resolved` flag + stderr)
-  gives a *correct* H∞ where the curve converges: 39/92 datasets resolve to real
-  positive floors (WebLINX 1.86, mind2web 1.68, SWE-bench 1.56, healthy
-  trajectories 0.7–1.2); the rest flag `resolved=False` — itself a template signal.
+**Final reconciliation (the binding decision, iter 68 — "use the reference paper exactly"):**
+the **reference-exact 3-point clamped H∞ is the canonical content metric**, kept
+bit-for-bit identical to the 358-dataset formal-math survey it was validated
+against (LZ↔neural H∞ Spearman 0.97). H∞ ≈ 0 is the reference's *valid*
+"template-degenerate" signal, not a bug. The earlier "BPC@32K replaces H∞"
+correction was an over-correction and was reverted; **`BPC@32K` (directly
+measured) and `score_v3` (bounded fit + `resolved` flag) are retained as
+*supplementary companions*** — most useful exactly where H∞ is pooling-confounded
+(benchmark eval rollouts under a heavy shared harness; see the paper §5.3). On
+clean corpora H∞ and BPC@32K agree (Spearman +0.56 overall, higher on clean
+data); they diverge precisely on harness-pooled rollouts, which is what flags the
+confound.
 
-**Lesson (now top of SAMPLES.md):** any "exactly 0" from a clamp, extrapolation,
-or pooled measurement must be falsified against a directly-measured quantity and
-synthetic controls before it becomes a finding.
+**Lesson (top of SAMPLES.md):** any "exactly 0" from a clamp, extrapolation, or
+pooled measurement must be falsified against a directly-measured quantity
+(BPC@32K), the turn-count, and synthetic controls before it becomes a finding.
 
 ## 3. The core findings (qualitative structure survived the correction)
 
@@ -89,8 +98,9 @@ that control it would have produced a false "finding 20 refuted."
 
 ## 5. Bottom line
 
-- The compression oracle is a useful, cheap **data-quality probe** — once you
-  use the directly-measured `BPC@32K` and stop trusting clamped/extrapolated H∞.
+- The compression oracle is a useful, cheap **data-quality probe** — read the
+  reference-exact H∞ for training corpora, and fall back to the directly-measured
+  `BPC@32K` + turn-count where H∞ is harness-pooled (benchmark eval rollouts).
 - Agentic data is **mostly low-content boilerplate**; the valuable minority
   (frontier rollouts in diverse real environments, human action streams) is
   identifiable in seconds.
@@ -106,3 +116,33 @@ decision check** (held-out terminus-2 next-command that must pass a held-out
 test — gives the metric dynamic range), and a genuinely content-empty template
 arm (verified low BPC@32K *and* `resolved≈0`) vs a high-content arm. The harness
 (`scripts/formchoice/`) is ready to scale up directly.
+
+## 7. The merged train+eval analysis (`paper/long_horizon_agentic_data.md`)
+
+Merging the training and evaluation corpora into one table (106 active) gives the
+project's headline result, dissociating two axes the literature usually conflates:
+
+- **Pattern is the agentic *format* signature.** α is role-invariant (median 0.23–0.34
+  across train / eval-task / eval-traj), and agentic data is a distinct
+  correlation-decay phase (β ≈ 0.2–0.5) vs prose (1.1–1.4), with code/math the
+  bridge (0.5–0.8). β tracks the *model-generated* bulk; human demos decorrelate
+  faster (Mind2Web β 0.77).
+- **Content is set by the generator, not the train/eval role.** Median H∞ falls
+  monotonically with source — human task 1.22 / human demo 1.13 / frontier 0.78 /
+  synthetic 0.45 / mid 0.00 / distilled 0.00 — and a variance decomposition makes
+  it quantitative: **source η² = 0.33 ≫ role 0.09 ≈ domain 0.09** (source explains
+  ~3× more). α and H∞ co-vary (ρ +0.79, both depressed by templating); Hurst is
+  the one statistic orthogonal to content (ρ −0.02).
+- **The content gap.** Benchmark *tasks* are human-authored and dense (median H∞
+  1.22); training data is mostly boilerplate (0.26). We test on human richness and
+  train on machine repetition.
+- **A measurement caveat (the sharpest contribution).** On benchmark eval rollouts,
+  H∞ measures the *agent harness* as much as the generator: SWE-bench-Verified reads
+  H∞ 0.00 / 0.83 / 1.0–1.2 across the mini-swe-agent / OpenHands / SWE-Router
+  harnesses — the same tasks, the ladder tracking shared-prompt weight. Within a
+  fixed harness, BPC@32K + turn-count recover the generator ranking where H∞ is flat.
+  Multi-agent orchestration is the same effect (finding 23).
+
+The cheap probe is a **regime selector, not a recipe selector**: it identifies the
+healthy band in seconds but cannot rank teachers within it (that still needs a proxy
+training run).
