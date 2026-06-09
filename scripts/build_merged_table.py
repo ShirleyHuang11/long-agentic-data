@@ -33,6 +33,7 @@ CLASS = {
     "r2e-gym-lite-tasks":      ("EVAL_TASK", "swe",    "synth_task"),
     "gdpval-tasks":            ("EVAL_TASK", "mixed",  "human_task"),
     "nemotron-rl-injection-v1":("EVAL_TASK", "safety", "synth_task"),
+    "crypto-agent-safe-fc":    ("TRAIN", "safety", "distill"),  # synth safe-fc SFT, content-rich (cf. ToolAce)
     "inferredbugs-tasks-clean":("EVAL_TASK", "swe",    "human_task"),
     "swe-factory-gym-tasks":   ("EVAL_TASK", "swe",    "human_task"),  # multilingual SWE
     "scienceagentbench-tasks": ("EVAL_TASK", "science","human_task"),  # iter 115: new science domain

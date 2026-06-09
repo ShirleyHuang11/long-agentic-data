@@ -1,0 +1,21 @@
+{
+  "hf_dataset": "SentientAGI/crypto-agent-safe-function-calling",
+  "hf_url": "https://huggingface.co/datasets/SentientAGI/crypto-agent-safe-function-calling",
+  "config": "crypto-agent-safe-function-calling.parquet (query+thinking+answers+tools)",
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "result": {
+    "alpha": 0.2882910670785921,
+    "h_inf": 0.9500050847966526,
+    "bpc_128": 6.127916293335171,
+    "bpc_2048": 3.278190499172642,
+    "bpc_32768": 1.9968456167035398
+  }
+}
