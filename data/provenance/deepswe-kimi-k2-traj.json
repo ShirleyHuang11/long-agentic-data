@@ -1,0 +1,22 @@
+{
+  "hf_dataset": "SWE-Factory/DeepSWE-Agent-Kimi-K2-Trajectories-2.8K",
+  "hf_revision_sha": "2a2175e291a0606376592af08b64c25afabe72a9",
+  "serializer": "messages_rc",
+  "oracle": {
+    "compressor": "zstd 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-09T19:32:31.888451+00:00",
+  "result": {
+    "alpha": 0.26595753392789784,
+    "h_inf": 0.593706655815053,
+    "bpc_32768": 1.7911014556884766,
+    "n_episodes": 103,
+    "mean_turns": 78.8,
+    "n_bytes": 8388608
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "hf_dataset": "ElenaFu/SWE-agent-trajectories",
+  "hf_revision_sha": "70b3d347c367fc4c9b67f834865ed4e46abb31bd",
+  "serializer": "trajectory_text_rc (text field, not content)",
+  "oracle": {
+    "compressor": "zstd 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-09T19:32:24.372469+00:00",
+  "result": {
+    "alpha": 0.16844446302668326,
+    "h_inf": 0.0,
+    "bpc_32768": 1.4281415939331055,
+    "n_episodes": 133,
+    "mean_turns": 57.2,
+    "n_bytes": 8388608.0
+  }
+}

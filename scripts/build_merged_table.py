@@ -66,6 +66,9 @@ CLASS = {
     # iter 81: single- vs multi-agent serialization of the same SWE-smith tasks
     "swesmith-singleagent-traj":             ("TRAIN", "swe", "frontier"),
     "swesmith-multiagent-traj":              ("TRAIN", "swe", "frontier"),
+    # iter 100: two new SWE training sources (mid llama-70b vs frontier Kimi-K2)
+    "swe-agent-llama70b-traj":               ("TRAIN", "swe", "mid"),
+    "deepswe-kimi-k2-traj":                  ("TRAIN", "swe", "frontier"),
     # --- human-demonstration datasets (benchmarks w/ test splits + demos) ---
     "mind2web-actions":        ("EVAL_TASK", "web",    "human_demo"),
     "mind2web-fullobs":        ("EVAL_TASK", "web",    "human_demo"),
