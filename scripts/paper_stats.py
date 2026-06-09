@@ -52,3 +52,16 @@ doms={}
 for r in rows: doms.setdefault(r['domain'],[]).append(r)
 for d,g in sorted(doms.items(),key=lambda kv:-med(kv[1])):
     print(f"  {d:9s} {len(g):3d}  {med(g):.2f}  {med(g,'bpc_32768'):.2f}  {med(g,'alpha'):.2f}")
+
+# two-way partial eta^2 (source controlling for domain, and vice versa) -- section 5.1
+def _resid(key):
+    g={}
+    for r in rows: g.setdefault(r[key],[]).append(F(r,'h_inf'))
+    mean={k:st.fmean(v) for k,v in g.items()}
+    return [F(r,'h_inf')-mean[r[key]] for r in rows]
+def _eta2_resid(vals,key):
+    m=st.fmean(vals); g={}
+    for v,r in zip(vals,rows): g.setdefault(r[key],[]).append(v)
+    ss=sum((v-m)**2 for v in vals)
+    return (sum(len(v)*(st.fmean(v)-m)**2 for v in g.values())/ss) if ss else 0
+print(f"\npartial eta2(source|domain)={_eta2_resid(_resid('domain'),'source'):.2f}  partial eta2(domain|source)={_eta2_resid(_resid('source'),'domain'):.2f}")
