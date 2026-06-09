@@ -65,3 +65,31 @@ def _eta2_resid(vals,key):
     ss=sum((v-m)**2 for v in vals)
     return (sum(len(v)*(st.fmean(v)-m)**2 for v in g.values())/ss) if ss else 0
 print(f"\npartial eta2(source|domain)={_eta2_resid(_resid('domain'),'source'):.2f}  partial eta2(domain|source)={_eta2_resid(_resid('source'),'domain'):.2f}")
+
+# --check-paper: assert the count-bearing table rows appear literally in the paper.
+# These n's drift on every registry add (the recurring stale-number bug); this
+# flags them automatically so each loop catches drift without a manual diff.
+import sys
+if "--check-paper" in sys.argv:
+    txt=open("paper/long_horizon_agentic_data.md").read()
+    n=lambda role:sum(1 for r in rows if r["role"]==role)
+    ns=lambda s:sum(1 for r in rows if r["source"]==s)
+    checks=[
+        (f"| TRAIN | {n('TRAIN')} |","role TRAIN n"),
+        (f"| EVAL_TASK | {n('EVAL_TASK')} |","role EVAL_TASK n"),
+        (f"| EVAL_TRAJ | {n('EVAL_TRAJ')} |","role EVAL_TRAJ n"),
+        (f"| human task (written problems) | {ns('human_task')} |","src human_task n"),
+        (f"| human demo (action streams) | {ns('human_demo')} |","src human_demo n"),
+        (f"| frontier-model rollout | {ns('frontier')} |","src frontier n"),
+        (f"| mid-size-model rollout | {ns('mid')} |","src mid n"),
+        (f"| distilled SFT mixture | {ns('distill')} |","src distill n"),
+        (f"human task n = {ns('human_task')}","limitations human_task n"),
+    ]
+    print("\n[check-paper]")
+    bad=0
+    for needle,label in checks:
+        ok=needle in txt
+        bad+=not ok
+        print(f"  {'OK ' if ok else 'MISS'} {label}: '{needle}'")
+    print(f"  {bad} mismatch(es)")
+    sys.exit(1 if bad else 0)
