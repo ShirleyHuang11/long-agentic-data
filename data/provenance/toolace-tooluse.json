@@ -1,0 +1,29 @@
+{
+  "hf_dataset": "AmanPriyanshu/tool-reasoning-sft-TOOLS-toolace-sft-tool-use-agent-data-cleaned-rectified",
+  "hf_url": "https://huggingface.co/datasets/AmanPriyanshu/tool-reasoning-sft-TOOLS-toolace-sft-tool-use-agent-data-cleaned-rectified",
+  "config": "tool_use.parquet (ToolAce synthetic tool-use SFT, messages)",
+  "serializer": "role: content join over messages[]",
+  "splits": [
+    "train"
+  ],
+  "sampling": {
+    "max_docs": 1500,
+    "max_bytes": 8388608
+  },
+  "oracle": {
+    "script": "scripts/lz_oracle.py",
+    "compressor": "zstd level 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "result": {
+    "alpha": 0.2720762508750318,
+    "h_inf": 0.901042051371914,
+    "bpc_128": 5.990891456604004,
+    "bpc_2048": 3.294867515563965,
+    "bpc_32768": 2.026890754699707
+  }
+}

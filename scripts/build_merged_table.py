@@ -143,6 +143,7 @@ CLASS = {
     "code-act-codeact":        ("TRAIN", "mixed", "distill"),
     "toolbench-toolllama-dfs": ("TRAIN", "tool", "distill"),
     "apigen-mt-5k":            ("TRAIN", "tool", "distill"),
+    "toolace-tooluse":         ("TRAIN", "tool", "distill"),  # content-rich synth (schema-diverse)
     "lumos-ground-iter":       ("TRAIN", "mixed", "distill"),
     "scienceworld-expert-traj":("TRAIN", "embodied", "distill"),
     "nemotron-rl-swe-pivot":   ("TRAIN", "swe", "distill"),
