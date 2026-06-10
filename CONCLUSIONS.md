@@ -7,7 +7,7 @@
 ## 1. What the project is
 
 A measurement study of **long-horizon agentic data** on HuggingFace —
-**134 active datasets/views** (CSV 140 rows) spanning training trajectories,
+**135 active datasets/views** (CSV 141 rows) spanning training trajectories,
 benchmark task corpora, human demonstrations, and benchmark eval rollouts,
 scored with a cheap, tokenizer-free compression oracle plus supplementary
 statistics (β correlation-decay, Hurst, seed-σ, image-channel). The training and
@@ -119,7 +119,7 @@ arm (verified low BPC@32K *and* `resolved≈0`) vs a high-content arm. The harne
 
 ## 7. The merged train+eval analysis (`paper/long_horizon_agentic_data.md`)
 
-Merging the training and evaluation corpora into one table (134 active) gives the
+Merging the training and evaluation corpora into one table (135 active) gives the
 project's headline result, dissociating two axes the literature usually conflates:
 
 - **Pattern is the agentic *format* signature.** α is role-invariant (median 0.25–0.34
@@ -132,9 +132,9 @@ project's headline result, dissociating two axes the literature usually conflate
   synthetic 0.45 / mid 0.00 / distilled 0.00 — and a variance decomposition makes
   it quantitative: **source η² = 0.33 ≫ role 0.09 ≈ domain 0.07** (source explains
   ~3× more). α and H∞ co-vary (ρ +0.79, both depressed by templating); Hurst is
-  the one statistic orthogonal to content (ρ −0.02).
+  the one statistic essentially unrelated to content (ρ −0.17 at n=17, weakly negative).
 - **The content gap.** Benchmark *tasks* are human-authored and dense (median H∞
-  1.11); training data is mostly boilerplate (0.27). We test on human richness and
+  1.11); training data is mostly boilerplate (0.26). We test on human richness and
   train on machine repetition.
 - **A measurement caveat (the sharpest contribution).** On benchmark eval rollouts,
   H∞ measures the *agent harness* as much as the generator: SWE-bench-Verified reads
@@ -196,7 +196,7 @@ specific α_D = γ/2β form is not yet supported at this scale.
 
 This deliverable was built over ~165 self-paced loop iterations. The arc:
 
-1. **Build (iters 1–~135):** grow the registry to 134 corpora, classify every slug by
+1. **Build (iters 1–~135):** grow the registry to 135 corpora, classify every slug by
    role/domain/source, and assemble the merged pattern+content analysis. The productive
    vein was niche named-org/benchmark searches; the recurring failure mode was per-add
    *number churn* across the paper, eventually tamed by a `paper_stats.py --check-paper`

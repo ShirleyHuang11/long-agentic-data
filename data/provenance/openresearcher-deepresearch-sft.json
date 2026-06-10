@@ -1,0 +1,22 @@
+{
+  "hf_dataset": "AmanPriyanshu/tool-reasoning-sft-RESEARCH-openresearcher-dataset-sft-deep-research-agent-data-cleaned",
+  "hf_revision_sha": "c68c452102215092792637495d8d8341e903aa53",
+  "serializer": "messages_rc_parquet_direct",
+  "oracle": {
+    "compressor": "zstd 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-10T07:04:12.827761+00:00",
+  "result": {
+    "alpha": 0.10878824487554122,
+    "h_inf": 0.0,
+    "bpc_32768": 2.542658805847168,
+    "n_episodes": 200,
+    "mean_turns": 118.8,
+    "n_bytes": 8388608
+  }
+}

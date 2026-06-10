@@ -7,7 +7,7 @@
 
 ## Headline result
 
-Merging training and evaluation corpora (134 active / 140 scored rows) dissociates
+Merging training and evaluation corpora (135 active / 141 scored rows) dissociates
 two axes:
 - **Pattern** (α, β, Hurst) is the agentic-*format* genre signature — role-invariant
   α (median 0.25–0.34), a distinct low-β phase (0.2–0.5 vs prose 1.1–1.4, code/math
