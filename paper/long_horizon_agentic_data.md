@@ -86,7 +86,7 @@ $$\mathrm{BPC}(n) = H_\infty + c\,n^{-\alpha}.$$
 
 | phase | β (measured range) | examples |
 | :-- | :-- | :-- |
-| **agentic** (model trajectories) | **0.15–0.52** | the trajectories in this survey |
+| **agentic** (model trajectories) | **0.15–0.52** | CoderForge/SWE-bench 0.15, Toucan 0.20, Glaive-FC 0.27, JetBrains/SWE 0.52 |
 | **code / math (bridge)** | 0.52–0.79 | Python code 0.74, Proof-Pile arxiv 0.52, open-web-math 0.79, The Pile 0.78 |
 | **natural-language prose** | 1.11–1.37 | C4 1.32, FineWeb-Edu 1.35, WikiText 1.22, TinyStories 1.35 |
 
