@@ -119,6 +119,7 @@ if "--check-paper" in sys.argv:
     # the alpha/BPC@32K/H∞ vectors computed above. Assert the two headline rank corrs.
     checks.append((f"Spearman(α, H∞) = **{spear(a,H):+.2f}**","§5 corr α-H∞"))
     checks.append((f"Spearman(BPC@32K, H∞) = **{spear(b,H):+.2f}**","§5 corr BPC-H∞"))
+    checks.append((f"Spearman(α, BPC@32K) = **{spear(a,b):+.2f}**","§5 corr α-BPC"))
     print("\n[check-paper]")
     bad=0
     for needle,label in checks:
