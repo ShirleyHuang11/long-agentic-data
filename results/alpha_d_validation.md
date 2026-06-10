@@ -29,3 +29,14 @@ Rank-correlating the measured data-scaling exponent against each candidate predi
 | BPC@32K (content) | −0.08 |
 
 **β alone out-predicts the full α/(2β) composite** (|−0.67| > 0.50): the entire directional signal lives in the correlation-decay exponent β (lower β → faster loss decay → more sample-efficient), and folding in the noisy γ-proxy α (uninformative on its own, 0.18) *dilutes* it. The two **content** metrics are orthogonal to data-efficiency (H∞ 0.27, BPC@32K −0.08) — a clean dissociation in the expected direction: sample-efficiency is a property of a corpus's repetition structure (a *pattern* statistic), not of its incompressible content. So the honest, sharpened claim is that **β is the predictive pattern statistic** for agentic-data learnability; the specific α_D = γ/2β functional form is not yet supported at this scale.
+
+**Robustness — is −0.67 an artifact of the curve-fit?** The measured exponent comes from an L∞ grid-fit, so the β↔efficiency correlation could be fit-dependent. Re-running it against *fit-free* efficiency proxies confirms the **direction is robust but the magnitude shrinks**:
+
+| efficiency measure | Spearman(β, ·) |
+| :-- | --: |
+| fitted exponent (figure value) | −0.67 |
+| raw log-log slope (no L∞) | −0.45 |
+| total loss drop, D = 0.25→3M | −0.38 |
+| relative drop per log-D | −0.45 |
+
+All four keep the expected negative sign, so β genuinely predicts data-efficiency regardless of how efficiency is operationalized — but the honest magnitude is a **range ≈ −0.4 to −0.7**, with the −0.67 figure value sitting at the optimistic (fitted) end. The signal is carried mainly by the slow-decaying high-β corpora (AgentNet 1.30, JetBrains 0.52, smolagents 0.49 have the lowest slopes); the low-β end is noisy (CoderForge β = 0.15 does *not* have the highest slope). Take the predictive claim as directional, not as a precise coefficient.
