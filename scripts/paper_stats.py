@@ -118,5 +118,12 @@ if "--check-paper" in sys.argv:
         ok=not wrong
         bad+=not ok
         print(f"  {'OK ' if ok else 'MISS'} {lbl} all=={want} ({len(hits)} mentions){'' if ok else f' STALE:{wrong}'}")
+    # §-reference integrity: every §X.Y must point at an existing section header
+    heads={m.group(1) for m in re.finditer(r'^#{2,3}\s+(\d+(?:\.\d+)?)[.\s]', txt, re.M)}
+    refs={m.group(1) for m in re.finditer(r'§\s*(\d+(?:\.\d+)?)', txt)}
+    dangling=sorted(refs-heads)
+    ok=not dangling
+    bad+=not ok
+    print(f"  {'OK ' if ok else 'MISS'} section-refs all resolve ({len(refs)} distinct){'' if ok else f' DANGLING:{dangling}'}")
     print(f"  {bad} mismatch(es)")
     sys.exit(1 if bad else 0)
