@@ -1,0 +1,22 @@
+{
+  "hf_dataset": "AmanPriyanshu/tool-reasoning-sft-MEMORY-mem_agent-sft-data-cleaned-rectified-408k",
+  "hf_revision_sha": "066233ee0f234ad1e8efe219877a2d2c0ec84a71",
+  "serializer": "messages_rc_parquet_direct",
+  "oracle": {
+    "compressor": "zstd 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-10T08:41:29.142684+00:00",
+  "result": {
+    "alpha": 0.18870826624805406,
+    "h_inf": 0.5447133662573282,
+    "bpc_32768": 2.482455253601074,
+    "n_episodes": 500,
+    "mean_turns": 4.2,
+    "n_bytes": 8388608
+  }
+}

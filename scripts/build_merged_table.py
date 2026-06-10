@@ -109,6 +109,8 @@ CLASS = {
     "miroverse-agentic-sft-new":("TRAIN", "search", "frontier"),
     # iter 179: deep-research agent SFT (openresearcher) — longest-horizon corpus (~119 turns)
     "openresearcher-deepresearch-sft":("TRAIN", "search", "distill"),
+    # iter 183: memory-agent SFT (mem_agent, long-context chunk processing) — new "memory" domain
+    "mem-agent-memory-sft":("TRAIN", "memory", "distill"),
     "nemotron-sft-v2-search":  ("TRAIN", "search", "frontier"),
     "nemotron-sft-v2-interactive": ("TRAIN", "tool", "frontier"),
     "toucan-15m-kimi-k2":      ("TRAIN", "tool", "frontier"),
