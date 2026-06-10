@@ -133,7 +133,7 @@ These role medians are nothing more than the weighted average of each role's *so
 
 ### 5.2 The content gap
 
-The benchmark *tasks* we measure agents against are human-written and dense (median H∞ 1.11); the training data we feed agents is mostly boilerplate (median 0.27). We evaluate on human richness and train on machine repetition. The healthy training minority that closes this gap — frontier rollouts in diverse, real environments, and human action streams — is exactly the data the probe scores ≥ 0.6 in seconds.
+The benchmark *tasks* we measure agents against are human-written and dense (median H∞ 1.11); the training data we feed agents is mostly boilerplate (median 0.27). We evaluate on human richness and train on machine repetition. The healthy training minority that closes this gap — frontier rollouts in diverse, real environments, and human action streams — is exactly the data the probe scores ≥ 0.6 in seconds. Concretely, **≈40% of the training corpora here clear H∞ ≥ 0.6, and 86% of those (31 of 36) are frontier rollouts**, while ≈42% sit at the template floor (H∞ < 0.05) and the rest occupy a thin middle — the bimodal split of §5.1 made into a head-count. That 40% is itself an upper bound on the field: this registry is a convenience sample that over-samples frontier rollouts (§8), so the healthy fraction of training data in the wild is lower, and the selection problem the probe addresses is correspondingly larger.
 
 Crucially, the gap is **within-domain, not a composition artifact** of train and eval covering different areas. In every domain that has both a training-trajectory and a human-authored eval-task cohort, the eval-task content floor is higher:
 
