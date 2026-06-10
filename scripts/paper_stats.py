@@ -96,6 +96,25 @@ if "--check-paper" in sys.argv:
     for r in rows: dc[r["domain"]]=dc.get(r["domain"],0)+1
     for dom in ["swe","terminal","tool","web","search","gui","safety","mixed","embodied"]:
         checks.append((f"| {dom} | {dc.get(dom,0)} |",f"domain {dom} n"))
+    # §5.1 DERIVED robustness stats — the guard's former blind spot (iter-174): these
+    # are computed inline in prose and drift silently with registry growth. Derive the
+    # live values here and assert the exact phrasing appears, so future drift is caught.
+    ratio=eta2('source')/eta2('role')
+    checks.append((f"roughly **{ratio:.1f}× more**","§5.1 one-way η² ratio"))
+    ps=_eta2_resid(_resid('domain'),'source'); pd=_eta2_resid(_resid('source'),'domain')
+    checks.append((f"explains {ps*100:.0f}% of the H∞ variance after removing domain means (partial η² {ps:.2f})","§5.1 partial η²(source|domain)"))
+    checks.append((f"after removing source means (partial η² {pd:.2f})","§5.1 partial η²(domain|source)"))
+    # pooling-exclusion margin: drop rows reading H∞≈0 with mid-band BPC@32K (pooled, not empty)
+    pooled=[r for r in rows if F(r,'h_inf')<0.05 and float(r['bpc_32768'])>1.0]
+    kept=[r for r in rows if r not in pooled]
+    def _eta2_on(items,k):
+        HH=[F(r,'h_inf') for r in items]; m=st.fmean(HH); s=sum((h-m)**2 for h in HH)
+        g={}
+        for r in items: g.setdefault(r[k],[]).append(F(r,'h_inf'))
+        return (sum(len(v)*(st.fmean(v)-m)**2 for v in g.values())/s) if s else 0
+    es,er=_eta2_on(kept,'source'),_eta2_on(kept,'role')
+    checks.append((f"dropping the {len(pooled)} rows","§5.1 pooled-row count"))
+    checks.append((f"source at η² {es:.2f} versus role {er:.2f} — a {es/er:.1f}× margin","§5.1 pooling-exclusion margin"))
     print("\n[check-paper]")
     bad=0
     for needle,label in checks:
