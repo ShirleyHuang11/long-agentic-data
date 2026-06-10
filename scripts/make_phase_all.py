@@ -37,6 +37,11 @@ AG_LABEL = {
     "glaive-fc-v2": "glaive-FC",
     "smolagents-gaia-traces": "smolagents GAIA",  # frontier search, healthy
     "mind2web-actions": "Mind2Web actions",        # human web demo (high beta)
+    # iter-189: two reasoning-SFT genres from one pipeline span the band by
+    # repetition structure, not content type (§4): memory short/templated (low
+    # beta, action band) vs deep-research long/unique-reasoning (high beta, bridge)
+    "mem-agent-memory-sft": "memory-agent (reasoning SFT)",
+    "openresearcher-deepresearch-sft": "deep-research (reasoning SFT)",
     # NB: openhands-feedback beta=0.005 is a fit artifact (flat correlation
     # curve, like FineMath/Pile) -- excluded, not plotted.
 }
