@@ -15,3 +15,17 @@ Single-pass from-scratch 29M GPT on each corpus's GPT-2 token stream (data-limit
 | AgentNet | 1.30 | 0.14 | 0.05 | 0.15 |
 
 **Spearman(predicted α_D, measured exponent) = 0.50 (n=9).** Positive but modest: the prediction's *direction* holds — low-β agentic data tends to be more sample-efficient (WebLINX, Glaive, SWE-ZERO decay faster than high-β AgentNet) — but the quantitative α_D=γ/2β prediction is far from precise at this scale, with notable discordant points (CoderForge predicted 0.93 but measured 0.22; tau-bench predicted 0.25 but measured 0.39). An earlier n=4 subset gave a stronger Spearman 0.80; the larger sample reveals that was optimistic. Absolute exponents are also compressed (measured 0.15–0.61 vs predicted 0.05–0.93): a single small model over a narrow D range (0.25–3M) recovers a weak ordering, not the theoretical scale. **Honest read: preliminary, modest positive support for the pattern statistics as a predictive signal — not a confirmation.** A fuller test (larger models, wider D, β/α measured on the exact training serialization) is forward work.
+
+## Which statistic actually carries the signal? (predictor decomposition)
+
+Rank-correlating the measured data-scaling exponent against each candidate predictor isolates where the directional success comes from:
+
+| predictor | Spearman vs measured exponent |
+| :-- | --: |
+| **β alone** | **−0.67** |
+| predicted α_D = α/(2β) | 0.50 |
+| H∞ (content) | 0.27 |
+| α alone (γ-proxy) | 0.18 |
+| BPC@32K (content) | −0.08 |
+
+**β alone out-predicts the full α/(2β) composite** (|−0.67| > 0.50): the entire directional signal lives in the correlation-decay exponent β (lower β → faster loss decay → more sample-efficient), and folding in the noisy γ-proxy α (uninformative on its own, 0.18) *dilutes* it. The two **content** metrics are orthogonal to data-efficiency (H∞ 0.27, BPC@32K −0.08) — a clean dissociation in the expected direction: sample-efficiency is a property of a corpus's repetition structure (a *pattern* statistic), not of its incompressible content. So the honest, sharpened claim is that **β is the predictive pattern statistic** for agentic-data learnability; the specific α_D = γ/2β functional form is not yet supported at this scale.

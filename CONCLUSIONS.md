@@ -183,6 +183,15 @@ narrow data range). Honest read: **preliminary, partial support** for the patter
 as a *predictive* signal — not a confirmation; a fuller test (larger models, wider D) is
 needed to settle whether the theory holds quantitatively for agentic data.
 
+Decomposing the predictor sharpens *which* statistic earns the signal: **β alone rank-correlates
+with the measured exponent (Spearman −0.67) more strongly than the full α/(2β) composite (0.50)**,
+while α alone is nearly uninformative (0.18) — the directional success is carried entirely by β,
+and the noisy γ-proxy α dilutes it. Both *content* metrics are orthogonal to data-efficiency
+(H∞ 0.27, BPC@32K −0.08): how sample-efficient a corpus is to fit is a **pattern/repetition**
+property, not a content one — a clean dissociation in the predicted direction. So the honest,
+narrowed claim is that **β is the predictive pattern statistic** for agentic learnability; the
+specific α_D = γ/2β form is not yet supported at this scale.
+
 ## 9. Reflections — the loop, and what it produced
 
 This deliverable was built over ~165 self-paced loop iterations. The arc:
