@@ -27,7 +27,7 @@ Long-horizon agentic data — multi-turn trajectories where a model interacts wi
 2. show that **pattern is the agentic-format genre signature** — α invariant across roles, and a distinct low-β correlation-decay phase separating agentic data from prose with code/math as the bridge (§4);
 3. show that **content (H∞) tracks generator source, not the train/eval role**, exposing a quantified content gap between human-authored benchmark tasks (median H∞ 1.11) and machine-generated training data (median 0.27) (§5);
 4. give a domain-dependent form/content decomposition (web/GUI observations are form, SWE observations are content) and a training experiment confirming SFT teaches form (§6–7); and
-5. document a measurement caveat — the agent harness confounds H∞ on single-harness-pooled eval rollouts — and the synthetic-control audit that fixes the canonical metric to the reference 3-point clamp (§8).
+5. document a measurement caveat — the agent harness confounds H∞ on single-harness-pooled eval rollouts — fix the canonical metric with a synthetic-control audit, and validate it directly against an independent neural oracle, which shows H∞ measures *cross-episode* incompressibility (the formal-math LZ↔neural agreement holds at finite context but not the ∞-extrapolation; §8, Figure 8).
 
 ---
 
