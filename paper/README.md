@@ -31,6 +31,7 @@ two axes:
 | Figure 7 (γ–β plane) | — | `python scripts/make_phase_all.py` |
 | Figure 2 (signature map) | — | `python scripts/make_figures_refhinf.py` |
 | Figure 8 (neural validation) | `data/neural_oracle_bpc.csv` | `sbatch scripts/run_neural_oracle.sh` (GPU) → `python scripts/make_neural_oracle_figure.py` |
+| Figure 9 (α_D validation) | `data/alpha_d_*.json` | `python scripts/alpha_d_dataprep.py` → `sbatch scripts/run_alpha_d_train.sh` (GPU) → `python scripts/make_alpha_d_figure.py` |
 | Appendix A | — | `python scripts/make_appendix_table.py` |
 | η² bootstrap | — | `python scripts/bootstrap_eta2.py` |
 

@@ -146,3 +146,63 @@ project's headline result, dissociating two axes the literature usually conflate
 The cheap probe is a **regime selector, not a recipe selector**: it identifies the
 healthy band in seconds but cannot rank teachers within it (that still needs a proxy
 training run).
+
+## 8. Two experiments run for this paper (the substantive validations)
+
+Late in the project we ran the two experiments the analysis had been pointing to —
+the loop's biggest contributions, both with full honesty about what does and doesn't hold.
+
+### 8a. Does the metric measure what we claim? (LZ-vs-neural, §8 + Figure 8)
+
+A Qwen2.5-0.5B neural oracle over 102 corpora gives **Spearman(neural bits/token, pooled
+H∞) = 0.17 — the formal-math LZ↔neural 0.97 does NOT transfer to agentic data.** But the
+divergence is diagnostic, not disqualifying: the neural estimate tracks the *finite-context*
+LZ series (BPC@128/2048/32K = 0.49/0.59/0.54) and **collapses only against the ∞-context
+extrapolated H∞**, with the per-corpus divergence scaling in the context-pooling drop. So
+**H∞ measures *cross-episode* incompressibility** — the shared-scaffold repetition that
+*defines* agentic template-degeneracy — which a context-bounded neural LM (like BPC@32K)
+structurally cannot see. The poster case: `agent-flan` reads H∞ 0 yet the *highest* neural
+bits/token measured (3.29) — varied episodes, one repeated scaffold. This **independently
+confirms the §5.3 harness-pooling story** and refines the headline: the source effect is
+specifically *cross-episode diversity* (within-window neural η²(source)=0.03; distill is
+locally dense yet H∞ 0). H∞ = 0 means "cross-episode-repetitive," not "neurally empty per
+episode" — and cross-episode repetition is exactly what makes training data low-value, so
+H∞ measures the training-relevant axis.
+
+### 8b. Does the metric *predict* training value? (α_D = γ/2β, §9 #1 + Figure 9)
+
+From-scratch single-pass training of a 29M GPT on 4 corpora spanning predicted
+α_D = α/(2β) (CoderForge 0.93 / SWE-ZERO 0.47 / JetBrains 0.34 / AgentNet 0.05) finds the
+**measured data-limited loss-decay exponent rank-correlates with the prediction at
+Spearman 0.80** — low-β agentic data is measurably *more sample-efficient*, the direction
+the theory predicts. Absolute exponents are compressed (0.15–0.26 measured vs 0.05–0.93
+predicted): a single small model over a narrow data range recovers the *ordering*, not the
+theoretical scale, and **n=4 is directional, not conclusive**. Still: this is the first
+evidence the pattern statistics are not just descriptive but *predictive* of learnability.
+
+## 9. Reflections — the loop, and what it produced
+
+This deliverable was built over ~165 self-paced loop iterations. The arc:
+
+1. **Build (iters 1–~135):** grow the registry to 133 corpora, classify every slug by
+   role/domain/source, and assemble the merged pattern+content analysis. The productive
+   vein was niche named-org/benchmark searches; the recurring failure mode was per-add
+   *number churn* across the paper, eventually tamed by a `paper_stats.py --check-paper`
+   drift guard (now asserts every count, table cell, figure caption, and §-ref).
+2. **Audit + mine (iters ~136–149):** at data saturation, value shifted from *adding* data
+   to *interrogating* it — three cross-cut findings (turns-by-source inversion, H∞-vs-BPC
+   discrimination, source-composition-by-role) and a four-confound robustness battery, all
+   from columns already in hand. Several iterations caught the loop's *own* drift (sampling
+   bias from over-adding content-rich exceptions; a within-domain overclaim a data-add had
+   silently created) and turned each into a sharper, more honest claim.
+3. **Validate (iters 150–166):** the two experiments above — the loop reaching past the
+   exhausted descriptive space to *test its own instrument and its own prediction*.
+
+**Methodological lessons that recurred:** (i) any clamped/pooled "0" is a hypothesis to
+falsify, not a finding; (ii) the test for adding data is whether it's an *independent,
+balance-improving* sample (skip same-pipeline twins and over-represented domains, even under
+an "add more" mandate); (iii) regenerating a figure is not verifying it — *look* at it;
+(iv) a finding earns its place by being coherent from the contribution statement down to the
+figure caption; (v) when a result is surprising, follow it — the neural "non-transfer" became
+the paper's mechanistic account of what H∞ measures. The paper is stronger for having
+measured its metric's limits and predictions on the target domain rather than assuming them.

@@ -1,0 +1,37 @@
+=== TRAIN coderforge ===
+coderforge: train 5,957,781 tok / val 661,976 tok on cuda
+model 29.0M params
+  D=0.25M  val_loss=6.2199
+  D=0.50M  val_loss=5.1083
+  D=1.00M  val_loss=4.4996
+  D=2.00M  val_loss=3.8765
+  D=3.00M  val_loss=3.5129
+wrote data/alpha_d_coderforge.json
+=== TRAIN swezero ===
+swezero: train 5,618,484 tok / val 624,277 tok on cuda
+model 29.0M params
+  D=0.25M  val_loss=6.1622
+  D=0.50M  val_loss=5.2967
+  D=1.00M  val_loss=4.7155
+  D=2.00M  val_loss=3.8338
+  D=3.00M  val_loss=3.1777
+wrote data/alpha_d_swezero.json
+=== TRAIN jetbrains ===
+jetbrains: train 6,489,659 tok / val 721,074 tok on cuda
+model 29.0M params
+  D=0.25M  val_loss=6.3090
+  D=0.50M  val_loss=5.2880
+  D=1.00M  val_loss=4.8951
+  D=2.00M  val_loss=4.2859
+  D=3.00M  val_loss=4.0526
+wrote data/alpha_d_jetbrains.json
+=== TRAIN agentnet ===
+agentnet: train 7,148,693 tok / val 794,300 tok on cuda
+model 29.0M params
+  D=0.25M  val_loss=6.6516
+  D=0.50M  val_loss=5.4275
+  D=1.00M  val_loss=4.9650
+  D=2.00M  val_loss=4.6437
+  D=3.00M  val_loss=4.4738
+wrote data/alpha_d_agentnet.json
+ALL DONE
