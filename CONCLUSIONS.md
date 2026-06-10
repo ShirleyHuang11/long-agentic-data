@@ -171,14 +171,17 @@ H∞ measures the training-relevant axis.
 
 ### 8b. Does the metric *predict* training value? (α_D = γ/2β, §9 #1 + Figure 9)
 
-From-scratch single-pass training of a 29M GPT on 4 corpora spanning predicted
-α_D = α/(2β) (CoderForge 0.93 / SWE-ZERO 0.47 / JetBrains 0.34 / AgentNet 0.05) finds the
-**measured data-limited loss-decay exponent rank-correlates with the prediction at
-Spearman 0.80** — low-β agentic data is measurably *more sample-efficient*, the direction
-the theory predicts. Absolute exponents are compressed (0.15–0.26 measured vs 0.05–0.93
-predicted): a single small model over a narrow data range recovers the *ordering*, not the
-theoretical scale, and **n=4 is directional, not conclusive**. Still: this is the first
-evidence the pattern statistics are not just descriptive but *predictive* of learnability.
+From-scratch single-pass training of a 29M GPT on **9 corpora** spanning predicted
+α_D = α/(2β) (WebLINX/CoderForge 0.93 … AgentNet 0.05) finds the measured data-limited
+loss-decay exponent correlates with the prediction at **Spearman 0.50 (n=9) — positive but
+modest.** The *direction* holds (low-β agentic data tends to be more sample-efficient) but
+the quantitative α_D=γ/2β prediction is far from precise, with clear discordant points
+(CoderForge predicted 0.93, measured 0.22; tau-bench 0.25→0.39). **A first n=4 subset gave a
+stronger 0.80 — the larger sample showed that was optimistic, a useful reminder to grow n
+before believing a clean number.** Absolute exponents are also compressed (small model,
+narrow data range). Honest read: **preliminary, partial support** for the pattern statistics
+as a *predictive* signal — not a confirmation; a fuller test (larger models, wider D) is
+needed to settle whether the theory holds quantitatively for agentic data.
 
 ## 9. Reflections — the loop, and what it produced
 

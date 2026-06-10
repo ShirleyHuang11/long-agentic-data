@@ -3,3 +3,80 @@ coderforge: train 5,957,781 tok / val 661,976 tok on cuda
 model 29.0M params
   D=0.25M  val_loss=6.2199
   D=0.50M  val_loss=5.1083
+  D=1.00M  val_loss=4.4996
+  D=2.00M  val_loss=3.8765
+  D=3.00M  val_loss=3.5129
+wrote data/alpha_d_coderforge.json
+=== TRAIN weblinx ===
+weblinx: train 3,671,659 tok / val 407,963 tok on cuda
+model 29.0M params
+  D=0.25M  val_loss=6.9317
+  D=0.50M  val_loss=5.1629
+  D=1.00M  val_loss=4.3464
+  D=2.00M  val_loss=3.5767
+  D=3.00M  val_loss=3.3656
+wrote data/alpha_d_weblinx.json
+=== TRAIN glaive ===
+glaive: train 4,559,315 tok / val 506,591 tok on cuda
+model 29.0M params
+  D=0.25M  val_loss=6.2819
+  D=0.50M  val_loss=4.8660
+  D=1.00M  val_loss=4.0900
+  D=2.00M  val_loss=3.5934
+  D=3.00M  val_loss=3.2734
+wrote data/alpha_d_glaive.json
+=== TRAIN swezero ===
+swezero: train 5,618,484 tok / val 624,277 tok on cuda
+model 29.0M params
+  D=0.25M  val_loss=6.1622
+  D=0.50M  val_loss=5.2967
+  D=1.00M  val_loss=4.7155
+  D=2.00M  val_loss=3.8338
+  D=3.00M  val_loss=3.1777
+wrote data/alpha_d_swezero.json
+=== TRAIN taubench ===
+taubench: train 4,363,326 tok / val 484,814 tok on cuda
+model 29.0M params
+  D=0.25M  val_loss=6.6663
+  D=0.50M  val_loss=5.2448
+  D=1.00M  val_loss=4.1856
+  D=2.00M  val_loss=3.0257
+  D=3.00M  val_loss=2.5358
+wrote data/alpha_d_taubench.json
+=== TRAIN apigen ===
+apigen: train 5,051,039 tok / val 561,227 tok on cuda
+model 29.0M params
+  D=0.25M  val_loss=6.3043
+  D=0.50M  val_loss=4.9008
+  D=1.00M  val_loss=4.0265
+  D=2.00M  val_loss=3.2076
+  D=3.00M  val_loss=2.6628
+wrote data/alpha_d_apigen.json
+=== TRAIN smolagents ===
+smolagents: train 3,067,860 tok / val 340,874 tok on cuda
+model 29.0M params
+  D=0.25M  val_loss=8.2207
+  D=0.50M  val_loss=7.1779
+  D=1.00M  val_loss=6.5934
+  D=2.00M  val_loss=5.9065
+  D=3.00M  val_loss=5.5021
+wrote data/alpha_d_smolagents.json
+=== TRAIN jetbrains ===
+jetbrains: train 6,489,659 tok / val 721,074 tok on cuda
+model 29.0M params
+  D=0.25M  val_loss=6.3090
+  D=0.50M  val_loss=5.2880
+  D=1.00M  val_loss=4.8951
+  D=2.00M  val_loss=4.2859
+  D=3.00M  val_loss=4.0526
+wrote data/alpha_d_jetbrains.json
+=== TRAIN agentnet ===
+agentnet: train 7,148,693 tok / val 794,300 tok on cuda
+model 29.0M params
+  D=0.25M  val_loss=6.6516
+  D=0.50M  val_loss=5.4275
+  D=1.00M  val_loss=4.9650
+  D=2.00M  val_loss=4.6437
+  D=3.00M  val_loss=4.4738
+wrote data/alpha_d_agentnet.json
+ALL DONE

@@ -63,9 +63,9 @@ for r in rows:
     axB.annotate(LAB[r['corpus']],(r['pred_aD'],r['meas_aD']),fontsize=10,fontweight="bold",
                  xytext=(7,3),textcoords="offset points")
 axB.set_xlabel("predicted α_D = α/(2β)"); axB.set_ylabel("measured data-scaling exponent")
-axB.set_title(f"(b) Predicted vs measured (n=4)\nrank-correlated: Spearman = {rho:.2f}",loc="left")
-fig.suptitle("α_D = γ/2β training validation: low-β agentic data is more sample-efficient",
-             fontsize=15,fontweight="bold")
+axB.set_title(f"(b) Predicted vs measured (n={len(rows)})\nSpearman = {rho:.2f} (positive but modest)",loc="left")
+fig.suptitle("α_D = γ/2β training validation: modest positive support (direction, not precise prediction)",
+             fontsize=14,fontweight="bold")
 fig.tight_layout(rect=[0,0,1,0.95])
 fig.savefig("figures/fig_alpha_d.png")
 print(f"wrote figures/fig_alpha_d.png  Spearman={rho:.2f}")
@@ -78,10 +78,14 @@ with open("results/alpha_d_validation.md","w") as f:
     f.write("| corpus | β | α(γ) | predicted α_D=α/2β | measured exponent |\n| :-- | --: | --: | --: | --: |\n")
     for r in sorted(rows,key=lambda x:-x['pred_aD']):
         f.write(f"| {LAB[r['corpus']]} | {r['beta']:.2f} | {r['alpha']:.2f} | {r['pred_aD']:.2f} | {r['meas_aD']:.2f} |\n")
-    f.write(f"\n**Spearman(predicted α_D, measured exponent) = {rho:.2f} (n=4).** The low-β agentic "
-            "corpora (CoderForge, SWE-ZERO) show steeper data-limited loss decay — more sample-efficient — "
-            "than high-β AgentNet, the direction α_D=γ/2β predicts. Absolute exponents are compressed "
-            "(0.15–0.26 measured vs 0.05–0.93 predicted): a single small model over a narrow D range "
-            "(0.25–3M) recovers the *ordering*, not the theoretical scale. **n=4 is directional/suggestive, "
-            "not conclusive** — a fuller test (more corpora, larger models, wider D) is forward work.\n")
+    f.write(f"\n**Spearman(predicted α_D, measured exponent) = {rho:.2f} (n={len(rows)}).** Positive but "
+            "modest: the prediction's *direction* holds — low-β agentic data tends to be more sample-efficient "
+            "(WebLINX, Glaive, SWE-ZERO decay faster than high-β AgentNet) — but the quantitative α_D=γ/2β "
+            "prediction is far from precise at this scale, with notable discordant points (CoderForge predicted "
+            "0.93 but measured 0.22; tau-bench predicted 0.25 but measured 0.39). An earlier n=4 subset gave a "
+            "stronger Spearman 0.80; the larger sample reveals that was optimistic. Absolute exponents are also "
+            "compressed (measured 0.15–0.61 vs predicted 0.05–0.93): a single small model over a narrow D range "
+            "(0.25–3M) recovers a weak ordering, not the theoretical scale. **Honest read: preliminary, modest "
+            "positive support for the pattern statistics as a predictive signal — not a confirmation.** A fuller "
+            "test (larger models, wider D, β/α measured on the exact training serialization) is forward work.\n")
 print("wrote results/alpha_d_validation.md")
