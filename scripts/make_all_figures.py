@@ -98,7 +98,12 @@ P={"toucan-15m-kimi-k2":("Toucan","#2ca02c"),"jetbrains-swe-test-minus-verified"
    "swe-zero-12m-traj":("SWE-ZERO","#1f77b4"),"glaive-fc-v2":("glaive-FC","#2ca02c"),
    "weblinx-actions":("WebLINX (human)","#9467bd"),"apigen-mt-5k":("APIGen","#9e9e9e"),
    "ko-agent-traj-train":("Ko-Agent","#9e9e9e"),"aider-polyglot-r2egym32b":("aider-32B flail","#d62728"),
-   "agentnet-text":("AgentNet annot.","#8c564b")}
+   "agentnet-text":("AgentNet annot.","#8c564b"),
+   # iter-176: +8 corpora spanning H∞ (grew Hurst n 9->17)
+   "agent-flan-all":("Agent-FLAN","#9e9e9e"),"agentgym-agenttraj-l":("AgentGym","#9e9e9e"),
+   "aider-polyglot-qwen3coder30b":("aider-qwen3","#d62728"),"rebel-alfworld-actions":("ALFWorld","#9e9e9e"),
+   "swe-hero-oh-traj":("SWE-Hero","#1f77b4"),"miroverse-agentic-sft-new":("MiroVerse","#2ca02c"),
+   "gui-odyssey-actions":("GUI-Odyssey (human)","#9467bd"),"fireact-multitask":("FireAct","#2ca02c")}
 fig,ax=plt.subplots(figsize=(11,7))
 for s,(l,c) in P.items():
     if s in R and s in hu:
