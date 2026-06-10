@@ -1,7 +1,7 @@
 slug,dataset,role,domain,source,alpha,h_inf,bpc_32768,hurst,n_episodes,mean_turns,mean_doc_bytes,resolved
 agentgym-agenttraj-l,AgentGym/AgentTraj-L,TRAIN,mixed,distill,0.10018357776405847,0.0,0.6681186018318965,0.719,1500,26.5,3170,False
-agentinstruct-all,THUDM/AgentInstruct,TRAIN,mixed,distill,0.10525533115900414,0.0,1.2441585286458334,,1500,12.8,3290,False
-mind2web-actions,osunlp/Mind2Web,EVAL_TASK,web,human_demo,0.4204276166867677,1.6963279634071835,2.1229154146634617,,1009,7.7,423,True
+agentinstruct-all,THUDM/AgentInstruct,TRAIN,mixed,distill,0.10525533115900414,0.0,1.2441585286458334,0.7725,1500,12.8,3290,False
+mind2web-actions,osunlp/Mind2Web,EVAL_TASK,web,human_demo,0.4204276166867677,1.6963279634071835,2.1229154146634617,0.5861,1009,7.7,423,True
 nebius-swe-agent-traj,nebius/SWE-agent-trajectories,TRAIN,swe,distill,0.15287843671318493,0.0,1.3220939636230469,,144,56.2,58315,False
 swe-bench-verified,princeton-nlp/SWE-bench_Verified,EVAL_TASK,swe,human_task,0.33435510752179065,1.566764951212698,2.217845394736842,,500,1,6225,True
 swe-smith-traj-xml,SWE-bench/SWE-smith-trajectories,TRAIN,swe,frontier,0.2854658052793455,0.5552212632048479,1.6171455383300781,,88,64.2,96001,True
@@ -9,9 +9,9 @@ swe-gym-tasks,SWE-Gym/SWE-Gym,EVAL_TASK,swe,human_task,0.3945394477626058,1.2205
 swe-rebench-test,nebius/SWE-rebench,EVAL_TASK,swe,human_task,0.2993852096956531,0.8414458692257585,1.8130149841308594,,249,1,34235,True
 code-act-codeact,xingyaoww/code-act,TRAIN,mixed,distill,0.13320500677505778,0.0,1.7294644442471592,,1500,8.3,4808,False
 swe-rebench-oh-traj,nebius/SWE-rebench-openhands-trajectories,TRAIN,swe,frontier,0.2941719871193061,0.6730966898936961,1.3621654510498047,,44,127.9,195763,True
-swe-gym-oh-sft-traj,SWE-Gym/OpenHands-SFT-Trajectories,TRAIN,swe,frontier,0.3492973550954838,1.106923423087189,1.760122299194336,,134,39.0,62786,True
+swe-gym-oh-sft-traj,SWE-Gym/OpenHands-SFT-Trajectories,TRAIN,swe,frontier,0.3492973550954838,1.106923423087189,1.760122299194336,0.8434,134,39.0,62786,True
 swe-zero-oh-traj,nvidia/SWE-Zero-openhands-trajectories,TRAIN,swe,frontier,0.31506751079317635,1.211842703308288,1.997023582458496,,106,63.7,79325,True
-agenttrek,xlangai/AgentTrek,TRAIN,web,distill,0.3365618500984194,0.8489581539852947,1.6539888381958008,,334,3,25167,False
+agenttrek,xlangai/AgentTrek,TRAIN,web,distill,0.3365618500984194,0.8489581539852947,1.6539888381958008,0.7751,334,3,25167,False
 nnetnav-wa,stanfordnlp/nnetnav-wa,TRAIN,web,mid,0.30943567834808405,0.46273491507324327,1.448507308959961,,453,3,18519,False
 swe-hero-oh-traj,nvidia/SWE-Hero-openhands-trajectories,TRAIN,swe,frontier,0.3181935605673664,0.8088993024650116,1.475642204284668,0.9425,60,125.0,141052,True
 agentbank-all,Solaris99/AgentBank,TRAIN,mixed,distill,0.48194113391399923,0.14585014339942054,0.5509872436523438,,807,67.3,10396,False
@@ -25,7 +25,7 @@ taubench-sonnet-proxy,sammshen/taubench-sonnet-traces,EXCLUDED,tool,frontier,0.4
 rlenv-appworld-train,hamishivi/rlenv-appworld-train,EXCLUDED,tool,synth_task,-0.16574033820493084,9.937885438753428,0.4573567708333333,,90,2,2447,False
 toolbench-toolllama-dfs,Yhyu13/ToolBench_toolllama_G123_dfs,TRAIN,tool,distill,0.1915213110330585,0.0,1.563197135925293,,860,7.2,9757,False
 openhands-feedback,OpenHands/openhands-feedback,TRAIN,swe,frontier,0.361043071146847,0.744701450735196,1.3382024765014648,,123,61.8,205677,True
-mind2web-fullobs,osunlp/Mind2Web,EVAL_TASK,web,human_demo,0.427103888085302,0.29730586347267707,0.6672458648681641,,129,7.9,65038,True
+mind2web-fullobs,osunlp/Mind2Web,EVAL_TASK,web,human_demo,0.427103888085302,0.29730586347267707,0.6672458648681641,0.6722,129,7.9,65038,True
 weblinx-fullobs,McGill-NLP/weblinx,EVAL_TASK,web,human_demo,0.2030228346071179,0.0,1.1108026504516602,,116,29.1,72353,False
 nemotron-sft-v2-interactive,nvidia/Nemotron-SFT-Agentic-v2,TRAIN,tool,frontier,0.16655970036803514,0.2579166380539606,2.6459503173828125,,1158,11.0,7251,True
 nemotron-agentic-v1,nvidia/Nemotron-Agentic-v1,EXCLUDED,tool,distill,-0.07879045609678233,15.165712089847984,1.4140872955322266,,1138,8.0,7374,False
@@ -40,7 +40,7 @@ r2e-gym-lite-tasks,R2E-Gym/R2E-Gym-Lite,EVAL_TASK,swe,synth_task,0.3813968310647
 glaive-fc-v2,glaiveai/glaive-function-calling-v2,TRAIN,tool,frontier,0.27969407102017974,1.0501678575112703,2.0768503042367787,0.8997,1500,5.6,2272,True
 hermes-fc-multiturn,NousResearch/hermes-function-calling-v1,TRAIN,tool,frontier,0.25878549587249605,0.776732661472108,2.031869888305664,,1237,4.6,6788,True
 aguvis-s2-androidctl-text,smolagents/aguvis-stage-2,EXCLUDED,gui,human_demo,-0.03118269176994294,34.56605178490962,0.4625079815204327,,1500,1,4537,False
-ii-agent-gaia-traj,Intelligent-Internet/ii-agent_gaia-benchmark_validation,EVAL_TRAJ,search,frontier,0.19742540510263487,1.2535433745879787,3.049951171875,,165,46.6,20984,False
+ii-agent-gaia-traj,Intelligent-Internet/ii-agent_gaia-benchmark_validation,EVAL_TRAJ,search,frontier,0.19742540510263487,1.2535433745879787,3.049951171875,0.9453,165,46.6,20984,False
 deep-research-sft-0406,kylemontgomery/deep-research-sft-0406,TRAIN,search,distill,0.17878096773328078,0.0,2.453004837036133,,161,32.5,52522,False
 fractal-deepresearch-sft,FractalAIResearch/DeepResearch-SFT,TRAIN,search,distill,0.17960631194945711,0.0,2.2928733825683594,,72,1,118099,False
 nemotron-sft-v2-search,nvidia/Nemotron-SFT-Agentic-v2,TRAIN,search,frontier,0.2608297377847353,1.3660330558584188,2.5242128372192383,,111,24.8,76289,
@@ -59,11 +59,11 @@ aider-polyglot-sweagentlm7b,DCAgent2/aider_polyglot_SWE_agent_LM_7B_20260429_173
 aider-polyglot-r2egym32b,DCAgent2/aider_polyglot_R2EGym_32B_Agent_20260505_060450-traces,EVAL_TRAJ,swe,mid,0.18482282886719595,0.0,0.8637514114379883,0.7693,44,149.8,196427,False
 miroverse-agentic-sft-new,WaltonFuture/agentic-sft-new,TRAIN,search,frontier,0.24514790847869716,1.2079353210365815,2.492417335510254,0.8216,152,12.9,55307,False
 aider-polyglot-qwen32b-ntc1k,DCAgent3/aider_polyglot_nemotron_terminal_corpus_unified_1000__Qwen3_32B_20260520_085722,EVAL_TRAJ,swe,mid,0.22145330846486708,0.0,1.4186515808105469,,132,23.6,63937,True
-aider-polyglot-qwen32b-ntc100k,DCAgent3/aider_polyglot_nemotron_terminal_corpus_unified_100000__Qwen3_32B_20260520_100037,EVAL_TRAJ,swe,mid,0.21202110014703088,0.0,1.616715431213379,,68,46.1,124389,True
+aider-polyglot-qwen32b-ntc100k,DCAgent3/aider_polyglot_nemotron_terminal_corpus_unified_100000__Qwen3_32B_20260520_100037,EVAL_TRAJ,swe,mid,0.21202110014703088,0.0,1.616715431213379,0.7977,68,46.1,124389,True
 app1-agentic-safety-sft,AI45Research/APP1-Agentic-Safety-SFT-Data,TRAIN,safety,distill,0.059387112603742784,0.0,1.2084551509122672,,1500,3,3534,False
 rebel-alfworld-sft,Decix/ReBel-ALFWorld-SFT-Trajectories,TRAIN,embodied,distill,0.10813620705939599,0.0,0.8919706344604492,,277,13.6,30296,False
 factory-agent-task-rollouts,hf-json:SeongryongJung/factory-agent-rollouts,TRAIN,tool,distill,0.21845899585944384,0.0,1.555689761513158,,70,24.7,7714,False
-smolagents-gaia-traces,smolagents/gaia-traces,EVAL_TRAJ,search,frontier,0.3014008930032536,1.436264201229077,2.3416996002197266,,1120,6.0,7511,True
+smolagents-gaia-traces,smolagents/gaia-traces,EVAL_TRAJ,search,frontier,0.3014008930032536,1.436264201229077,2.3416996002197266,0.7837,1120,6.0,7511,True
 toucan-15m-oss,Agent-Ark/Toucan-1.5M,TRAIN,tool,frontier,0.38218226827543034,0.5694290851336049,1.2505264282226562,,309,11.9,27245,True
 toucan-15m-qwen3,Agent-Ark/Toucan-1.5M,TRAIN,tool,frontier,0.34217267139025054,1.100105706852133,1.8395090103149414,,730,6.4,11494,True
 toucan-15m-sft,Agent-Ark/Toucan-1.5M,TRAIN,tool,frontier,0.3147393091728564,0.9240969285252331,1.8270225524902344,,1140,9.9,7361,True

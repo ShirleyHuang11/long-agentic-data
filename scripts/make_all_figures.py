@@ -103,7 +103,12 @@ P={"toucan-15m-kimi-k2":("Toucan","#2ca02c"),"jetbrains-swe-test-minus-verified"
    "agent-flan-all":("Agent-FLAN","#9e9e9e"),"agentgym-agenttraj-l":("AgentGym","#9e9e9e"),
    "aider-polyglot-qwen3coder30b":("aider-qwen3","#d62728"),"rebel-alfworld-actions":("ALFWorld","#9e9e9e"),
    "swe-hero-oh-traj":("SWE-Hero","#1f77b4"),"miroverse-agentic-sft-new":("MiroVerse","#2ca02c"),
-   "gui-odyssey-actions":("GUI-Odyssey (human)","#9467bd"),"fireact-multitask":("FireAct","#2ca02c")}
+   "gui-odyssey-actions":("GUI-Odyssey (human)","#9467bd"),"fireact-multitask":("FireAct","#2ca02c"),
+   # iter-186: +8 more corpora (grew Hurst n 17->25)
+   "agentinstruct-all":("AgentInstruct","#9e9e9e"),"aider-polyglot-qwen32b-ntc100k":("aider-q32b","#d62728"),
+   "mind2web-fullobs":("Mind2Web-obs (human)","#9467bd"),"agenttrek":("AgentTrek","#9e9e9e"),
+   "swe-gym-oh-sft-traj":("SWE-Gym-OH","#1f77b4"),"ii-agent-gaia-traj":("ii-agent-GAIA","#2ca02c"),
+   "smolagents-gaia-traces":("smolagents-GAIA","#2ca02c"),"mind2web-actions":("Mind2Web-act (human)","#9467bd")}
 fig,ax=plt.subplots(figsize=(11,7))
 for s,(l,c) in P.items():
     if s in R and s in hu:

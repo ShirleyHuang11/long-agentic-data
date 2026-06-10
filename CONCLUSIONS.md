@@ -132,7 +132,7 @@ project's headline result, dissociating two axes the literature usually conflate
   synthetic 0.45 / mid 0.00 / distilled 0.00 — and a variance decomposition makes
   it quantitative: **source η² = 0.33 ≫ role 0.09 ≈ domain 0.07** (source explains
   ~3× more). α and H∞ co-vary (ρ +0.78, both depressed by templating); Hurst is
-  the one statistic essentially unrelated to content (ρ −0.17 at n=17, weakly negative).
+  the one statistic essentially unrelated to content (ρ −0.15 at n=25, weakly negative).
 - **The content gap.** Benchmark *tasks* are human-authored and dense (median H∞
   1.11); training data is mostly boilerplate (0.27). We test on human richness and
   train on machine repetition.
