@@ -41,7 +41,7 @@ correction was an over-correction and was reverted; **`BPC@32K` (directly
 measured) and `score_v3` (bounded fit + `resolved` flag) are retained as
 *supplementary companions*** — most useful exactly where H∞ is pooling-confounded
 (benchmark eval rollouts under a heavy shared harness; see the paper §5.3). On
-clean corpora H∞ and BPC@32K agree (Spearman +0.56 overall, higher on clean
+clean corpora H∞ and BPC@32K agree (Spearman +0.57 overall, higher on clean
 data); they diverge precisely on harness-pooled rollouts, which is what flags the
 confound.
 
@@ -131,7 +131,7 @@ project's headline result, dissociating two axes the literature usually conflate
   monotonically with source — human task 1.11 / human demo 1.13 / frontier 0.76 /
   synthetic 0.45 / mid 0.00 / distilled 0.00 — and a variance decomposition makes
   it quantitative: **source η² = 0.33 ≫ role 0.09 ≈ domain 0.07** (source explains
-  ~3× more). α and H∞ co-vary (ρ +0.79, both depressed by templating); Hurst is
+  ~3× more). α and H∞ co-vary (ρ +0.78, both depressed by templating); Hurst is
   the one statistic essentially unrelated to content (ρ −0.17 at n=17, weakly negative).
 - **The content gap.** Benchmark *tasks* are human-authored and dense (median H∞
   1.11); training data is mostly boilerplate (0.26). We test on human richness and

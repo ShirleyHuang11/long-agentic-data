@@ -115,6 +115,10 @@ if "--check-paper" in sys.argv:
     es,er=_eta2_on(kept,'source'),_eta2_on(kept,'role')
     checks.append((f"dropping the {len(pooled)} rows","§5.1 pooled-row count"))
     checks.append((f"source at η² {es:.2f} versus role {er:.2f} — a {es/er:.1f}× margin","§5.1 pooling-exclusion margin"))
+    # §5 correlation backbone — also drifts silently with each add (iter-180); a,b,H are
+    # the alpha/BPC@32K/H∞ vectors computed above. Assert the two headline rank corrs.
+    checks.append((f"Spearman(α, H∞) = **{spear(a,H):+.2f}**","§5 corr α-H∞"))
+    checks.append((f"Spearman(BPC@32K, H∞) = **{spear(b,H):+.2f}**","§5 corr BPC-H∞"))
     print("\n[check-paper]")
     bad=0
     for needle,label in checks:
