@@ -1,0 +1,3 @@
+/n/netscratch/chen_lab_seas/Lab/shirleyhuang/envs/formchoice/lib64/python3.12/site-packages/transformers/utils/hub.py:105: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+toucan: fetching Agent-Ark/Toucan-1.5M ...
