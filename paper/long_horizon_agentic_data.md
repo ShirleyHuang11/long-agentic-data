@@ -115,6 +115,8 @@ This is the paper's central result (Figure 1).
 | mid-size-model rollout | 20 | **0.00** | 0.16 | 4/20 |
 | distilled SFT mixture | 31 | **0.00** | 0.12 | 5/31 |
 
+(The `synth_task` median is left unbolded because n = 2 is too thin to place reliably — its members are APIGen-MT at H∞ 0.00 and one schema-diverse set at 0.89, so the 0.45 is merely the midpoint of a degenerate/diverse pair, not a stable category value. We read it only as "synthetic tasks span the range," consistent with the diversity-sets-content mechanism below; it carries no weight in the monotonic ordering, which rests on the well-populated human/frontier/mid/distill rows.)
+
 By role, the same numbers re-sort to expose the gap:
 
 | role | n | median H∞ | reading |
