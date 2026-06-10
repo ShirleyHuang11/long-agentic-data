@@ -22,12 +22,19 @@ def encode(text):
     return out
 TARGET_BYTES = 16 * 1024 * 1024  # ~16MB serialized text → ~4M tokens
 
-# predicted α_D = α/(2β): coderforge 0.93, swezero 0.47, jetbrains 0.34, agentnet 0.05
+# predicted α_D = α/(2β): coderforge 0.93, weblinx 0.93, glaive 0.52, swezero 0.47,
+# terminalbench 0.43, jetbrains 0.34, smolagents 0.31, apigen 0.30, mind2web 0.27, agentnet 0.05
 CORPORA = {
     "coderforge":("togethercomputer/CoderForge-Preview-32B-SWE-Bench-Verified-Evaluation-trajectories", None),
     "swezero":  ("AlienKevin/SWE-ZERO-12M-trajectories", None),
     "jetbrains":("JetBrains-Research/agent-trajectories-swe-bench-test-minus-verified", None),
     "agentnet": ("xlangai/AgentNet", None),
+    "weblinx":  ("McGill-NLP/weblinx", None),
+    "glaive":   ("glaiveai/glaive-function-calling-v2", None),
+    "apigen":   ("Salesforce/APIGen-MT-5k", None),
+    "smolagents":("smolagents/gaia-traces", None),
+    "taubench": ("AgentSuite/tau-bench-trajectories", None),
+    "mind2web": ("osunlp/Mind2Web", None),
 }
 
 def ser_row(row):
@@ -42,6 +49,15 @@ def ser_row(row):
                 out = [f"{m.get('from') or m.get('role')}: {m.get('value') or m.get('content','')}"
                        for m in ms if isinstance(m, dict)]
                 if out: return "\n".join(out)
+    # glaive: 'system' + 'chat' strings
+    if isinstance(row.get("chat"), str):
+        return str(row.get("system", "")) + "\n" + row["chat"]
+    # weblinx action view: utterances + action (NOT clean_html — that's the form layer)
+    if "action" in row and "utterances" in row:
+        return " ".join(str(row.get(k, "")) for k in ("utterances", "action_history", "action"))
+    # mind2web: task + action_reprs (human-readable action strings)
+    if isinstance(row.get("action_reprs"), list):
+        return str(row.get("confirmed_task", "")) + "\n" + "\n".join(str(x) for x in row["action_reprs"])
     # agentnet: 'traj' list of step dicts + instruction text
     if isinstance(row.get("traj"), list):
         pre = " ".join(str(row.get(k, "")) for k in ("instruction", "natural_language_task", "actual_task"))

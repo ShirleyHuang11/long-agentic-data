@@ -9,7 +9,7 @@
 #SBATCH -J alpha_d
 source $SCRATCH/envs/formchoice/bin/activate
 cd /n/home12/shirleyhuang/long-agentic-data
-for c in coderforge swezero jetbrains agentnet; do
+for c in coderforge weblinx glaive swezero taubench apigen smolagents jetbrains agentnet; do
   echo "=== TRAIN $c ==="
   python scripts/alpha_d_train.py --corpus $c
 done

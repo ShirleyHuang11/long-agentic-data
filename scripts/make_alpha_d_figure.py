@@ -17,12 +17,18 @@ reg={r['slug']:r for r in csv.DictReader(open("data/agentic_alpha_hinf.csv"))}
 gb={(r.get('slug') or r.get('dataset')):float(r[[k for k in r if 'beta' in k.lower()][0]])
     for r in csv.DictReader(open("data/gamma_beta.csv"))}
 M={"coderforge":"coderforge-32b-swebench-verified-eval","swezero":"swe-zero-12m-traj",
-   "jetbrains":"jetbrains-swe-test-minus-verified","agentnet":"agentnet-text"}
-LAB={"coderforge":"CoderForge","swezero":"SWE-ZERO","jetbrains":"JetBrains","agentnet":"AgentNet"}
-COL={"coderforge":"#1f77b4","swezero":"#2ca02c","jetbrains":"#ff7f0e","agentnet":"#d62728"}
+   "jetbrains":"jetbrains-swe-test-minus-verified","agentnet":"agentnet-text",
+   "weblinx":"weblinx-actions","glaive":"glaive-fc-v2","apigen":"apigen-mt-5k",
+   "smolagents":"smolagents-gaia-traces","taubench":"taubench-deepseek-r1-eval"}
+LAB={"coderforge":"CoderForge","swezero":"SWE-ZERO","jetbrains":"JetBrains","agentnet":"AgentNet",
+     "weblinx":"WebLINX","glaive":"Glaive-FC","apigen":"APIGen","smolagents":"smolagents-GAIA","taubench":"tau-bench"}
+import matplotlib.cm as _cm
+COL={k:_cm.tab10(i % 10) for i,k in enumerate(M)}
 
+import os
 rows=[]
 for c,slug in M.items():
+    if not os.path.exists(f"data/alpha_d_{c}.json"): continue
     d=json.load(open(f"data/alpha_d_{c}.json"))
     D=np.array([p['D'] for p in d['curve']]); L=np.array([p['val_loss'] for p in d['curve']])
     a=float(reg[slug]['alpha']); b=gb[slug]; pred=a/(2*b)

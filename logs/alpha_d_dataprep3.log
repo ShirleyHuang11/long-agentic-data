@@ -1,0 +1,15 @@
+/n/netscratch/chen_lab_seas/Lab/shirleyhuang/envs/formchoice/lib64/python3.12/site-packages/transformers/utils/hub.py:105: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+coderforge: exists, skip
+swezero: exists, skip
+jetbrains: exists, skip
+agentnet: exists, skip
+weblinx: fetching McGill-NLP/weblinx ...
+Token indices sequence length is longer than the specified maximum sequence length for this model (74152 > 1024). Running this sequence through the model will result in indexing errors
+weblinx: 4,079,622 tokens (4.08M)  train 3,671,659 / val 407,963
+glaive: fetching glaiveai/glaive-function-calling-v2 ...
+glaive: 5,065,906 tokens (5.07M)  train 4,559,315 / val 506,591
+apigen: exists, skip
+smolagents: exists, skip
+taubench: exists, skip
+mind2web: fetching osunlp/Mind2Web ...

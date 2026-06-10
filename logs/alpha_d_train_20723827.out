@@ -1,0 +1,5 @@
+=== TRAIN coderforge ===
+coderforge: train 5,957,781 tok / val 661,976 tok on cuda
+model 29.0M params
+  D=0.25M  val_loss=6.2199
+  D=0.50M  val_loss=5.1083
