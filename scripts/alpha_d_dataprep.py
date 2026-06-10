@@ -8,8 +8,7 @@ corpus and compares to the predicted α/(2β).
 """
 import json, os, sys
 import numpy as np
-from huggingface_hub import HfApi, hf_hub_download
-import pandas as pd
+from datasets import load_dataset
 from transformers import GPT2TokenizerFast
 
 OUT = os.path.join(os.environ["SCRATCH"], "alpha_d")
@@ -23,42 +22,55 @@ def encode(text):
     return out
 TARGET_BYTES = 16 * 1024 * 1024  # ~16MB serialized text → ~4M tokens
 
+# predicted α_D = α/(2β): coderforge 0.93, swezero 0.47, jetbrains 0.34, agentnet 0.05
 CORPORA = {
-    "toucan":   ("Agent-Ark/Toucan-1.5M", "Kimi-K2"),
+    "coderforge":("togethercomputer/CoderForge-Preview-32B-SWE-Bench-Verified-Evaluation-trajectories", None),
     "swezero":  ("AlienKevin/SWE-ZERO-12M-trajectories", None),
     "jetbrains":("JetBrains-Research/agent-trajectories-swe-bench-test-minus-verified", None),
     "agentnet": ("xlangai/AgentNet", None),
 }
 
 def ser_row(row):
-    # generic: conversations/messages list, or a text field
+    # conversations/messages — may be a list OR a JSON string
     for col in ("conversations", "messages"):
         if col in row and row[col] is not None:
             ms = row[col]
-            return "\n".join(
-                f"{m.get('from') or m.get('role')}: {m.get('value') or m.get('content','')}"
-                for m in ms if isinstance(m, dict))
-    for col in ("text", "content"):
-        if col in row and isinstance(row[col], str):
+            if isinstance(ms, str):
+                try: ms = json.loads(ms)
+                except Exception: ms = None
+            if isinstance(ms, list):
+                out = [f"{m.get('from') or m.get('role')}: {m.get('value') or m.get('content','')}"
+                       for m in ms if isinstance(m, dict)]
+                if out: return "\n".join(out)
+    # agentnet: 'traj' list of step dicts + instruction text
+    if isinstance(row.get("traj"), list):
+        pre = " ".join(str(row.get(k, "")) for k in ("instruction", "natural_language_task", "actual_task"))
+        steps = []
+        for st in row["traj"]:
+            steps.append(" ".join(str(v) for v in st.values() if isinstance(v, (str, int, float)))
+                         if isinstance(st, dict) else str(st))
+        return pre + "\n" + "\n".join(steps)
+    for col in ("text", "content", "instruction"):
+        if isinstance(row.get(col), str):
             return row[col]
     return ""
 
 def fetch_text(repo, config):
-    api = HfApi()
-    files = sorted(s.rfilename for s in api.dataset_info(repo).siblings
-                   if s.rfilename.endswith(".parquet"))
-    if config:  # filter shards by config dir if present
-        cf = [f for f in files if config.lower().replace("-", "").replace("_", "") in f.lower().replace("-", "").replace("_", "")]
-        files = cf or files
+    # stream rows incrementally (no whole-shard download)
+    try:
+        ds = load_dataset(repo, config, split="train", streaming=True) if config \
+             else load_dataset(repo, split="train", streaming=True)
+    except Exception:
+        ds = load_dataset(repo, split="train", streaming=True)
     buf, total = [], 0
-    for f in files:
-        df = pd.read_parquet(hf_hub_download(repo, f, repo_type="dataset"))
-        for _, r in df.iterrows():
-            t = ser_row(r.to_dict())
-            if t:
-                buf.append(t); total += len(t.encode())
-                if total >= TARGET_BYTES:
-                    return "\n\n".join(buf)
+    for i, r in enumerate(ds):
+        if i > 200_000:  # safety: never stream a whole huge dataset
+            break
+        t = ser_row(r)
+        if t:
+            buf.append(t); total += len(t.encode())
+            if total >= TARGET_BYTES:
+                break
     return "\n\n".join(buf)
 
 for name, (repo, config) in CORPORA.items():

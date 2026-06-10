@@ -1,3 +1,10 @@
 /n/netscratch/chen_lab_seas/Lab/shirleyhuang/envs/formchoice/lib64/python3.12/site-packages/transformers/utils/hub.py:105: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
   warnings.warn(
-toucan: fetching Agent-Ark/Toucan-1.5M ...
+coderforge: fetching togethercomputer/CoderForge-Preview-32B-SWE-Bench-Verified-Evaluation-trajectories ...
+Token indices sequence length is longer than the specified maximum sequence length for this model (79971 > 1024). Running this sequence through the model will result in indexing errors
+coderforge: 6,619,757 tokens (6.62M)  train 5,957,781 / val 661,976
+swezero: exists, skip
+jetbrains: exists, skip
+agentnet: fetching xlangai/AgentNet ...
+agentnet: 7,942,993 tokens (7.94M)  train 7,148,693 / val 794,300
+done; arrays in /n/netscratch/chen_lab_seas/Lab/shirleyhuang/alpha_d
