@@ -1,12 +1,14 @@
 """iter-171: FleetAI/trajectories-tool_use-difficult-envs-raw.
-Frontier (gemini-3-pro-preview) tool-use rollouts on *difficult* environments — a new
-generator + harder-env tool domain. Reference-exact score; full 17-col row."""
+Frontier-model MIX (gemini-3-pro, claude-sonnet-4.5, gemini-3-flash, kimi-k2.5,
+opus-4.6/4.5, gpt-5.2) tool-use rollouts on *difficult* environments — harder-env tool
+domain. Reference-exact score; full 17-col row. (iter-172: relabeled gemini3pro ->
+frontiermix after auditing the model composition — the row pools 7 frontier models.)"""
 import csv, datetime, json, os, statistics, sys
 sys.path.insert(0, os.path.dirname(__file__))
 import lz_oracle
 from datasets import load_dataset
 from huggingface_hub import HfApi
-ENTRIES=[("FleetAI/trajectories-tool_use-difficult-envs-raw","tool_use","messages","fleet-tooluse-difficult-gemini3pro")]
+ENTRIES=[("FleetAI/trajectories-tool_use-difficult-envs-raw","tool_use","messages","fleet-tooluse-difficult-frontiermix")]
 FIELDS=["dataset","config","splits","slug","alpha","h_inf","h_inf_raw","bpc_128","bpc_2048",
         "bpc_32768","n_episodes","mean_turns","mean_doc_bytes","n_bytes","h_inf_v3","h_inf_stderr","resolved"]
 rows=[]

@@ -138,4 +138,4 @@ eto-alfworld,agent-eto/eto-sft-trajectory,TRAIN,embodied,distill,0.1017293647023
 eto-sciworld,agent-eto/eto-sft-trajectory,TRAIN,embodied,distill,0.1621176405412777,0.0,1.0632715225219727,,1309,29.0,6410,True
 eto-webshop,agent-eto/eto-sft-trajectory,TRAIN,web,distill,0.17509292660168094,0.0,1.7382055557450873,,1500,9.9,5017,True
 gelato-osworld-gui,mlfoundations/gelato-osworld-agent-trajectories,EVAL_TRAJ,gui,mid,0.2678481350862125,0.0,1.27452392578125,,200,15.3,9864,True
-fleet-tooluse-difficult-gemini3pro,FleetAI/trajectories-tool_use-difficult-envs-raw,EVAL_TRAJ,tool,frontier,0.3206539066914411,0.0905697326117878,1.0447988510131836,,92,34.5,91675,
+fleet-tooluse-difficult-frontiermix,FleetAI/trajectories-tool_use-difficult-envs-raw,EVAL_TRAJ,tool,frontier,0.3206539066914411,0.0905697326117878,1.0447988510131836,,92,34.5,91675,

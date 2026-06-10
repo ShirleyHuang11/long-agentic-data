@@ -41,7 +41,7 @@
 | webarena-infinity-kimi | frontier | web | 0.31 | 0.52 | 1.56 | 11.0 |
 | webarena-infinity-qwen | mid | web | 0.44 | 0.33 | 0.83 | 11.0 |
 | terminal-bench2-claude-sonnet45 | frontier | terminal | 0.23 | 0.16 | 1.75 | 27.6 |
-| fleet-tooluse-difficult-gemini3pro | frontier | tool | 0.32 | 0.09 | 1.04 | 34.5 |
+| fleet-tooluse-difficult-frontiermix | frontier | tool | 0.32 | 0.09 | 1.04 | 34.5 |
 | aider-polyglot-qwen3coder30b | mid | swe | 0.23 | 0.08 | 1.65 | 94.3 |
 | webarena-infinity-gemini | frontier | web | 0.30 | 0.03 | 1.20 | 11.5 |
 | taubench-traces-jkazdan | distill | tool | 0.26 | 0.00 | 1.40 | 27.6 |
