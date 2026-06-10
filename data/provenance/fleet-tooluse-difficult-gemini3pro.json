@@ -1,0 +1,22 @@
+{
+  "hf_dataset": "FleetAI/trajectories-tool_use-difficult-envs-raw",
+  "hf_revision_sha": "b694f00167feebb8c227af104e2f6da57d37004b",
+  "serializer": "messages_rc",
+  "oracle": {
+    "compressor": "zstd 19",
+    "context_points": [
+      128,
+      2048,
+      32768
+    ]
+  },
+  "collected_at_utc": "2026-06-10T03:49:09.085731+00:00",
+  "result": {
+    "alpha": 0.3206539066914411,
+    "h_inf": 0.0905697326117878,
+    "bpc_32768": 1.0447988510131836,
+    "n_episodes": 92,
+    "mean_turns": 34.5,
+    "n_bytes": 8388608
+  }
+}
