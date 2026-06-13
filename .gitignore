@@ -6,6 +6,8 @@ plot*
 ./*.md
 wandb
 
+assets/data-manifold*
+
 bio
 scratch.*
 toy*
