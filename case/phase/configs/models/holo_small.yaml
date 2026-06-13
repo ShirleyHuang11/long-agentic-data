@@ -1,0 +1,39 @@
+# Grid-tier RoPE preset for the holographic length-gen sweep.
+# ~15M non-embed params; min floor lowered so small models pass build_config.
+architecture: transformer_rope
+vocab_size: 552           # p=31 + n_names=512 + 3 specials + 6 filler
+d_model: 512
+nhead: 8
+ff_mult: 4
+num_layers: 6
+dropout: 0.1
+min_non_embed_params: 1000000
+
+# ---- task knobs ----
+task: nested_monoid
+op_kind: perm
+n_perms: 16
+monoid_p: 31
+monoid_names: 512
+monoid_filler: 6
+gen_mode: holographic
+source_len: 1024
+eval_answer_masked: true
+
+# ---- training ----
+train_len: 256
+eval_lengths: [256, 512, 1024, 2048]
+train_steps: 4000
+train_batch_size: 64
+eval_batch_size: 16
+eval_batches: 16
+lr: 3e-4
+warmup_steps: 100
+lr_min_ratio: 0.1
+grad_clip: 1.0
+deterministic: false
+
+# ---- diagnostics ----
+renyi_seq_len: 12000
+renyi_qs: [0.5, 1.0, 2.0]
+renyi_orders: [1, 2, 3]

@@ -1,0 +1,36 @@
+# Scale-tier RoPE preset (≥100M non-embed) for headline-cell confirmation.
+# d_model=1024, num_layers=8, ff_mult=4 → same ~100.8M as the KV 100m preset.
+architecture: transformer_rope
+vocab_size: 552
+d_model: 1024
+nhead: 16
+ff_mult: 4
+num_layers: 8
+dropout: 0.1
+# no min_non_embed_params override → default 100M floor enforced
+
+task: nested_monoid
+op_kind: perm
+n_perms: 16
+monoid_p: 31
+monoid_names: 512
+monoid_filler: 6
+gen_mode: holographic
+source_len: 1024
+eval_answer_masked: true
+
+train_len: 256
+eval_lengths: [256, 512, 1024, 2048]
+train_steps: 6000
+train_batch_size: 32
+eval_batch_size: 8
+eval_batches: 16
+lr: 3e-4
+warmup_steps: 100
+lr_min_ratio: 0.1
+grad_clip: 1.0
+deterministic: false
+
+renyi_seq_len: 12000
+renyi_qs: [0.5, 1.0, 2.0]
+renyi_orders: [1, 2, 3]

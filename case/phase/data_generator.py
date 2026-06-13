@@ -357,6 +357,24 @@ def _single_from_cfg(c) -> SweepPlan:
     )
 
 
+def holo_anchors(_cfg=None) -> SweepPlan:
+    """The four holo.pdf anchors for the holographic length-gen study."""
+    pairs = ((2.0, 0.8), (0.5, 0.4), (0.05, 0.05), (0.0, 0.0))
+    return SweepPlan(name="holo_anchors",
+                     description="Natural / CoT / Edge-of-chaos / Abyss anchors",
+                     pairs=pairs)
+
+
+def holo_grid(_cfg=None) -> SweepPlan:
+    """6x6 (β,γ) grid for the holographic length-gen phase map."""
+    betas = [0.0, 0.05, 0.2, 0.5, 1.0, 2.0]
+    gammas = [0.0, 0.05, 0.2, 0.4, 0.6, 0.8]
+    pairs = tuple((b, g) for b in betas for g in gammas)
+    return SweepPlan(name="holo_grid",
+                     description="6x6 beta x gamma grid (holographic length-gen)",
+                     pairs=pairs)
+
+
 _FACTORIES = {
     "standard": _standard_from_cfg,
     "corners": lambda c: boundary_corners(),
@@ -366,6 +384,8 @@ _FACTORIES = {
     "fast_beta": lambda c: fast_beta_limit(p=c.p, n=c.n),
     "refine": lambda c: refine_around(c.beta, c.gamma),
     "single": _single_from_cfg,
+    "holo_anchors": lambda c: holo_anchors(c),
+    "holo_grid": lambda c: holo_grid(c),
 }
 
 

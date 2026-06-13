@@ -1,0 +1,37 @@
+# Grid-tier Mamba control for the H3 architecture comparison.
+architecture: mamba
+vocab_size: 552
+d_model: 512
+num_layers: 16
+d_state: 16
+d_conv: 3
+nhead: 8            # kept for build_config back-compat (Mamba ignores)
+ff_mult: 4
+dropout: 0.0
+min_non_embed_params: 1000000
+
+task: nested_monoid
+op_kind: perm
+n_perms: 16
+monoid_p: 31
+monoid_names: 512
+monoid_filler: 6
+gen_mode: holographic
+source_len: 1024
+eval_answer_masked: true
+
+train_len: 256
+eval_lengths: [256, 512, 1024, 2048]
+train_steps: 4000
+train_batch_size: 32     # Mamba scan is slower; smaller batch
+eval_batch_size: 8
+eval_batches: 16
+lr: 3e-4
+warmup_steps: 100
+lr_min_ratio: 0.1
+grad_clip: 1.0
+deterministic: false
+
+renyi_seq_len: 12000
+renyi_qs: [0.5, 1.0, 2.0]
+renyi_orders: [1, 2, 3]
