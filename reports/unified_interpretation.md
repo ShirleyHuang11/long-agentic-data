@@ -115,13 +115,23 @@ The current axes are all byte-level. The unified frame would be sharpened by a f
 (full space in `reports/metric_space_brainstorm.md`):
 
 1. **reasoning-to-action ratio** (think-tokens / action-tokens) — a content-
-   orthogonal "cognitive load" axis; may explain β.
-2. **scaffold/boilerplate fraction** — operationalizes the pooling mechanism that
-   drives H∞=0 from a *latent cause* into a *measured coordinate*.
+   orthogonal "cognitive load" axis; may explain β. *(not yet measured)*
+2. ✅ **scaffold/boilerplate fraction** — *measured* (`scripts/measure_scaffold.py`,
+   `data/scaffold_frac.csv`, n=102 active corpora; byte share of lines shared
+   across ≥2 cached episodes; figure `figures/fig_scaffold_pooling.png`). It
+   operationalizes the pooling cause of H∞=0 as a coordinate: the **H∞=0 pooled
+   cluster carries 2.5× the scaffold of healthy corpora** (median 0.246 vs 0.100),
+   it is **orthogonal to length** (ρ=−0.05), and it retains signal among content-
+   dense corpora (ρ(scaffold, H∞)=−0.32 at BPC@32K>1) — i.e. it explains some
+   H∞=0 *beyond* low within-window density. It is a **modest** standalone predictor
+   (ρ(scaffold, H∞)=−0.34 overall) and is estimated from only 3 cached episodes, so
+   it is a directional coordinate, not a precise one. Verdict: a real, partially-
+   independent pooling axis — it makes the pooled/degenerate "kind" (Sec 4) a
+   *measured* region rather than an inferred one.
 3. **credit-assignment horizon** — the long-horizon-specific axis; test whether it
-   is genuinely captured by Hurst or independent.
+   is genuinely captured by Hurst or independent. *(not yet measured)*
 4. **near-duplication / contamination** — the hygiene axis that decides train-vs-
-   eval *usability* regardless of content score.
+   eval *usability* regardless of content score. *(not yet measured)*
 
 The gold *benchmark* metrics (empirical difficulty, discrimination, verifiability)
 require model rollouts or oracle access — they mark the boundary of what a
