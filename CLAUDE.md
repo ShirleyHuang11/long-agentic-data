@@ -78,7 +78,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 - Try not to run jobs that would consume large memories on nodes like boslogin*.rc.fas.harvard.edu. For jobs that can be handled by CPUs, submit them to -p=seas_compute -A=barak_lab. For jobs that require GPUs, submit them to -p kempner (40 GiB A100) or -p kempner_h100 (80 GiB H100), then for kempner nodes use -A=kempner_sham_lab, choosing the appropriate queue based on the situation, especially try to reschedule the (QOSMaxGRESPerUser) to proper partitions.
 
-- use uv to install environments - source $SCRATCH/envs/xxx/bin/activate. don't install hf_cache into my home dir, we have the HF_HOME dir to store ckpts. 
+- use uv to install environments - source $SCRATCH/envs/holo/bin/activate. don't install hf_cache into my home dir, we have the HF_HOME dir to store ckpts. 
 
 - there are requeue partitions - gpu_requeue and kempner_requeue, consider using those if they are very empty and the job is quick to finish. if the job takes >8 hours, use checkpointing so after preemption, the job can be resumed again. when partitions are full, try to flexibly find useful and efficient partition for the jobs at hand.
 
