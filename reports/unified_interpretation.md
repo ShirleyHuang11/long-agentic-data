@@ -114,8 +114,18 @@ The current axes are all byte-level. The unified frame would be sharpened by a f
 *structural* axes that are plausibly independent and still cheaply measurable
 (full space in `reports/metric_space_brainstorm.md`):
 
-1. **reasoning-to-action ratio** (think-tokens / action-tokens) — a content-
-   orthogonal "cognitive load" axis; may explain β. *(not yet measured)*
+1. ⚠️ **reasoning-to-action ratio** — *attempted, marker-based version infeasible*:
+   explicit `Thought:`/`Action:` markers occur in only 12%/7% of corpora, so a
+   marker ratio would be format-heterogeneity noise. Measured a **format-free
+   proxy instead** — `structure_density` = non-alphabetic char fraction (high in
+   JSON/code/tool serializations, low in reasoning prose; `scripts/measure_
+   structure_density.py`, `data/structure_density.csv`, n=102; figure
+   `figures/fig_structure_density.png`). **It is a genuinely new near-independent
+   axis**: ρ(structure, H∞)=**+0.08** (orthogonal to content), and no label
+   organizes it (η² role/domain/source = 0.09/0.10/0.11 — *not* a domain proxy).
+   A suggestive negative link to β (ρ=−0.53) is **underpowered (n=12)** so the
+   "explains β" idea stays open. Verdict: a real serialization-symbol-heaviness
+   axis, orthogonal to content — but its "reasoning vs action" reading is loose.
 2. ✅ **scaffold/boilerplate fraction** — *measured* (`scripts/measure_scaffold.py`,
    `data/scaffold_frac.csv`, n=102 active corpora; byte share of lines shared
    across ≥2 cached episodes; figure `figures/fig_scaffold_pooling.png`). It
