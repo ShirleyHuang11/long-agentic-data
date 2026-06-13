@@ -140,8 +140,34 @@ The current axes are all byte-level. The unified frame would be sharpened by a f
    *measured* region rather than an inferred one.
 3. **credit-assignment horizon** — the long-horizon-specific axis; test whether it
    is genuinely captured by Hurst or independent. *(not yet measured)*
-4. **near-duplication / contamination** — the hygiene axis that decides train-vs-
-   eval *usability* regardless of content score. *(not yet measured)*
+4. ✅ **near-duplication** — *measured* (`scripts/measure_neardup.py`,
+   `data/neardup.csv`, n=102; mean pairwise word-5-gram Jaccard across cached
+   episodes). **It is not a new axis — it collapses onto scaffold** (ρ=+0.84), but
+   it is the *stronger estimator* of the redundancy/pooling dimension
+   (ρ(neardup, H∞)=−0.48 vs scaffold's −0.34; ⊥ length at +0.03). So redundancy is
+   one robust axis, best measured by shingle-Jaccard. (Contamination *vs an external
+   training set* — the eval-validity sense — remains unmeasured; needs a reference
+   corpus.)
+
+## 7. The consolidated frame — ~5 measured dimensions
+
+Putting all measured axes together (`scripts/extended_axes.py`,
+`figures/fig_extended_axes_corr.png`, n=102 corpora with all axes), a PCA shows
+**5 dimensions capture 90% of the variance**. The Spearman structure resolves them:
+
+| dimension | markers | independence |
+|---|---|---|
+| 1. content richness | H∞, α (ρ=0.78) | the primary axis |
+| 2. within-window density | BPC@32K | partly separate from #1 (α–BPC only 0.13) |
+| 3. length | turns | **fully orthogonal** (all \|ρ\|≤0.21) |
+| 4. structure / serialization | structure_density | near-orthogonal (max \|ρ\|=0.29) |
+| 5. redundancy / pooling | neardup ≈ scaffold (ρ=0.84) | anti-correlated w/ content, distinct |
+
+This is the unified interpretation in compact form: **agentic corpora occupy a
+~5-dimensional content/format space — and the train/eval role is not one of its
+dimensions.** Role re-enters only as a weak loading on #3 (length). The same four
+"kinds" of Sec 4 are simply dense regions of this space, defined by content ×
+length × density × redundancy, with structure as a near-free fifth knob.
 
 The gold *benchmark* metrics (empirical difficulty, discrimination, verifiability)
 require model rollouts or oracle access — they mark the boundary of what a
