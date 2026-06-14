@@ -1,0 +1,14 @@
+=== β-axis (γ=0.2 fixed): median recall distance vs β ===
+  β= 0.05  median_recall_lag=   24.0  mean_uses= 65.6
+  β= 0.50  median_recall_lag=   12.0  mean_uses= 65.6
+  β= 2.00  median_recall_lag=    7.0  mean_uses= 65.6
+=== γ-axis (β=0.5 fixed): filler fraction vs γ ===
+  γ= 0.05  filler_frac= 0.016
+  γ= 0.40  filler_frac= 0.163
+  γ= 0.80  filler_frac= 0.527
+=== secondary diagnostic: ||C(n)|| / entropy on a long stream ===
+  (noisy on synthetic data; reported only) beta_hat=0.575 gamma_hat=9.922
+
+GATE β (median recall distance ↓ in β): True
+GATE γ (filler fraction ↑ in γ):        True
+GATE: PASS

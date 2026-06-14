@@ -110,7 +110,7 @@ def build_config(model_cfg, long_len, task: str = "kv") -> Dict[str, object]:
             d_state=int(cfg.get("d_state", 16)),
             d_conv=int(cfg.get("d_conv", 3)),
         )
-    else:
+    else:  # 'transformer' (APE) and 'transformer_rope' share the count
         n_non_embed = count_non_embedding_params(
             d_model=int(cfg["d_model"]),
             nhead=int(cfg["nhead"]),
@@ -118,13 +118,12 @@ def build_config(model_cfg, long_len, task: str = "kv") -> Dict[str, object]:
             num_layers=int(cfg["num_layers"]),
             vocab_size=int(cfg["vocab_size"]),
         )
-    if n_non_embed < MIN_NON_EMBED_PARAMS:
+    floor = int(cfg.get("min_non_embed_params", MIN_NON_EMBED_PARAMS))
+    if n_non_embed < floor:
         raise ValueError(
             f"non-embedding params = {n_non_embed:,} (~{n_non_embed/1e6:.2f}M) "
-            f"< floor {MIN_NON_EMBED_PARAMS:,} (100M). "
-            f"Bump model.d_model / model.num_layers (current "
-            f"d_model={cfg['d_model']}, num_layers={cfg['num_layers']}, "
-            f"nhead={cfg['nhead']}, ff_mult={cfg['ff_mult']})."
+            f"< floor {floor:,}. Bump model.d_model / model.num_layers, or lower "
+            f"model.min_non_embed_params for a small-scale grid sweep."
         )
     cfg["_non_embed_params"] = int(n_non_embed)
     return cfg

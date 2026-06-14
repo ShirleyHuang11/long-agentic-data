@@ -118,7 +118,19 @@ def make_generator(config: Dict[str, object]):
     if task == "logical_folding":
         from data_logical_folding import LogicalFoldingGenerator
         return LogicalFoldingGenerator(vocab_size=vocab_size)
-    raise ValueError(f"unknown task={task!r} (expected 'kv' or 'logical_folding')")
+    if task == "nested_monoid":
+        from data_nested_monoid import NestedMonoidGenerator
+        return NestedMonoidGenerator(
+            p=int(config.get("monoid_p", 31)),
+            n_names=int(config.get("monoid_names", 512)),
+            n_filler=int(config.get("monoid_filler", 6)),
+            mode=str(config.get("gen_mode", "holographic")),
+            source_len=int(config.get("source_len", 1024)),
+            op_kind=str(config.get("op_kind", "perm")),
+            n_perms=int(config.get("n_perms", 16)),
+        )
+    raise ValueError(
+        f"unknown task={task!r} (expected 'kv', 'logical_folding', or 'nested_monoid')")
 
 
 def compute_dataset_renyi_dimensions(
@@ -202,6 +214,17 @@ def next_token_loss_and_acc(logits: torch.Tensor, targets: torch.Tensor) -> Tupl
     return loss, acc
 
 
+def masked_next_token_acc(logits: torch.Tensor, targets: torch.Tensor,
+                          target_mask: torch.Tensor) -> float:
+    """Next-token accuracy over positions where target_mask == 1 (answer/trace)."""
+    pred = logits.argmax(-1)
+    correct = (pred == targets).float() * target_mask
+    denom = float(target_mask.sum().item())
+    if denom <= 0:
+        return 0.0
+    return float(correct.sum().item() / denom)
+
+
 def evaluate_at_length(
     model: nn.Module,
     gen,
@@ -211,15 +234,18 @@ def evaluate_at_length(
     eval_batches: int,
     batch_size: int,
     device: torch.device,
+    answer_masked: bool = False,
 ) -> Dict[str, float]:
     model.eval()
     total_loss = 0.0
-    total_correct = 0.0
-    total_count = 0.0
+    total_correct_all = 0.0
+    total_count_all = 0.0
+    masked_correct = 0.0
+    masked_count = 0.0
 
     with torch.no_grad():
         for _ in range(eval_batches):
-            x, _, _ = gen.generate_batch(batch_size, seq_len, beta, gamma)
+            x, _, m = gen.generate_batch(batch_size, seq_len, beta, gamma)
             x = x.to(device)
             if x.size(1) < 2:
                 continue
@@ -229,13 +255,23 @@ def evaluate_at_length(
             logits = model(inp)
             loss, acc = next_token_loss_and_acc(logits, y)
             total_loss += float(loss.item())
-            total_correct += float(acc.item()) * float(y.numel())
-            total_count += float(y.numel())
+            total_correct_all += float(acc.item()) * float(y.numel())
+            total_count_all += float(y.numel())
+            if answer_masked:
+                tmask = m[:, 1:].to(device)
+                pred = logits.argmax(-1)
+                masked_correct += float(((pred == y).float() * tmask).sum().item())
+                masked_count += float(tmask.sum().item())
 
-    return {
-        "loss": total_loss / max(eval_batches, 1),
-        "acc": total_correct / max(total_count, EPS),
-    }
+    acc_all = total_correct_all / max(total_count_all, EPS)
+    out = {"loss": total_loss / max(eval_batches, 1), "acc_all": acc_all}
+    if answer_masked:
+        acc_ans = masked_correct / max(masked_count, EPS)
+        out["acc_answer"] = acc_ans
+        out["acc"] = acc_ans      # primary metric = answer accuracy
+    else:
+        out["acc"] = acc_all
+    return out
 
 
 def train_one_model(
@@ -267,6 +303,16 @@ def train_one_model(
             num_layers=int(config["num_layers"]),
             d_state=int(config.get("d_state", 16)),
             d_conv=int(config.get("d_conv", 3)),
+            dropout=float(config["dropout"]),
+        ).to(device)
+    elif arch == "transformer_rope":
+        from model_rope import RoPECausalTransformer
+        model = RoPECausalTransformer(
+            vocab_size=int(config["vocab_size"]),
+            d_model=int(config["d_model"]),
+            nhead=int(config["nhead"]),
+            ff_mult=int(config["ff_mult"]),
+            num_layers=int(config["num_layers"]),
             dropout=float(config["dropout"]),
         ).to(device)
     else:
@@ -342,6 +388,7 @@ def train_one_model(
         else:
             aulc_train_to_final_norm = float(aulc_train_to_final)
 
+    answer_masked = bool(config.get("eval_answer_masked", False))
     eval_by_len: Dict[int, Dict[str, float]] = {}
     for L in eval_lengths:
         eval_by_len[int(L)] = evaluate_at_length(
@@ -353,6 +400,7 @@ def train_one_model(
             eval_batches=int(config["eval_batches"]),
             batch_size=int(config["eval_batch_size"]),
             device=device,
+            answer_masked=answer_masked,
         )
 
     renyi_diag = compute_dataset_renyi_dimensions(beta=beta, gamma=gamma, seed=seed, config=config)
