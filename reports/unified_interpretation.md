@@ -65,10 +65,11 @@ Reading the axes:
 - **Axis 3 — within-window density vs length (24%).** BPC@32K trades off against
   length: short-but-dense vs long-but-dilute episodes.
 
-Hurst (n=39 subset, grown from 25 — `data/hurst.csv`) is a fourth, weakly-coupled
-axis: ρ(Hurst, H∞) = **−0.03**, ρ(Hurst, α) = −0.16 — long-range dependence is
-largely its own thing, and the H∞-independence *sharpened* as the sample grew
-(was −0.15 at n=25).
+Hurst (n=62 subset, grown from 25 — `data/hurst.csv`) is a fourth, weakly-coupled
+axis: ρ(Hurst, H∞) = **+0.02**, ρ(Hurst, α) = −0.07 — long-range dependence is
+genuinely its own thing, and the H∞-independence *sharpened to ≈0* as the sample
+nearly tripled (was −0.15 at n=25 → −0.03 at n=39 → +0.02 at n=62). What was a
+small-n caveat is now a solid result: Hurst cannot grade content.
 
 ## 3. Each axis is governed by a different property — none of them role
 
@@ -155,7 +156,7 @@ The current axes are all byte-level. The unified frame would be sharpened by a f
    `data/credit_horizon.csv`, n=100; normalized long-range reuse distance = mean
    (last−first)/n_tokens over content words recurring within an episode). **A real
    near-independent axis**, orthogonal to content *and* length (ρ ≤ 0.13 with H∞,
-   α, BPC, turns), and — the key test — **not captured by Hurst** (ρ=−0.29, n=37
+   α, BPC, turns), and — the key test — **not captured by Hurst** (ρ=−0.24, n=60
    after growing Hurst coverage, weak): lexical reuse-span and surprisal-series LRD
    are related but distinct. The
    long-horizon-specific dimension the format-genre stats miss. Crude proxy
