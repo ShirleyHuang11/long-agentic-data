@@ -170,28 +170,34 @@ The current axes are all byte-level. The unified frame would be sharpened by a f
    training set* — the eval-validity sense — remains unmeasured; needs a reference
    corpus.)
 
-## 7. The consolidated frame — ~5 measured dimensions
+## 7. The consolidated frame — ~6 measured dimensions
 
-Putting all 8 measured axes together (`scripts/extended_axes.py`,
-`figures/fig_extended_axes_corr.png`, n=100 corpora with all axes), a PCA shows
-**5 dimensions capture 90% of the variance** (6 reach 96.5%). The Spearman
+Putting all **9 measured axes** together (`scripts/extended_axes.py`,
+`figures/fig_extended_axes_corr.png`, n=58 corpora with *all* axes including the
+grown Hurst), a PCA shows **6 dimensions capture 90% of the variance**. The Spearman
 structure resolves them:
 
 | dimension | markers | independence |
 |---|---|---|
-| 1. content richness | H∞, α (ρ=0.79) | the primary axis |
-| 2. within-window density | BPC@32K | partly separate from #1 (α–BPC only 0.17) |
-| 3. length | turns | **fully orthogonal** (all \|ρ\|≤0.22) |
-| 4. structure / serialization | structure_density | near-orthogonal (max \|ρ\|=0.31) |
-| 5. redundancy / pooling | neardup ≈ scaffold (ρ=0.84) | anti-correlated w/ content, distinct |
-| 6. credit-assignment horizon | reuse_dist | low-variance but near-orthogonal (max \|ρ\|=0.32); not Hurst |
+| 1. content richness | H∞, α (ρ=0.78) | the primary axis |
+| 2. within-window density | BPC@32K | partly separate from #1 (α–BPC 0.26) |
+| 3. length | turns | near-orthogonal (all \|ρ\|≤0.32) |
+| 4. structure / serialization | structure_density | near-orthogonal (max \|ρ\|=0.28) |
+| 5. redundancy / pooling | neardup ≈ scaffold (ρ=0.82) | anti-correlated w/ content, distinct |
+| 6. credit-assignment horizon | reuse_dist | low-variance, near-orthogonal (max \|ρ\|=0.30) |
+| (—) long-range dependence | Hurst (n=62) | near-orthogonal to content (ρ(H∞)=+0.04, ρ(α)=−0.03); mild ρ(length)=0.29 |
+
+*(Caveat: the 9-axis matrix is on the n=58 Hurst-covered subset, which is biased
+toward longer SWE/agent corpora, so some marginals shift vs the full n=100 8-axis
+set — e.g. H∞–length reads −0.24 here vs −0.01 on the full set. The dimensionality
+count and Hurst's content-orthogonality are the stable takeaways.)*
 
 This is the unified interpretation in compact form: **agentic corpora occupy a
-~5–6-dimensional content/format space — and the train/eval role is not one of its
+~6-dimensional content/format space — and the train/eval role is not one of its
 dimensions.** Role re-enters only as a weak loading on #3 (length). The four
 "kinds" of Sec 4 are simply dense regions of this space, defined by content ×
-length × density × redundancy, with structure and credit-horizon as near-free
-extra knobs.
+length × density × redundancy, with structure, credit-horizon, and long-range
+dependence as near-free extra knobs.
 
 The gold *benchmark* metrics (empirical difficulty, discrimination, verifiability)
 require model rollouts or oracle access — they mark the boundary of what a
