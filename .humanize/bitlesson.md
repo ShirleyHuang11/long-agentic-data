@@ -39,3 +39,33 @@ Solution: Gate on the ground-truth structural quantities the knobs directly cont
 Constraints: Validates that knobs MOVE structure monotonically; does not claim the realized exponent equals the nominal one.
 Validation Evidence: knob_verify._run_gate prints β-axis and γ-axis tables with PASS/FAIL on monotonicity.
 Source Rounds: 0
+
+## Lesson: retention-ratio-cheat-guard
+Lesson ID: BL-20260613-retention-guard
+Scope: any length-generalization sweep using retention = acc(L_long)/acc(L_short)
+Problem Description: A (β,γ) cell showed "high retention" (0.30–0.80) suggesting great length
+generalization, but it was an artifact: those cells had low train-length accuracy (0.18–0.31), so
+the small denominator inflated the ratio while ABSOLUTE long-length accuracy was the WORST (0.08–0.20).
+Trusting raw retention would have produced a false "holographic ridge" / false "truncated > holographic".
+Root Cause: retention is a ratio; when the model never learned the task at train length, the ratio is
+dominated by noise/low base rate, not by genuine extrapolation.
+Solution: ALWAYS cheat-guard: (1) only trust retention where train_acc >= ~0.90; (2) always report
+ABSOLUTE long-length accuracy alongside retention; (3) report train_acc as a gate. The genuine signal
+lives in absolute long-length accuracy within the learnable region.
+Constraints: threshold 0.90 is a heuristic; tune per task.
+Validation Evidence: Phase B grid — guarded view removed the small-β/high-γ pseudo-ridge; results/holo_phaseB_grid.md.
+Source Rounds: 0
+
+## Lesson: pure-pytorch-mamba-scan-too-slow
+Lesson ID: BL-20260613-mamba-scan-slow
+Scope: case/phase/model_mamba.py (sequential-scan MambaCausal) in length-gen sweeps
+Problem Description: Mamba eval at L>=1024/2048 with the pure-pytorch sequential scan is prohibitively
+slow (3/12 runs in ~5h); a full 4-anchor×3-seed grid would need ~20h A100. Also undertrained at 2000
+steps (acc@256=0.62<1.0), making Tx-vs-Mamba comparisons unreliable/contradictory across horizons.
+Root Cause: O(L) python loop over timesteps × layers, no CUDA kernel; SSM also needs more steps to fit.
+Solution: Do NOT run pure-pytorch Mamba in long-eval sweeps. For architecture comparisons either (a) cap
+eval length and budget for more steps, or (b) use mamba_ssm CUDA kernels, or (c) cite the prior clean
+N=3 KV result (commit d371e5a). Mark such a control INCONCLUSIVE rather than burning ~20h GPU.
+Constraints: applies to the minimal pure-pytorch scan; CUDA-kernel Mamba is fine.
+Validation Evidence: holo_C_mamba (eval≤2048) + holo_C_mamba_fast (eval≤1024) both stalled at 3/12; cancelled.
+Source Rounds: 0

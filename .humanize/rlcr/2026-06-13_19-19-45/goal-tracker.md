@@ -42,7 +42,7 @@ docs/superpowers/specs/2026-06-13-holographic-length-gen-design.md.
 #### Active Tasks
 | Task | Target AC | Status | Tag | Owner | Notes |
 |------|-----------|--------|-----|-------|-------|
-| Phase C H3 Mamba (fast, eval≤1024) | AC7 | in_progress | coding | claude | job 22709447 kempner; slow scan → fast ladder; finalize H3 when done |
+| (none — all mainline tasks resolved) | - | - | - | - | H3 closed as INCONCLUSIVE (pure-pytorch Mamba too slow + undertrained) |
 
 ### Blocking Side Issues
 | Issue | Discovered Round | Blocking AC | Resolution Path |
@@ -66,6 +66,7 @@ docs/superpowers/specs/2026-06-13-holographic-length-gen-design.md.
 | AC6 | Phase B 6×6 grid + heatmap (H1) | 0 | pending | results/holo_phaseB_grid.md + heatmap.png — flat, ridge is artifact; H1 refuted |
 | AC8 | Phase D 100M + report | 0 | pending | results/holo_phaseD_scale.md — H1 refuted at scale; reports/holo_length_gen.md |
 | AC7 (H2) | holographic vs truncated | 0 | pending | results/holo_phaseC_controls.md — holo>trunc abs acc (trunc retention artifact) |
+| AC7 (H3) | Transformer vs Mamba | 0 | pending | INCONCLUSIVE — pure-pytorch Mamba scan too slow + undertrained; defer to N=3 KV (d371e5a) |
 
 ### Explicitly Deferred
 | Task | Original AC | Deferred Since | Justification | When to Reconsider |

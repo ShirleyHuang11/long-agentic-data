@@ -1,8 +1,11 @@
 # Round 0 Summary — Holographic Length-Generalization
 
-**State: implementation COMPLETE + validated; GPU campaign LAUNCHED; results PENDING.**
-This round is not yet "plan complete" — Phases A–D experiments are running on the
-cluster and analysis/reports (plan Tasks 11–14) follow as results land.
+**State: COMPLETE — implementation + all experiments + analysis + report done.**
+Headline: holographic/edge-of-chaos length-gen hypothesis (H1) is REFUTED for a
+vanilla decoder-only Transformer across Phase A (anchors), Phase B (6×6 grid,
+cheat-guarded), and Phase D (100M). H2 partially supports holo>trunc on absolute
+accuracy. H3 (Mamba) inconclusive (pure-pytorch scan too slow). See
+reports/holo_length_gen.md.
 
 ## What Was Implemented (plan Tasks 1–10, all committed)
 
@@ -42,19 +45,28 @@ Modified: phase_core.py, phase_sweep.py, data_generator.py, .humanize/bitlesson.
    default; long-range retrieval preserved. Gate instrument corrected to verify realized
    structure, not gamma-beta exponents (BL-20260613-gate-instrument).
 
-## Campaign status (Phases A–D) — routed to gpu_test (idle, separate QoS)
-- RUNNING: Phase A anchors ×3 (22532601); grid β=0 row ×3 (22532602).
-- DRAINING (background submitter through the submit cap): full grid ×1 seed,
-  Phase C truncated-long (H2), Phase C Mamba (H3).
-- DEFERRED: Phase D (≥100M) — OOMs on MIG-20GB at L=2048; needs an H100 slot.
+## Results (Phases A–D, all committed to results/ + reports/)
+- **Phase A** (anchors N=3): retention Natural .250 ≈ Abyss .247 > Edge .200 > CoT .187 → Edge NOT best.
+- **Phase B** (6×6 grid, cheat-guarded): flat retention ~.18–.24, no ridge; small-β/high-γ "ridge" is a
+  low-train-acc artifact. Heatmap PNG saved.
+- **Phase D** (100M N=3): same ordering, uniformly higher retention (.26–.33) → H1 refuted at scale.
+- **H2** (holo vs truncated, matched budget): holo > trunc on absolute L=2048 acc (trunc barely learns;
+  its high retention is the same artifact). Partial support for holo's "microcosm > slice".
+- **H3** (Tx vs Mamba): INCONCLUSIVE — pure-pytorch Mamba scan too slow (3/12 in 5h) + undertrained;
+  defer to prior clean N=3 KV result (commit d371e5a). GPU freed.
 
-## Remaining Items (next rounds, plan Tasks 11–14)
-Phase A retention ordering (H1 directional); Phase B heatmap + ridge; Phase C H2/H3
-verdicts; Phase D scale confirmation; consolidated report reports/holo_length_gen.md.
-Blocker: kempner QOSMaxGRESPerUser + ~220 queued cron jobs (QOSMaxSubmitJobPerUserLimit).
+Routing solved: kempner QOSMaxGRESPerUser + ~220 cron jobs (submit cap) → used gpu_test (2-slot QoS)
++ kempner A100 (per user request; backfilled instantly, unblocked Phase D's 40GB need).
+
+## Remaining / follow-ups (not blocking)
+Grid is N=1 (anchors N=3) — could confirm ridge-absence at N=3; H3 needs mamba_ssm CUDA kernel + more
+steps; affine op_kind and a second task family are future work.
 
 ## BitLesson Delta
 Action: add
-Lesson ID(s): BL-20260613-recall-cue, BL-20260613-gate-instrument
+Lesson ID(s): BL-20260613-recall-cue, BL-20260613-gate-instrument,
+BL-20260613-retention-guard, BL-20260613-mamba-scan-slow
 Notes: recall cue makes the compositional AR task well-posed + measurable; verify
-synthetic-data (β,γ) knobs via realized structure, not gamma-beta exponents.
+synthetic-data (β,γ) knobs via realized structure (not gamma-beta exponents);
+cheat-guard retention with train_acc + absolute long-length acc (caught a false
+holographic ridge); pure-pytorch Mamba scan too slow for long-eval sweeps.
