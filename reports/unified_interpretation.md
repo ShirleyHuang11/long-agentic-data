@@ -98,6 +98,17 @@ kinds, by median signature:
 These four kinds — defined by **content × length × density**, not by train/eval —
 are the honest taxonomy of the corpus collection.
 
+**Robustness (`scripts/kinds_robustness.py`, `figures/fig_kinds_profile.png`):**
+re-clustering in the *full 8-axis* space (adding scaffold/structure/neardup/horizon)
+keeps the kinds **role-independent** — every kind still contains TRAIN and EVAL
+corpora — while reshaping the partition moderately (Adjusted Rand Index 0.37 vs the
+4-metric kinds). The reshaping is informative, not noise: the extra axes **split the
+H∞=0 region into two kinds** — *pooled* (scaffold 0.49, neardup 0.30) vs
+*non-pooled* (scaffold 0.13, neardup 0.07) — which is exactly the
+multiple-causes-of-H∞=0 distinction (redundancy/pooling vs low-content/
+non-identifiability) made measurable. The new axes don't overturn the taxonomy;
+they give it the resolution to separate *why* a corpus reads as empty.
+
 ## 5. What this frame can and cannot claim (held-out check)
 
 The associational picture above is robust. But a stronger reading — "these metrics
