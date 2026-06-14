@@ -1,0 +1,20 @@
+__pycache__
+*/__pycache__
+logs
+plot*
+*.sh
+./*.md
+wandb
+
+assets/data-manifold*
+
+bio
+scratch.*
+toy*
+
+# auto-generated outputs from case/phase/ analysis pipeline
+# (always re-derivable from runs/*/run_summary.csv)
+case/phase/runs/
+case/phase/figures/
+case/phase/REPORT_sweep_summary.md
+case/phase/results/predictions_verification.md
