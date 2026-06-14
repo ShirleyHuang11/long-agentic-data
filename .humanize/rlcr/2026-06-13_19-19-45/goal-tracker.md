@@ -42,11 +42,7 @@ docs/superpowers/specs/2026-06-13-holographic-length-gen-design.md.
 #### Active Tasks
 | Task | Target AC | Status | Tag | Owner | Notes |
 |------|-----------|--------|-----|-------|-------|
-| GPU learnability probe (1 cell, holo_small, 2500 steps) | AC2/AC5 | in_progress | coding | claude | job 22513000 gpu_requeue; gate before campaign |
-| Phase A anchors sweep | AC5 | pending | coding | claude | submit after probe confirms learnability |
-| Phase B 6×6 grid + heatmap | AC6 | pending | coding | claude | gate on Phase A ordering |
-| Phase C controls (H2 + H3) | AC7 | pending | coding | claude | |
-| Phase D ≥100M + report | AC8 | pending | coding | claude | |
+| Phase C H3 Mamba (fast, eval≤1024) | AC7 | in_progress | coding | claude | job 22709447 kempner; slow scan → fast ladder; finalize H3 when done |
 
 ### Blocking Side Issues
 | Issue | Discovered Round | Blocking AC | Resolution Path |
@@ -66,6 +62,10 @@ docs/superpowers/specs/2026-06-13-holographic-length-gen-design.md.
 | AC2 | RoPE model + presets + Mamba | 0 | pending | test_model_rope (4); presets build 19.2/101.3/13.4M |
 | AC3 | masked answer-eval + retention CSV | 0 | pending | test_phase_core_masked (2); smoke CSV has retention_ratio |
 | AC4 | knob-verification gate | 0 | pending | knob_verify.py GATE PASS (results/holo_knob_verification.md) |
+| AC5 | Phase A anchors retention (H1) | 0 | pending | results/holo_phaseA_anchors.md — Edge NOT best; H1 refuted directionally |
+| AC6 | Phase B 6×6 grid + heatmap (H1) | 0 | pending | results/holo_phaseB_grid.md + heatmap.png — flat, ridge is artifact; H1 refuted |
+| AC8 | Phase D 100M + report | 0 | pending | results/holo_phaseD_scale.md — H1 refuted at scale; reports/holo_length_gen.md |
+| AC7 (H2) | holographic vs truncated | 0 | pending | results/holo_phaseC_controls.md — holo>trunc abs acc (trunc retention artifact) |
 
 ### Explicitly Deferred
 | Task | Original AC | Deferred Since | Justification | When to Reconsider |
