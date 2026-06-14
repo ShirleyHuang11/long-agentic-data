@@ -13,13 +13,15 @@ from sklearn.decomposition import PCA
 m = pd.read_csv("data/merged_analysis.csv")
 m = m[m["role"].isin(["TRAIN", "EVAL_TASK", "EVAL_TRAJ"])].copy()
 m["log_turns"] = np.log10(m["mean_turns"].clip(lower=1))
-for f in ["scaffold_frac.csv", "structure_density.csv", "neardup.csv"]:
+for f in ["scaffold_frac.csv", "structure_density.csv", "neardup.csv",
+          "credit_horizon.csv"]:
     m = m.merge(pd.read_csv(f"data/{f}"), on="slug", how="left")
 
 AX = ["h_inf", "alpha", "bpc_32768", "log_turns",
-      "scaffold_frac", "structure_density", "neardup"]
+      "scaffold_frac", "structure_density", "neardup", "reuse_dist"]
 LBL = {"h_inf": "H∞", "alpha": "α", "bpc_32768": "BPC@32K", "log_turns": "length",
-       "scaffold_frac": "scaffold", "structure_density": "structure", "neardup": "neardup"}
+       "scaffold_frac": "scaffold", "structure_density": "structure",
+       "neardup": "neardup", "reuse_dist": "horizon"}
 
 df = m.dropna(subset=AX)
 print(f"n={len(df)} corpora with all {len(AX)} axes measured\n")
