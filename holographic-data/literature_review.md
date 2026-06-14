@@ -27,6 +27,13 @@ Detailed sections live in `lit_review/`; this file is the synthesis + the action
 | 5 | Formal math / symbolic / theory of computation | `lit_review/formal_math_symbolic.md` | 23 |
 | 6 | Measurement methods toolbox | `lit_review/methods_toolbox.md` | 31 |
 | 7 | ML architectures (LRD) & scaling-law theory | `lit_review/ml_architecture_scaling.md` | 33 |
+| 8 | Neuroscience & physiology (EEG, avalanches, HRV) | `lit_review/neuro_physiology.md` | 22 |
+| 9 | Econophysics & quantitative finance | `lit_review/econophysics_finance.md` | 22 |
+| 10 | Time-series forecasting & horizon generalization | `lit_review/timeseries_forecasting.md` | 23 |
+| 11 | Linguistics & information theory of language | `lit_review/linguistics_information_theory.md` | 25 |
+| 12 | Theory derivation of α_D & citation verification | `lit_review/theory_derivation_and_verification.md` | — |
+
+*Round 1 = sections 1–7; Round 2 (cross-field deepening) = sections 8–12. ≈315 references total.*
 
 ---
 
@@ -93,7 +100,7 @@ a **mature estimator** or a **conceptual reframing** the project can adopt direc
 | new complexity axis | **MFDFA singularity width Δα** (physics) | one-number multifractality; test "edge-of-chaos ⇔ max Δα" | Kantelhardt 2002 |
 | integrated view | **excess entropy / predictive information** | the formal "max effective complexity" target | Bialek et al. 2001 |
 | length-gen | **finite-size-scaling collapse** of `acc(T)` | reframes `r`; collapse exponent predicted by β | Binder 1981 |
-| α_D derivation | Random Hierarchy Model; RG flow | upgrade α_D from fit to derived law | Cagnetta–Wyart 2307.02129 |
+| α_D derivation | Random Hierarchy Model; RG flow | upgrade α_D from fit to derived law | RHM: Cagnetta et al. PRX 2024, arXiv:2307.02129; analytic power-law correlations: Cagnetta–Wyart NeurIPS 2024, arXiv:2406.00048 |
 | logical depth | report **depth = path_length / fold count** as first-class stat | grounds "holographic" claim | Bennett 1988 |
 
 **Zero-training-cost validation:** β̂ (MI-decay), γ̂ (block-entropy), Ĥ (DFA) can all be
@@ -126,3 +133,77 @@ targets and to characterize real corpora — without training a model.
    MFDFA Δα / predictive information**.
 4. Use the **L²M condition** as the theoretical lens for the Transformer/Mamba/RoPE (δ) study;
    add the `n^γ Lₙ` vs `P/n^{2β}` **scaling-collapse** test from the source paper.
+
+---
+
+## Round 2 — cross-field deepening (sections 8–12)
+
+**Neuroscience & physiology.** The brain-criticality literature is the closest empirical
+analog to the edge-of-chaos hypothesis. Three transfers: **DFA on EEG/MEG** (Linkenkaer-Hansen
+2001) as a second Hurst estimator; **neuronal-avalanche / crackling-noise scaling** (Beggs–Plenz
+2003; Friedman 2012) with the **exponent-relation test** `(α_dur−1)/(τ−1)=1/σνz` — a built-in
+falsifiability check in the spirit of the repo's `verify_predictions.py`; and **Multiscale
+Entropy** (Costa–Goldberger–Peng 2002), which by design *peaks* for structured long-range
+signals and dips for both random and over-regular ones — a better-shaped "max effective
+complexity" probe than the current (monotone) Rényi `D_q`. Strong caution carried over:
+single power laws are necessary-not-sufficient for criticality (Touboul–Destexhe 2017;
+subsampling bias, Wilting–Priesemann 2018) — demand multiple independent signatures + MLE
+power-law fitting (Clauset 2009).
+
+**Econophysics & finance.** The canonical "returns uncorrelated but |returns| long-memory"
+dichotomy (Cont 2001) is the empirical precedent for separating **β (correlation)** from
+**γ (entropy)** axes — run diagnostics on both the raw series and a magnitude/entropy transform.
+**MFDFA singularity-spectrum width Δα** (Kantelhardt 2002) recurs (3rd field to recommend it)
+as the single-scalar complexity measure; **DCCA/MF-DCCA** can *measure* the "Hurst is
+independent of (β,γ)" claim per scale. Critical methodological import: a **multi-estimator
+panel + surrogate/break nulls** (Lo 1991; Granger–Hyung 2004; rough-vol GJR 2018) before
+asserting genuine long memory — rough short-memory and structural breaks both *fake* LRD.
+
+**Time-series forecasting.** The **DLinear** result (Zeng et al. 2022) — a linear map beating
+transformers — is a cautionary control the repo should adopt (a linear/direct read-out ablation
+to separate learned retrieval from autoregressive drift). **β is ARFIMA long-memory in disguise**
+(`p(d)∝d^−(β+1)` ⇒ `H=d+½`), and classical theory predicts small-β horizons are *info-limited
+but flat* — independently corroborating the repo's **refuted H1** (no edge-of-chaos ridge).
+Most actionable untried lever: **patching + a TimesFM-style length curriculum** (dynamic masking
+over mixed train lengths) to attack test-length ≫ train-length directly.
+
+**Linguistics & information theory.** Half a century of language statistics already *defines*
+γ and β: γ = entropy-rate-convergence/**Hilberg exponent**, β = two-symbol **MI-decay**
+(Lin–Tegmark). The cleanest new result: **excess entropy `E=Σ(Hₙ−H∞)` is finite iff γ>1** —
+a principled, model-free location for the weak-vs-strong-LRD boundary (and a candidate anchor
+for "max effective complexity" near γ≈1). Best estimators: **neural-LM cross-entropy `Lₙ(P)`
+at varying context** for γ (Brown 1992 → Cagnetta), and **`‖C(n)‖_op`** for β — cross-checked
+via the `P/n^{2β}`, `n^γ Lₙ` collapse.
+
+**Theory derivation + citation verification.** Verified the anchors live; **one correction**:
+the RHM is the 5-author PRX 2024 paper (Cagnetta, Petrini, Tomasini, Favero, Wyart,
+arXiv:2307.02129); the 2-author *Cagnetta–Wyart* analytic-correlation paper is **arXiv:2406.00048**
+(cite both, different roles). α_D source = Cagnetta, **Raventós**, Ganguli, Wyart (arXiv:2602.07488).
+**Cleanest derivation:** `n*(P) ∝ P^{1/2β}` comes from matching signal `‖C(n)‖²` to the
+`1/P` sample-covariance noise floor — the **factor 2 is the square in a variance-limited
+detection comparison**, not a kinetics constant; then `loss ≈ (n*)^{−γ} = P^{−γ/2β}`. **δ lives
+in the hidden "fast within-horizon learning" assumption** (the gap between data-resolvable and
+model-learned), which is exactly what a Transformer/Mamba/RoPE comparison at fixed (β,γ) isolates.
+
+## Research agenda (synthesized across all 12 sections)
+
+1. **Re-tool the estimators** (zero training cost): R/S → **DFA/MFDFA**; add **MI-decay β̂** and
+   **block/neural-Lₙ γ̂**; relabel Rényi `D_q` as an entropy *rate*; report **MFDFA Δα** and
+   **multiscale entropy** as peaked complexity probes.
+2. **Reframe length-gen as finite-size scaling**: test `acc(T)` data-collapse; predict the
+   collapse exponent from β; collapse fails ⇔ correlation length ξ > T.
+3. **Derive, don't fit, α_D** via the **RHM** with β,γ known in closed form; **measure δ** as each
+   architecture's deviation from the data-optimal exponent (Transformer/Mamba/RoPE at fixed data).
+4. **Harden criticality claims**: multi-estimator panel + surrogate/structural-break nulls +
+   MLE power-law fits + exponent-relation tests before calling anything "critical."
+5. **Ground "holographic" in logical depth / epiplexity**; report depth as a first-class stat;
+   test whether the emergent strip coincides with peak predictive information / Δα / γ≈1.
+
+## Next round (per request: expand to more subjects)
+Planned additional fields: **dynamical-systems & chaos** (Lyapunov, attractor reconstruction,
+recurrence quantification), **complex networks & ecology** (degree/community power laws, network
+RG), **geophysics/climate & hydrology** (Hurst's original Nile work; 1/f climate spectra),
+**music & audio** (1/f in music, Voss–Clarke), **cognitive science & memory** (power-law forgetting,
+serial-recall length effects), and **disordered systems / spin glasses & MaxEnt models of
+sequences** (Ising/Potts inference, direct-coupling analysis). Each adds either an estimator or a
+generative model for (β, γ).
