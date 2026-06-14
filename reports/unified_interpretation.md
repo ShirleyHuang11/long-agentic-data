@@ -170,6 +170,14 @@ The current axes are all byte-level. The unified frame would be sharpened by a f
    training set* — the eval-validity sense — remains unmeasured; needs a reference
    corpus.)
 
+**Proxy validation (`scripts/validate_proxies.py`, `data/proxies_multiep.csv`):**
+all four structural axes were re-measured on ~25 episodes per corpus (reloaded from
+source, n=83) and the many-episode estimates **rank-agree strongly with the
+3-episode cached proxies** — Spearman **0.80** (scaffold) / **0.86** (structure) /
+**0.92** (neardup) / **0.90** (horizon). The 3-episode estimates are therefore
+stable rank-coordinates, not noise: the four axes are promoted from *directional* to
+**validated** (absolute values stay approximate; rankings are reliable).
+
 ## 7. The consolidated frame — ~6 measured dimensions
 
 Putting all **9 measured axes** together (`scripts/extended_axes.py`,
