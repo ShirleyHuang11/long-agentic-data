@@ -1,64 +1,73 @@
 # Goal Tracker
 
-<!--
-This file tracks the ultimate goal, acceptance criteria, and plan evolution.
-It prevents goal drift by maintaining a persistent anchor across all rounds.
-
-RULES:
-- IMMUTABLE SECTION: Do not modify after initialization
-- MUTABLE SECTION: Update each round, but document all changes
-- Every task must be in one of: Active, Completed, or Deferred
-- Deferred items require explicit justification
--->
-
 ## IMMUTABLE SECTION
 <!-- Do not modify after initialization -->
 
 ### Ultimate Goal
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+Build "holographic" synthetic pre-training data + the harness to map the (β,γ)
+phase diagram of **length generalization** (train short/shallow → test long/deep)
+for a vanilla decoder-only Transformer trained with pure next-token prediction,
+locate the holographic/edge-of-chaos band, and test it against two controls
+(holographic-short vs truncated-long; Transformer vs Mamba). Spec:
+docs/superpowers/specs/2026-06-13-holographic-length-gen-design.md.
 
 ### Acceptance Criteria
-<!-- Each criterion must be independently verifiable -->
-<!-- Claude must extract or define these in Round 0 -->
-
-[To be defined by Claude in Round 0 based on the plan]
+- **AC1** Holographic generator (`nested_monoid` task) producing well-posed AR
+  reduction/recall traces with continuous (β,γ) knobs; deterministic; unit-tested.
+- **AC2** Standard decoder-only Transformer (RoPE) trainable via the existing
+  NTP harness on this task; Mamba control available; small + ≥100M presets.
+- **AC3** Answer-masked length-generalization metric (retention =
+  acc(D_long)/acc(D_short)) wired into the sweep CSVs.
+- **AC4** §3.4 knob-verification gate: realized structure tracks (β,γ) monotonically.
+- **AC5** Phase A anchors retention ordering produced (Transformer, grid tier).
+- **AC6** Phase B 6×6 (β,γ) retention heatmap + ridge analysis.
+- **AC7** Phase C controls: H2 (holographic-short vs truncated-long) + H3 (Mamba).
+- **AC8** Phase D ≥100M scale confirmation + consolidated report with H1/H2/H3 verdicts.
 
 ---
 
 ## MUTABLE SECTION
-<!-- Update each round with justification for changes -->
 
 ### Plan Version: 1 (Updated: Round 0)
 
 #### Plan Evolution Log
-<!-- Document any changes to the plan with justification -->
 | Round | Change | Reason | Impact on AC |
 |-------|--------|--------|--------------|
-| 0 | Initial plan | - | - |
+| 0 | Code lives in `case/phase/` as task `nested_monoid` (not new `case/recursion/`) | Follows the existing task-dispatch convention (kv, logical_folding); DRY | none (spec §7 intent preserved) |
+| 0 | Primary model = RoPE (`model_rope.py`), not APE `model.py` | APE far positions untrained → confounds length-gen; spec text said RoPE | strengthens AC2/AC3 |
+| 0 | Generator redesigned: separate-blocks fold → interleaved register machine with **named-op recall cue** (`DEF name idx`/`USE name→result`) | Original was ill-posed (op-application order never encoded) and had no measurable long-range structure; recall cue fixes both (BL-20260613-recall-cue) | required for AC1/AC4 |
+| 0 | Default operator = permutation-pool lookup (`op_kind=perm`), affine optional | Modular affine over in-context params is grokking-hard → unlearnable; isolates length-gen from arithmetic (spec §9) | required for AC2/AC5 |
+| 0 | Gate verifies via realized recall-distance + filler fraction, not `‖C(n)‖`/entropy-decay exponents | gamma-beta exponents unestimable on sparse synthetic streams (fail even on proven KV) (BL-20260613-gate-instrument) | AC4 |
 
 #### Active Tasks
-<!-- Mainline tasks only: each task must directly advance the current round objective and carry routing metadata -->
 | Task | Target AC | Status | Tag | Owner | Notes |
 |------|-----------|--------|-----|-------|-------|
-| [To be populated by Claude based on plan] | - | pending | coding or analyze | claude or codex | mainline task only |
+| GPU learnability probe (1 cell, holo_small, 2500 steps) | AC2/AC5 | in_progress | coding | claude | job 22513000 gpu_requeue; gate before campaign |
+| Phase A anchors sweep | AC5 | pending | coding | claude | submit after probe confirms learnability |
+| Phase B 6×6 grid + heatmap | AC6 | pending | coding | claude | gate on Phase A ordering |
+| Phase C controls (H2 + H3) | AC7 | pending | coding | claude | |
+| Phase D ≥100M + report | AC8 | pending | coding | claude | |
 
 ### Blocking Side Issues
-<!-- Only issues that directly block current mainline progress belong here -->
 | Issue | Discovered Round | Blocking AC | Resolution Path |
 |-------|-----------------|-------------|-----------------|
+| kempner partitions QOSMaxGRESPerUser-capped for this user | 0 | AC5-AC8 | route GPU jobs to SEAS (chen_lab_seas) / gpu_requeue; or kempner_barak_lab |
 
 ### Queued Side Issues
-<!-- Non-blocking issues stay queued and must NOT replace the round objective -->
 | Issue | Discovered Round | Why Not Blocking | Revisit Trigger |
 |-------|-----------------|------------------|-----------------|
+| filler fraction ≈ γ/(γ+(1-γ)·3.5) < γ (per-step convention) | 0 | knob is monotone (matches KV convention); axis uses nominal γ | if phase map needs realized-γ axis |
+| `‖C(n)‖`/γ-decay estimators noisy on synthetic data | 0 | kept as secondary diagnostics only; gate uses structural measures | if a reviewer requires exponent-based verification |
 
 ### Completed and Verified
-<!-- Only move tasks here after Codex verification -->
 | AC | Task | Completed Round | Verified Round | Evidence |
 |----|------|-----------------|----------------|----------|
+| AC1 | nested_monoid generator | 0 | pending | test_nested_monoid (8 tests) pass |
+| AC2 | RoPE model + presets + Mamba | 0 | pending | test_model_rope (4); presets build 19.2/101.3/13.4M |
+| AC3 | masked answer-eval + retention CSV | 0 | pending | test_phase_core_masked (2); smoke CSV has retention_ratio |
+| AC4 | knob-verification gate | 0 | pending | knob_verify.py GATE PASS (results/holo_knob_verification.md) |
 
 ### Explicitly Deferred
-<!-- Items here require strong justification -->
 | Task | Original AC | Deferred Since | Justification | When to Reconsider |
 |------|-------------|----------------|---------------|-------------------|
-
+| (none) | - | - | - | - |

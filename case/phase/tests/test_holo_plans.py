@@ -15,3 +15,9 @@ def test_holo_grid_shape():
     assert betas == [0.0, 0.05, 0.2, 0.5, 1.0, 2.0]
     assert gammas == [0.0, 0.05, 0.2, 0.4, 0.6, 0.8]
     assert len(pl.pairs) == 36
+
+
+def test_holo_grid_at_beta_row():
+    pl = _FACTORIES["holo_grid_at_beta"](OmegaConf.create({"beta": 0.5}))
+    assert {round(b, 3) for b, _ in pl.pairs} == {0.5}
+    assert sorted(round(g, 3) for _, g in pl.pairs) == [0.0, 0.05, 0.2, 0.4, 0.6, 0.8]
