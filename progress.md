@@ -58,20 +58,27 @@ Hurst batch) auto-targeting REGISTRY corpora with α but no β. **Result: 74 add
 above: the principled scaffold-γ bridge is **null** — the +0.13 at n=18 did not
 survive the power increase.
 
-### Which proxy makes sense for γ? (the crux)
-- ❌ **`2βα`** — wrong construct: it's the entropy-decay/content exponent, not a
-  noise rate. Gives backwards results.
-- 🤔 **`scaffold_frac`** — the most defensible *available* proxy (fraction of
-  repeated task-irrelevant filler; anti-content), right construct — but yields a
-  null bridge at n=85.
-- ⚠️ A **content-derived γ** (e.g. 1 − normalized H∞) *would* "work" but only
-  **tautologically** (healthy = dense = low-γ = emergent).
-- 💡 Conclusion: holographic γ is a *generative knob* (signal-vs-noise token split)
-  with **no clean, non-circular observational counterpart** in real corpora — which
-  is the deeper reason the quantitative bridge does not transfer. A proper γ proxy
-  would have to be *constructed* (a within-sequence signal-dilution measure: the
-  fraction of context that fails to reduce next-token uncertainty), not repurposed
-  from an existing axis.
+### Which γ is correct? (resolved from the source paper)
+Reading the source `assets/gamma-beta.pdf` (the paper that derives α_D=γ/2β)
+settles it: **γ is the entropy-decay exponent** — "Hₙ is the next-token conditional
+entropy conditioned on the previous n tokens; Hₙ ≍ n^−γ … the entropy exponent γ
+and the correlation exponent β are strictly properties of the dataset; α_D=γ/(2β)."
+- ✅ **Canonical γ = entropy-decay exponent = our LZ-α** (BPC ≈ conditional entropy,
+  BPC ∼ N^−α). Our framework already uses this correctly (`α_D = α/2β`); we simply
+  named the reference's γ "α".
+- ⚠️ **Holographic `holo.pdf` redefines γ as a *noise/sparsity rate*** ("信息稀疏度/
+  噪声率", `if rand()<γ: insert noise`) — a *generative knob*, not the entropy-decay
+  exponent. Their synthetic phase-diagram axis is this noise-rate, which is **not the
+  canonical γ** — that is the real reason placing real corpora on their diagram was
+  ill-posed.
+- ❌ **`2βα` is wrong** simply because `2βα = 2β·γ ≠ γ` — the correct γ to use is our
+  α itself, no derivation needed.
+- 📌 Correction note: an earlier version of this file (and my reasoning) called the
+  holographic noise-rate γ "canonical" and `scaffold_frac` the construct-correct
+  proxy. That was from reading the holographic *code*, not the source *theory*. The
+  source theory's γ is the entropy-decay exponent (= our LZ-α); the noise-rate is
+  the holographic task's relabeling. `scaffold_frac` is a proxy for the holographic
+  generative knob, not for the canonical γ.
 
 ## Step 4 — sharpen the α_D = γ/2β validation
 
@@ -107,13 +114,15 @@ discordance is the stable message, not the exact coefficient.)
 
 ## Summary
 
-- The two repos genuinely study the **same (β, γ) structure**, but a naive
-  quantitative bridge via the shared `α=γ/2β` formula **does not work** — the two
-  γ's are different constructs (noise rate vs entropy-decay exponent).
-- A **principled** bridge (holographic noise-γ ↔ measured `scaffold_frac`) had the
-  right sign at n=18 but **collapsed to null at n=85** (learnability↔H∞ = −0.03).
-  The holographic boundary does **not** transfer to predicting real-corpus health.
-  Root cause: γ is a generative knob with no clean, non-circular real-corpus proxy.
+- The two repos genuinely share **β**, and the **canonical γ** (per the source
+  paper `gamma-beta.pdf`) is the **entropy-decay exponent = our LZ-α** — which our
+  framework already uses correctly (`α_D=α/2β`). The clash is that the **holographic
+  synthetic task relabels γ as a noise rate** (a generative knob), so its
+  phase-diagram axis is *not* the canonical γ.
+- Trying to place real corpora on the holographic *noise-rate* axis is therefore
+  ill-posed; the best available noise-rate proxy (`scaffold_frac`) gives a **null**
+  bridge at n=85. But this is a limitation of *their diagram's axis choice*, not of
+  the canonical γ — which is in hand (LZ-α).
 - α_D=γ/2β is a **controlled-setting law**; real corpora violate the control
   (uncontrolled content, pooling, tiny model / narrow D), which **explains** the
   loose validation rather than excusing it.
