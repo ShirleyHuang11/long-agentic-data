@@ -11,10 +11,18 @@ import lz_oracle
 import score_agentic_datasets as sad
 from measure_hurst import surprisal_series, rs_hurst, WINDOWS
 
+# proactively skip loaders that error (datasets/Arrow metadata) or OOM-crash the
+# process uncaught (large nemotron shards) — keeps the batch from aborting
+SKIP = {
+    "app1-agentic-safety-sft", "factory-agent-task-rollouts",
+    "nemotron-rl-conv-tool-pivot", "nemotron-rl-injection-v1",
+    "nemotron-rl-swe-pivot", "nemotron-sft-v2-interactive",
+    "nemotron-sft-v2-search", "nemotron-sft-v2-tool", "opencua-text",
+}
 have_hurst = {r["slug"] for r in csv.DictReader(open("data/hurst.csv"))}
 have_reuse = {r["slug"] for r in csv.DictReader(open("data/credit_horizon.csv"))}
 reg_by_slug = {t[4]: t for t in sad.REGISTRY}
-todo = sorted((set(reg_by_slug) & have_reuse) - have_hurst)
+todo = sorted((set(reg_by_slug) & have_reuse) - have_hurst - SKIP)
 print(f"{len(todo)} corpora to attempt\n", flush=True)
 
 out = "data/hurst.csv"

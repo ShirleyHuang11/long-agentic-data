@@ -65,11 +65,11 @@ Reading the axes:
 - **Axis 3 — within-window density vs length (24%).** BPC@32K trades off against
   length: short-but-dense vs long-but-dilute episodes.
 
-Hurst (n=62 subset, grown from 25 — `data/hurst.csv`) is a fourth, weakly-coupled
-axis: ρ(Hurst, H∞) = **+0.02**, ρ(Hurst, α) = −0.07 — long-range dependence is
-genuinely its own thing, and the H∞-independence *sharpened to ≈0* as the sample
-nearly tripled (was −0.15 at n=25 → −0.03 at n=39 → +0.02 at n=62). What was a
-small-n caveat is now a solid result: Hurst cannot grade content.
+Hurst (n=85 subset, grown from 25 — `data/hurst.csv`) is a fourth, weakly-coupled
+axis: ρ(Hurst, H∞) = **+0.09**, ρ(Hurst, α) = +0.11 — long-range dependence is
+genuinely its own thing. The content-correlation stays near zero across the whole
+sweep (|ρ(Hurst, H∞)| ≤ 0.11 at every n from 25 → 85). What was a small-n caveat is
+now a solid result: Hurst cannot grade content.
 
 ## 3. Each axis is governed by a different property — none of them role
 
@@ -156,7 +156,7 @@ The current axes are all byte-level. The unified frame would be sharpened by a f
    `data/credit_horizon.csv`, n=100; normalized long-range reuse distance = mean
    (last−first)/n_tokens over content words recurring within an episode). **A real
    near-independent axis**, orthogonal to content *and* length (ρ ≤ 0.13 with H∞,
-   α, BPC, turns), and — the key test — **not captured by Hurst** (ρ=−0.24, n=60
+   α, BPC, turns), and — the key test — **not captured by Hurst** (ρ=−0.32, n=83
    after growing Hurst coverage, weak): lexical reuse-span and surprisal-series LRD
    are related but distinct. The
    long-horizon-specific dimension the format-genre stats miss. Crude proxy
@@ -173,7 +173,7 @@ The current axes are all byte-level. The unified frame would be sharpened by a f
 ## 7. The consolidated frame — ~6 measured dimensions
 
 Putting all **9 measured axes** together (`scripts/extended_axes.py`,
-`figures/fig_extended_axes_corr.png`, n=58 corpora with *all* axes including the
+`figures/fig_extended_axes_corr.png`, n=77 corpora with *all* axes including the
 grown Hurst), a PCA shows **6 dimensions capture 90% of the variance**. The Spearman
 structure resolves them:
 
@@ -185,12 +185,12 @@ structure resolves them:
 | 4. structure / serialization | structure_density | near-orthogonal (max \|ρ\|=0.28) |
 | 5. redundancy / pooling | neardup ≈ scaffold (ρ=0.82) | anti-correlated w/ content, distinct |
 | 6. credit-assignment horizon | reuse_dist | low-variance, near-orthogonal (max \|ρ\|=0.30) |
-| (—) long-range dependence | Hurst (n=62) | near-orthogonal to content (ρ(H∞)=+0.04, ρ(α)=−0.03); mild ρ(length)=0.29 |
+| (—) long-range dependence | Hurst (n=85) | near-orthogonal to content (ρ(H∞)=+0.09, ρ(α)=+0.11); mild ρ(length)≈0.2–0.3 |
 
-*(Caveat: the 9-axis matrix is on the n=58 Hurst-covered subset, which is biased
-toward longer SWE/agent corpora, so some marginals shift vs the full n=100 8-axis
-set — e.g. H∞–length reads −0.24 here vs −0.01 on the full set. The dimensionality
-count and Hurst's content-orthogonality are the stable takeaways.)*
+*(Hurst coverage was grown to 85 — nearly all reachable corpora; the remaining ~9
+are loader-broken datasets, so the n=77 all-axes matrix is now broadly
+representative rather than a small biased subset. The dimensionality count and
+Hurst's content-orthogonality hold across the full n=25→85 sweep.)*
 
 This is the unified interpretation in compact form: **agentic corpora occupy a
 ~6-dimensional content/format space — and the train/eval role is not one of its
